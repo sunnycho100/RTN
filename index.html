@@ -130,6 +130,11 @@ details.step summary:hover .t { color: var(--accent); }
 @media (max-width: 760px) { .tiles { grid-template-columns: 1fr; } }
 .tiles h3 { margin: 14px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
 .tiles p { margin: 0; color: var(--dim); font-size: 16px; }
+.also { margin: 48px 0 16px; font: 600 15px/1 var(--mono); color: var(--dim); letter-spacing: 0.06em; text-transform: uppercase; }
+.tiles.small { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.tiles.small h3 { font-size: 17px; margin-top: 10px; }
+@media (max-width: 760px) { .tiles.small { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.clip.wide video { aspect-ratio: 16 / 9; }
 
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 32px; align-items: start; }
 @media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
@@ -259,16 +264,35 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
 
   <section class="block wrap" id="robots">
     <h2 class="sec">Robots we can place</h2>
-    <p class="lede">Any robot with a simulation model. These run in our scenes today or are next.</p>
+    <p class="lede">Any robot with a simulation model. These already run in MuJoCo or Isaac Sim.</p>
     <div class="tiles">
       <div><figure class="clip"><video data-src="media/walk.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>MuJoCo</figcaption></figure>
-        <h3>G1 walking</h3><p>Walks reconstructed scenes and stops at the walls.</p></div>
-      <div><figure class="clip"><video data-src="media/coop_carry.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>MuJoCo, two 23-DoF G1s</figcaption></figure>
-        <h3>Two G1s, one box</h3><p>Two full-body humanoids carry one box together.</p></div>
-      <div><figure class="clip"><video data-src="media/panda.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>MuJoCo render, scripted motion</figcaption></figure>
-        <h3>Arm pick and place</h3><p>A vision-language model drives an arm through skill calls.</p></div>
-      <div><figure class="clip"><video data-src="media/go2.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>MuJoCo render, scripted gait</figcaption></figure>
-        <h3>Quadrupeds</h3><p>Go1 and Go2 for patrol and inspection routes.</p></div>
+        <h3>G1 walking in a scanned room</h3><p>Walks a reconstructed scene and stops at the walls.</p></div>
+      <div><figure class="clip"><video data-src="media/coop_carry.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>MuJoCo</figcaption></figure>
+        <h3>Two G1s, one box</h3><p>Two full-body humanoids squeeze one box and carry it together.</p></div>
+      <div><figure class="clip"><video data-src="media/h1_photoreal_room.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>H1 in a photoreal scanned room</h3><p>A humanoid walking policy inside a real scanned space.</p></div>
+      <div><figure class="clip"><video data-src="media/h1_warehouse.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>H1 in a warehouse</h3><p>The same policy on a warehouse floor.</p></div>
+      <div><figure class="clip"><video data-src="media/ur10_palletizing.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>Palletizing</h3><p>A UR10 stacking cases onto a pallet.</p></div>
+      <div><figure class="clip"><video data-src="media/ur10e_pick_place_cumotion.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>Pick and place</h3><p>A UR10e with a Robotiq gripper, planned with cuMotion.</p></div>
+      <div><figure class="clip"><video data-src="media/franka_policy.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>Arm policy</h3><p>A Franka arm running a learned policy.</p></div>
+      <div><figure class="clip"><video data-src="media/coohoi_twoagent.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Gym, early run</figcaption></figure>
+        <h3>Humanoid box carry</h3><p>CooHOI box handling, an early training run.</p></div>
+    </div>
+    <h3 class="also">Also running</h3>
+    <div class="tiles small">
+      <div><figure class="clip"><video data-src="media/h2.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>Unitree H2</h3></div>
+      <div><figure class="clip"><video data-src="media/spot.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>Spot</h3></div>
+      <div><figure class="clip"><video data-src="media/go2.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>Go2</h3></div>
+      <div><figure class="clip"><video data-src="media/anymal.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>ANYmal</h3></div>
     </div>
   </section>
 
@@ -307,7 +331,7 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
 
 <footer class="wrap mono">
   <span>robosim · working name · draft</span>
-  <span>All clips are ours. Arm and quadruped motion is scripted for now; real policy runs replace it.</span>
+  <span>All clips are our own MuJoCo and Isaac Sim runs. Placeholders until the final pipeline renders replace them.</span>
 </footer>
 
 <script src="scan.js"></script>
