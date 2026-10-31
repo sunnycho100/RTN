@@ -32,6 +32,7 @@ All clips are our own runs. None come from other companies' sites.
 | `h1_photoreal_room.mp4`, `h1_warehouse.mp4`, `h2.mp4`, `spot.mp4`, `go2.mp4`, `anymal.mp4` | Isaac Sim locomotion runs |
 | `ur10_palletizing.mp4`, `ur10e_pick_place_cumotion.mp4`, `franka_policy.mp4` | Isaac Sim manipulation runs |
 | `coohoi_twoagent.mp4` | CooHOI box handling, early training run |
+| `factory_workflow.mp4` | Factory workflow simulation: metal shop, 15 robots (15 s cut) |
 
 The Isaac Sim clips use NVIDIA's sample robot and environment assets.
 
