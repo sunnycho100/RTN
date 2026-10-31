@@ -135,6 +135,9 @@ details.step summary:hover .t { color: var(--accent); }
 .tiles.small h3 { font-size: 17px; margin-top: 10px; }
 @media (max-width: 760px) { .tiles.small { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .clip.wide video { aspect-ratio: 16 / 9; }
+#industry .tiles { margin-top: 40px; }
+.cap-h { margin: 16px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
+.cap-p { margin: 0; color: var(--dim); font-size: 16px; max-width: 70ch; }
 
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 32px; align-items: start; }
 @media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
@@ -305,8 +308,15 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
 
   <section class="block wrap" id="industry">
     <h2 class="sec">A whole floor, not one cell.</h2>
-    <p class="lede">A metal shop with 15 robots, simulated as one workflow.</p>
-    <figure class="clip wide"><video data-src="media/factory_workflow.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Factory workflow simulation, top-down</figcaption></figure>
+    <p class="lede">Whole lines and factories, simulated before anything is installed.</p>
+    <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Seohee's MuJoCo run, rendered in Isaac Sim. Depot warehouse by roqsim, CC BY 4.0</figcaption></figure>
+    <h3 class="cap-h">20 robots in one metal shop</h3><p class="cap-p">G1 pairs carry crates and a welded T-frame, next to arm cells, couriers and two Spots, run by a production scheduler.</p>
+    <div class="tiles">
+      <div><figure class="clip"><video data-src="media/carda_line.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Kinematic replay. Motion capture from CarDA, CC BY 4.0</figcaption></figure>
+        <h3>Car-door line</h3><p>Three stations, cobots on tracks driving screws next to a worker, with the separation distance shown live. The UR10e stands in for the study's Doosan M0617.</p></div>
+      <div><figure class="clip"><video data-src="media/factory_workflow.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Factory workflow simulation, top-down</figcaption></figure>
+        <h3>Metal shop workflow</h3><p>15 robots moving parts between stations, simulated as one workflow.</p></div>
+    </div>
   </section>
 
   <section class="block wrap" id="trust">
@@ -344,7 +354,7 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
 
 <footer class="wrap mono">
   <span>robosim · working name · draft</span>
-  <span>All clips are our own MuJoCo and Isaac Sim runs. Placeholders until the final pipeline renders replace them.</span>
+  <span>All clips are our own MuJoCo and Isaac Sim runs. CarDA motion data and the Depot warehouse (roqsim) are CC BY 4.0.</span>
 </footer>
 
 <script src="scan.js"></script>
