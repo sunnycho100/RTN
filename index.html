@@ -131,7 +131,7 @@ details.step summary:hover .t { color: var(--accent); }
 .tiles h3 { margin: 14px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
 .tiles p { margin: 0; color: var(--dim); font-size: 16px; }
 .also { margin: 48px 0 16px; font: 600 15px/1 var(--mono); color: var(--dim); letter-spacing: 0.06em; text-transform: uppercase; }
-.tiles.small { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.tiles.small { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
 .tiles.small h3 { font-size: 17px; margin-top: 10px; }
 @media (max-width: 760px) { .tiles.small { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .clip.wide video { aspect-ratio: 16 / 9; }
@@ -279,10 +279,7 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
         <h3>Palletizing</h3><p>A UR10 stacking cases onto a pallet.</p></div>
       <div><figure class="clip"><video data-src="media/ur10e_pick_place_cumotion.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
         <h3>Pick and place</h3><p>A UR10e with a Robotiq gripper, planned with cuMotion.</p></div>
-      <div><figure class="clip"><video data-src="media/franka_policy.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
-        <h3>Arm policy</h3><p>A Franka arm running a learned policy.</p></div>
-      <div><figure class="clip"><video data-src="media/coohoi_twoagent.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Gym, early run</figcaption></figure>
-        <h3>Humanoid box carry</h3><p>CooHOI box handling, an early training run.</p></div>
+      <!-- private-tiles: the share link adds CooHOI clips here (tools/build_artifact.py) -->
     </div>
     <h3 class="also">Also running</h3>
     <div class="tiles small">
@@ -294,6 +291,8 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
         <h3>Go2</h3></div>
       <div><figure class="clip"><video data-src="media/anymal.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
         <h3>ANYmal</h3></div>
+      <div><figure class="clip"><video data-src="media/franka_policy.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Isaac Sim</figcaption></figure>
+        <h3>Franka arm</h3></div>
     </div>
   </section>
 

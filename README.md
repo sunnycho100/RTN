@@ -33,10 +33,11 @@ All clips are our own runs. None come from other companies' sites.
 | `walk.mp4`, `coop_carry.mp4` | MuJoCo: G1 walking in a reconstructed scene, two G1s carrying one box |
 | `h1_photoreal_room.mp4`, `h1_warehouse.mp4`, `h2.mp4`, `spot.mp4`, `go2.mp4`, `anymal.mp4` | Isaac Sim locomotion runs |
 | `ur10_palletizing.mp4`, `ur10e_pick_place_cumotion.mp4`, `franka_policy.mp4` | Isaac Sim manipulation runs |
-| `coohoi_twoagent.mp4` | CooHOI box handling, early training run |
 | `factory_workflow.mp4` | Factory workflow simulation: metal shop, 15 robots (15 s cut) |
 
 The Isaac Sim clips use NVIDIA's sample robot and environment assets.
+
+CooHOI clips (NeurIPS 2024, no license file) are never committed. They sit in the git-ignored `private/` folder with a `tiles.html` snippet, and `tools/build_artifact.py` adds them to the private share link only.
 
 ## Status
 

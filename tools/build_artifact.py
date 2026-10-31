@@ -20,6 +20,11 @@ def placeholder(m):
 body = re.sub(r'(src="[^"?]+)\?v=\d+"', r'\1"', body)  # cache-busting query is for local serving; artifact files are versioned
 body, n = re.subn(r'<video data-src="https://([^/"]+)/[^"]*"[^>]*></video>', placeholder, body)
 
+# Clips without a license for public use (CooHOI) live in the git-ignored private/ folder and only go on the share link.
+tiles = os.path.join(site, "private", "tiles.html")
+if os.path.exists(tiles):
+    body = re.sub(r"\s*<!-- private-tiles:[^>]*-->", "\n" + open(tiles).read().rstrip(), body)
+
 os.makedirs(os.path.join(site, "dist"), exist_ok=True)
 out = os.path.join(site, "dist", name)
 open(out, "w").write(head.strip() + "\n" + body.strip() + "\n")

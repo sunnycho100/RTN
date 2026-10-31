@@ -2,3 +2,4 @@
 dist/
 .claude/
 __pycache__/
+private/
