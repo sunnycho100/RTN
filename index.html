@@ -194,7 +194,7 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
         <div class="cap"><h2><span class="no">04</span>Every shape is checked against the scan.</h2><p>Points far from any shape mean the scene is wrong there.</p>
           <div class="stat" id="stat-check"></div>
           <div class="legend mono"><span style="color: var(--accent)">under 5 cm</span><span style="color: var(--mid)">5 to 15 cm</span><span style="color: var(--hot)">over 15 cm</span></div></div>
-        <div class="cap"><h2><span class="no">05</span>Your robots do the job here.</h2><p>Placeholder figures until the G1 motion is exported.</p></div>
+        <div class="cap"><h2><span class="no">05</span>Your robots do the job here.</h2><p>Two G1s carry a box, an arm works a scanned table, a Go2 patrols.</p><div class="stat">G1s from a MuJoCo policy run · arm and Go2 motion scripted</div></div>
         <div class="cap"><h2><span class="no">06</span>Know before you buy.</h2><p>Whether it works, how fast, and what it costs. Then one site at a time.</p></div>
       </div>
       <div class="rail" id="rail" aria-label="Story steps">
@@ -342,6 +342,7 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
 </footer>
 
 <script src="scan.js"></script>
-<script src="engine.js?v=3"></script>
+<script src="robots.js"></script>
+<script src="engine.js?v=5"></script>
 </body>
 </html>

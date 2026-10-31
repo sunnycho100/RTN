@@ -243,29 +243,49 @@ var capsEl = Array.prototype.slice.call(document.querySelectorAll('.cap')), rail
 var verdictEl = document.getElementById('verdict'), storyOn = false, tShown = 0;
 var KEYS = [  // camera at the start of each stage, and the final pull-back
   { yaw: -2.3, pitch: 0.62, dist: 8.2 }, { yaw: -1.7, pitch: 0.66, dist: 7.6 }, { yaw: -1.1, pitch: 0.8, dist: 8.0 },
-  { yaw: -0.6, pitch: 1.0, dist: 8.2 }, { yaw: -0.25, pitch: 0.55, dist: 5.6 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
+  { yaw: -0.6, pitch: 1.0, dist: 8.2 }, { yaw: -0.3, pitch: 0.38, dist: 3.7 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
 function storyT() { var span = story.offsetHeight - innerHeight; return clamp(-story.getBoundingClientRect().top / span, 0, 1) * 6; }
 railBtns.forEach(function (b) { b.addEventListener('click', function () {
   var span = story.offsetHeight - innerHeight; scrollTo({ top: story.offsetTop + span * (+b.dataset.stage + 0.5) / 6, behavior: REDUCED ? 'auto' : 'smooth' }); }); });
 
 var spawn = [S.spawn[0] / 100 - OX, S.spawn[1] / 100 - OY];
-function figure(ctx, v, x, y, dir, ph, a, dpr) {   // line humanoid, G1-sized (1.3 m), walking toward dir
-  var c = Math.cos(dir), s = Math.sin(dir), L = function (f, side, z) { return [x + c * f - s * side, y + s * f + c * side, z]; };
-  var sw = Math.sin(ph) * 0.28, l1 = Math.max(0, Math.cos(ph)) * 0.08, l2 = Math.max(0, -Math.cos(ph)) * 0.08;
-  ctx.strokeStyle = rgba(C.ink, a); ctx.lineWidth = 1.6 * dpr; ctx.beginPath();
-  seg(ctx, v, L(0, 0.1, 0.72), L(0, -0.1, 0.72)); seg(ctx, v, L(0, 0, 0.72), L(0, 0, 1.12)); seg(ctx, v, L(0, 0.17, 1.1), L(0, -0.17, 1.1));
-  seg(ctx, v, L(0, 0.1, 0.72), L(sw * 0.5, 0.1, 0.38 + l1)); seg(ctx, v, L(sw * 0.5, 0.1, 0.38 + l1), L(sw, 0.1, l1));
-  seg(ctx, v, L(0, -0.1, 0.72), L(-sw * 0.5, -0.1, 0.38 + l2)); seg(ctx, v, L(-sw * 0.5, -0.1, 0.38 + l2), L(-sw, -0.1, l2));
-  ctx.stroke();
-  if (proj(v, x, y, 1.25)) { ctx.beginPath(); ctx.arc(P[0], P[1], Math.max(2, 0.08 * v.f / P[2]), 0, TAU); ctx.stroke(); }
-  var sa = L(0, 0.17, 1.1), sb = L(0, -0.17, 1.1);
-  return [sa, sb];
+
+/* Robots (robots.js): points on each body plus body poses per frame, exported from MuJoCo by tools/export_robots.py.
+   coop is the real two-G1 carry run; arm and quad are scripted stand-ins. */
+var BOTS = null;
+if (window.ROBOTS) {
+  BOTS = {};
+  Object.keys(window.ROBOTS).forEach(function (k) {
+    var r = window.ROBOTS[k];
+    BOTS[k] = { fps: r.fps, n: r.frames, f: r.f, bodies: r.bodies.map(function (b) { return { p: Float32Array.from(b.p, function (x) { return x / 1000; }), c: b.c }; }) };
+  });
+  // The arm sits on the largest table-height clutter piece in the scan, so it works a real surface.
+  var table = null;
+  boxes.forEach(function (b) { var top = b.cz + b.hz; if (!b.wall && top > 0.55 && top < 1.05 && b.hx > 0.15 && b.hy > 0.15 && (!table || b.hx * b.hy > table.hx * table.hy)) table = b; });
+  BOTS.arm.at = table ? [table.cx, table.cy, table.cz + table.hz] : [spawn[0] - 1.2, spawn[1] - 1.0, 0];
 }
+function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a) {
+  var fr = R.f[frame], cy = Math.cos(yaw), sy = Math.sin(yaw), cols = [rgba(C.ink, a), rgba(C.acc, a)];
+  R.bodies.forEach(function (b, bi) {
+    var o = bi * 7, px = fr[o] / 1000, py = fr[o + 1] / 1000, pz = fr[o + 2] / 1000;
+    var qw = fr[o + 3] / 1000, qx = fr[o + 4] / 1000, qy = fr[o + 5] / 1000, qz = fr[o + 6] / 1000, p = b.p;
+    ctx.fillStyle = cols[b.c];
+    for (var j = 0; j < p.length; j += 3) {
+      var lx = p[j], ly = p[j + 1], lz = p[j + 2];
+      var tx = 2 * (qy * lz - qz * ly), ty = 2 * (qz * lx - qx * lz), tz = 2 * (qx * ly - qy * lx);   // rotate by the body quaternion
+      var wx = lx + qw * tx + (qy * tz - qz * ty) + px, wy = ly + qw * ty + (qz * tx - qx * tz) + py, wz = lz + qw * tz + (qx * ty - qy * tx) + pz;
+      if (!proj(v, ox + cy * wx - sy * wy, oy + sy * wx + cy * wy, oz + wz)) continue;
+      var s = clamp(0.022 * v.f / P[2], 1, 3.4); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
+    }
+  });
+}
+function pingpong(R, sec) { var k = Math.floor(sec * R.fps) % (2 * R.n - 2); return k < R.n ? k : 2 * R.n - 2 - k; }
 function drawStory(now) {
   var dpr = fit(simCv), W = simCv.width, H = simCv.height, ctx = simCv.getContext('2d'), so = SMALL ? CFG.storySmall : CFG.story;
   tShown += (storyT() - tShown) * (REDUCED ? 1 : 0.14); var t = tShown;
   var a = Math.min(5, Math.floor(t)), u = smooth(0, 1, t - a), K0 = KEYS[a], K1 = KEYS[a + 1];
-  var v = view(W, H, { tx: 0, ty: 0, tz: a === 5 ? 0.4 : 0.7, yaw: K0.yaw + (K1.yaw - K0.yaw) * u + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03),
+  var focus = BOTS ? smooth(4, 4.35, t) * (1 - smooth(5, 5.35, t)) : 0;   // stage 05 looks at the robots
+  var v = view(W, H, { tx: focus * (spawn[0] - 0.7), ty: focus * (spawn[1] - 0.5), tz: a === 5 ? 0.4 : 0.7, yaw: K0.yaw + (K1.yaw - K0.yaw) * u + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03),
     pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch, dist: K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
   ctx.clearRect(0, 0, W, H);
 
@@ -311,14 +331,12 @@ function drawStory(now) {
     ctx.beginPath(); q.forEach(function (c) { seg(ctx, v, o, c); }); seg(ctx, v, q[0], q[1]); seg(ctx, v, q[1], q[3]); seg(ctx, v, q[3], q[2]); seg(ctx, v, q[2], q[0]); ctx.stroke();
   }
 
-  if (robots > 0) {   // two figures carrying one box from the spawn point (placeholder for the real G1 run)
-    var tt = REDUCED ? 0 : now, along = (Math.sin(tt / 2600) + 1) / 2, dir = Math.cos(tt / 2600) >= 0 ? Math.PI : 0;
-    var bx = spawn[0] - along * 2.0, by = spawn[1], ph = tt / 190;
-    var s1 = figure(ctx, v, bx, by + 0.42, dir, ph, 0.95 * robots, dpr), s2 = figure(ctx, v, bx, by - 0.42, dir, ph + Math.PI, 0.95 * robots, dpr);
-    var near = function (sh) { return Math.abs(sh[0][1] - by) < Math.abs(sh[1][1] - by) ? sh[0] : sh[1]; };
-    ctx.strokeStyle = rgba(C.acc, robots); ctx.lineWidth = 1.6 * dpr; ctx.beginPath();
-    boxEdges(ctx, v, { cx: bx, cy: by, cz: 0.86, hx: 0.18, hy: 0.24, hz: 0.13, c: 1, s: 0 }, 0, 0);
-    seg(ctx, v, near(s1), [bx, by + 0.24, 0.86]); seg(ctx, v, near(s2), [bx, by - 0.24, 0.86]); ctx.stroke();
+  if (robots > 0 && BOTS) {   // the real two-G1 carry at the spawn point, an arm on a scanned table, a Go2 patrolling
+    var sec = REDUCED ? 0 : now / 1000, ra = 0.95 * robots * (1 - 0.5 * fac);
+    drawBot(ctx, v, BOTS.coop, pingpong(BOTS.coop, sec), spawn[0], spawn[1] - 0.3, 0, Math.PI / 2, ra);
+    drawBot(ctx, v, BOTS.arm, Math.floor(sec * BOTS.arm.fps) % BOTS.arm.n, BOTS.arm.at[0], BOTS.arm.at[1], BOTS.arm.at[2], 2.4, ra);
+    var along = (Math.sin(sec / 4) + 1) / 2, back = Math.cos(sec / 4) < 0;
+    drawBot(ctx, v, BOTS.quad, Math.floor(sec * BOTS.quad.fps) % BOTS.quad.n, spawn[0] - 0.4 - along * 2.6, spawn[1] - 1.3, 0, back ? 0 : Math.PI, ra);
   }
 
   var cur = Math.min(5, Math.floor(clamp(t, 0, 5.999)));
