@@ -32,7 +32,7 @@ All clips are our own runs. None come from other companies' sites.
 | `capture.mp4` | The floor4 scan's camera frames |
 | `process_film.mp4` | Process film of the same scan, video frames to a walking G1 (Mac render; clean walls and camera moves are styling) |
 | `walk.mp4` | MuJoCo: G1 walking in a reconstructed scene |
-| `g1coop_factory.mp4` | Seohee's 20-robot factory: her MuJoCo run rendered in Isaac Sim (visual port, MuJoCo decides all motion) |
+| `g1coop_factory.mp4` | Seohee's 20-robot factory, v2 with realistic loads (welded T-frame, steel sheet bundle, KLT tote): her MuJoCo run rendered in Isaac Sim (visual port, MuJoCo decides all motion) |
 | `carda_line.mp4` | Car-door line, option C: kinematic replay, UR10e as a visual stand-in for the Doosan M0617 |
 | `factory_workflow.mp4` | Factory workflow simulation: metal shop, 15 robots (15 s cut) |
 
