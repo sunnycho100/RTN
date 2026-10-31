@@ -111,11 +111,12 @@ function boxEdges(ctx, v, b, dx, dy) {
 
 /* Points drawn in buckets (color × alpha level) so the canvas changes fillStyle only a few dozen times per frame. */
 var LEVELS = 8, buckets = [], COLS = [C.ink, C.acc, C.mid, C.hot];
-function drawPoints(ctx, v, pick, size, dx, dy, step) {
+function drawPoints(ctx, v, pick, size, dx, dy, step, xs, ys, zs) {
+  xs = xs || X; ys = ys || Y; zs = zs || Z;
   var nb = 4 * LEVELS; for (k = 0; k < nb; k++) (buckets[k] || (buckets[k] = [])).length = 0;
   for (i = 0; i < N; i += step) {
     var r = pick(i); if (!r) continue;               // r = colorIndex * 16 + alphaLevel (1..8)
-    if (!proj(v, X[i] + dx, Y[i] + dy, Z[i])) continue;
+    if (!proj(v, xs[i] + dx, ys[i] + dy, zs[i])) continue;
     var s = clamp(size * v.f / P[2], 0.8, 3.2);
     buckets[(r >> 4) * LEVELS + (r & 15) - 1].push(P[0] - s / 2, P[1] - s / 2, s);
   }
@@ -155,6 +156,15 @@ var dome = (function () {
 })();
 
 var heroCv = document.getElementById('hero'), heroOn = true, heroT0 = performance.now();
+/* Intro: every point starts on a shell around the room and flies to its place, then two H1s fade in. */
+var HX = new Float32Array(N), HY = new Float32Array(N), HZ = new Float32Array(N), SX = new Float32Array(N), SY = new Float32Array(N), SZ = new Float32Array(N), DEL = new Float32Array(N);
+(function () {
+  var seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }, R0 = Math.max(RW, RD) * 0.75;
+  for (i = 0; i < N; i++) {
+    var th = rnd() * TAU, ph = Math.acos(2 * rnd() - 1);
+    SX[i] = R0 * Math.sin(ph) * Math.cos(th); SY[i] = R0 * Math.sin(ph) * Math.sin(th); SZ[i] = 0.9 + R0 * Math.cos(ph); DEL[i] = rnd() * 0.4;
+  }
+})();
 /* Drag the dome with a mouse or a finger: horizontal turns it, vertical tilts it, and it coasts a little after release.
    Touch keeps vertical swipes for page scrolling (touch-action: pan-y), so on phones a drag only turns it. */
 var drag = { yaw: 0, pitch: 0, vy: 0, vp: 0, down: false, x: 0, y: 0 };
@@ -199,7 +209,20 @@ function drawHero(now) {
     }
   });
   ctx.lineWidth = dpr;
-  drawPoints(ctx, v, function (i) { return lvl(0.35 + 0.07 * SH[i]); }, 0.022, 0, 0, SMALL ? 2 : 1);
+  var fp = REDUCED ? 1 : clamp((t - 300) / 2600, 0, 1), xs = X, ys = Y, zs = Z;
+  if (fp < 1) {
+    for (i = 0; i < N; i++) { var e = smooth(0, 1, clamp(fp * 1.4 - DEL[i], 0, 1));
+      HX[i] = SX[i] + (X[i] - SX[i]) * e; HY[i] = SY[i] + (Y[i] - SY[i]) * e; HZ[i] = SZ[i] + (Z[i] - SZ[i]) * e; }
+    xs = HX; ys = HY; zs = HZ;
+  }
+  drawPoints(ctx, v, function (i) { return lvl(0.35 + 0.07 * SH[i]); }, 0.022, 0, 0, SMALL ? 2 : 1, xs, ys, zs);
+  if (BOTS && BOTS.h1) {   // two Unitree H1s facing each other in the rebuilt room
+    var ha = REDUCED ? 1 : smooth(2900, 4100, t), fr = Math.floor(t / 1000 * BOTS.h1.fps) % BOTS.h1.n;
+    if (ha > 0) {
+      drawBot(ctx, v, BOTS.h1, fr, -RW * 0.27, -0.2, (1 - ha) * 0.8, 0, 0.95 * ha, true);
+      drawBot(ctx, v, BOTS.h1, (fr + 20) % BOTS.h1.n, RW * 0.27, 0.2, (1 - ha) * 0.8, Math.PI, 0.95 * ha, true);
+    }
+  }
 }
 if (heroCv) {
   onScreen(heroCv, function (on) { heroOn = on; });
@@ -241,9 +264,11 @@ var story = document.getElementById('story'), simCv = document.getElementById('s
 if (!story || !simCv) return;
 var capsEl = Array.prototype.slice.call(document.querySelectorAll('.cap')), railBtns = Array.prototype.slice.call(document.querySelectorAll('[data-stage]'));
 var verdictEl = document.getElementById('verdict'), storyOn = false, tShown = 0;
-var KEYS = [  // camera at the start of each stage, and the final pull-back
-  { yaw: -2.3, pitch: 0.62, dist: 8.2 }, { yaw: -1.7, pitch: 0.66, dist: 7.6 }, { yaw: -1.1, pitch: 0.8, dist: 8.0 },
-  { yaw: -0.6, pitch: 1.0, dist: 8.2 }, { yaw: -0.3, pitch: 0.38, dist: 3.7 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
+var KEYS = [  // camera at the start of each stage (input, capture, rebuild, team, run, decide) and the final pull-back
+  { yaw: -2.6, pitch: 0.75, dist: 9.0 }, { yaw: -2.3, pitch: 0.62, dist: 8.2 }, { yaw: -1.4, pitch: 0.7, dist: 7.8 },
+  { yaw: -0.9, pitch: 0.85, dist: 8.2 }, { yaw: -0.3, pitch: 0.38, dist: 3.7 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
+var panels = { lead: document.getElementById('lead-panel'), pip: document.getElementById('pip'), team: document.getElementById('team-panel') };
+function show(el, o) { if (el) { el.style.opacity = o.toFixed(3); el.style.visibility = o > 0.01 ? 'visible' : 'hidden'; } }
 function storyT() { var span = story.offsetHeight - innerHeight; return clamp(-story.getBoundingClientRect().top / span, 0, 1) * 6; }
 railBtns.forEach(function (b) { b.addEventListener('click', function () {
   var span = story.offsetHeight - innerHeight; scrollTo({ top: story.offsetTop + span * (+b.dataset.stage + 0.5) / 6, behavior: REDUCED ? 'auto' : 'smooth' }); }); });
@@ -264,12 +289,12 @@ if (window.ROBOTS) {
   boxes.forEach(function (b) { var top = b.cz + b.hz; if (!b.wall && top > 0.55 && top < 1.05 && b.hx > 0.15 && b.hy > 0.15 && (!table || b.hx * b.hy > table.hx * table.hy)) table = b; });
   BOTS.arm.at = table ? [table.cx, table.cy, table.cz + table.hz] : [spawn[0] - 1.2, spawn[1] - 1.0, 0];
 }
-function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a) {
+function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a, tint) {
   var fr = R.f[frame], cy = Math.cos(yaw), sy = Math.sin(yaw), cols = [rgba(C.ink, a), rgba(C.acc, a)];
   R.bodies.forEach(function (b, bi) {
     var o = bi * 7, px = fr[o] / 1000, py = fr[o + 1] / 1000, pz = fr[o + 2] / 1000;
     var qw = fr[o + 3] / 1000, qx = fr[o + 4] / 1000, qy = fr[o + 5] / 1000, qz = fr[o + 6] / 1000, p = b.p;
-    ctx.fillStyle = cols[b.c];
+    ctx.fillStyle = tint ? cols[1] : cols[b.c];
     for (var j = 0; j < p.length; j += 3) {
       var lx = p[j], ly = p[j + 1], lz = p[j + 2];
       var tx = 2 * (qy * lz - qz * ly), ty = 2 * (qz * lx - qx * lz), tz = 2 * (qx * ly - qy * lx);   // rotate by the body quaternion
@@ -289,8 +314,9 @@ function drawStory(now) {
     pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch, dist: K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
   ctx.clearRect(0, 0, W, H);
 
-  var cap = clamp(t, 0, 1), heat = smooth(3, 3.25, t) * (1 - smooth(3.85, 4.1, t)), shapes = smooth(2, 2.3, t), robots = smooth(4, 4.25, t), fac = smooth(5.15, 5.7, t);
-  var base = t < 1 ? 1 : 1 - 0.62 * smooth(2, 2.35, t) * (1 - heat), g;
+  var cap = clamp(t - 1, 0, 1), robots = smooth(4, 4.25, t), fac = smooth(5.15, 5.7, t), g;
+  var team = smooth(3, 3.2, t) * (1 - smooth(3.8, 4, t)), dots = smooth(0.85, 1.05, t) * (1 - 0.75 * team);
+  show(panels.lead, 1 - smooth(0.75, 1, t)); show(panels.pip, smooth(2, 2.2, t) * (1 - smooth(2.8, 3, t))); show(panels.team, team);
 
   ctx.lineWidth = dpr; ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath();     // floor grid
   var gx = RW / 2 + 0.6, gy = RD / 2 + 0.6;
@@ -308,17 +334,12 @@ function drawStory(now) {
       drawPoints(ctx, v, function () { return lvl(0.32 * on); }, 0.03, gxi * sx, gyi * sy, ring === 1 ? 4 : 9);
     }
   }
-  if (shapes > 0) {   // walls and clutter as a line drawing
-    ctx.lineWidth = dpr; ctx.strokeStyle = rgba(C.acc, (heat > 0 ? 0.25 : 0.7) * shapes * (1 - 0.5 * robots)); ctx.beginPath();
-    boxes.forEach(function (b) { boxEdges(ctx, v, b, 0, 0); }); ctx.stroke();
-  }
-  drawPoints(ctx, v, function (i) {   // the scan
-    if (t < 1 && reveal[i] > cap * 1.04) return 0;
-    if (heat > 0.02) return (err[i] < 0.05 ? 1 : err[i] < 0.15 ? 2 : 3) * 16 + lvl(0.25 + 0.7 * heat + (1 - heat) * 0.2);
-    return lvl(base * (0.38 + 0.065 * SH[i]));
+  drawPoints(ctx, v, function (i) {   // the scan: revealed along the camera path, then the rebuilt room
+    if (t < 2 && reveal[i] > cap * 1.04) return 0;
+    return lvl(dots * (1 - 0.4 * robots) * (0.38 + 0.065 * SH[i]));
   }, 0.03, 0, 0, SMALL ? 2 : 1);
 
-  var path = 1 - smooth(1.6, 2.2, t);   // camera path and the moving camera (capture)
+  var path = smooth(0.9, 1.05, t) * (1 - smooth(1.7, 2.3, t));   // camera path and the moving camera (capture)
   if (path > 0) {
     var upto = Math.max(1, Math.round(cap * (cams.length - 1)));
     ctx.strokeStyle = rgba(C.acc, 0.9 * path); ctx.lineWidth = 1.6 * dpr; ctx.beginPath();

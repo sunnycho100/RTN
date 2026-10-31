@@ -81,6 +81,26 @@ a { color: inherit; }
 .rail button.on::after { width: 34px; background: var(--accent); }
 .rail button:focus-visible { outline: 1px solid var(--accent); }
 @media (max-width: 720px) { .rail { display: none; } .cap p { font-size: 15px; } }
+.lead-panel { position: absolute; right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); top: 50%; transform: translateY(-50%); width: min(520px, 44vw); display: grid; gap: 12px; opacity: 0; visibility: hidden; }
+.chips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.chips li { background: var(--panel); border: 1px solid var(--line); padding: 10px 12px; font-size: 15px; }
+.chips b { display: block; font: 500 11px/1.5 var(--mono); color: var(--accent); letter-spacing: 0.06em; }
+.pip { position: absolute; right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); top: 96px; width: min(340px, 32vw); border: 1px solid var(--line); background: #050606; opacity: 0; visibility: hidden; }
+.pip video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.pip span { display: block; padding: 6px 8px; }
+.team-panel { position: absolute; top: 88px; bottom: calc(clamp(32px, 8vh, 80px) + 190px); left: max(var(--gutter), env(safe-area-inset-left, 0px)); right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); display: grid; place-items: center; opacity: 0; visibility: hidden; }
+.team-panel .clip { width: 100%; height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+.team-panel .clip video { width: 100%; height: 100%; aspect-ratio: auto; object-fit: contain; }
+@media (max-width: 1100px) {
+  .lead-panel { top: 80px; transform: none; width: min(460px, 48vw); }
+  .lead-panel .chips { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .lead-panel .chips li { padding: 6px 8px; font-size: 12px; }
+}
+@media (max-width: 720px) {
+  .lead-panel { left: 16px; right: 16px; width: auto; top: 76px; transform: none; }
+  .pip { right: 16px; top: 70px; width: 48vw; }
+  .team-panel { left: 16px; right: 16px; top: 70px; bottom: 210px; }
+}
 .verdict { position: absolute; right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: clamp(32px, 8vh, 80px); width: min(320px, 100% - 32px);
   padding: 18px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); opacity: 0; transition: opacity 0.4s; }
 .verdict.on { opacity: 1; }
@@ -187,18 +207,30 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
     <div class="stage">
       <canvas id="sim" aria-hidden="true"></canvas>
       <div class="caps wrap">
-        <div class="cap"><h2><span class="no">01</span>Walk the site once.</h2><p>A phone or a robot camera records the space.</p><div class="stat" id="stat-cap"></div></div>
-        <div class="cap"><h2><span class="no">02</span>We rebuild it in 3D.</h2><p>Camera poses and a dense map of every surface.</p></div>
-        <div class="cap"><h2><span class="no">03</span>A scene a simulator can run.</h2><p>Level floor, walls and clutter as simple shapes.</p><div class="stat" id="stat-build"></div></div>
-        <div class="cap"><h2><span class="no">04</span>Every shape is checked against the scan.</h2><p>Points far from any shape mean the scene is wrong there.</p>
-          <div class="stat" id="stat-check"></div>
-          <div class="legend mono"><span style="color: var(--accent)">under 5 cm</span><span style="color: var(--mid)">5 to 15 cm</span><span style="color: var(--hot)">over 15 cm</span></div></div>
-        <div class="cap"><h2><span class="no">05</span>Your robots do the job here.</h2><p>Two G1s carry a box, an arm works a scanned table, a Go2 patrols.</p><div class="stat">G1s from a MuJoCo policy run · arm and Go2 motion scripted</div></div>
-        <div class="cap"><h2><span class="no">06</span>Know before you buy.</h2><p>Whether it works, how fast, and what it costs. Then one site at a time.</p></div>
+        <div class="cap"><h2>All we need is a video of your site and a little information.</h2><p>A phone walkthrough, the task, and the robots you are considering.</p></div>
+        <div class="cap"><h2><span class="no">01</span>Walk the site once.</h2><p>Use a phone to record the place.</p><div class="stat" id="stat-cap"></div></div>
+        <div class="cap"><h2><span class="no">02</span>We rebuild it in 3D, as a scene a simulator can run.</h2><p>Your video becomes the space, with its machines in place.</p></div>
+        <div class="cap"><h2><span class="no">03</span>See your floor today, then with a robot team.</h2><p>Two arms on rails carry a door from station 1 to station 2. One G1 brings a screw, another fits the window glass.</p></div>
+        <div class="cap"><h2><span class="no">04</span>Your robots do the job here.</h2><p>Two G1s carry a box, an arm works a scanned table, a Go2 patrols.</p><div class="stat">G1s from a MuJoCo policy run · arm and Go2 motion scripted</div></div>
+        <div class="cap"><h2><span class="no">05</span>Know before you buy.</h2><p>Whether it works, how fast, and what it costs. Then one site at a time.</p></div>
+      </div>
+      <div class="lead-panel" id="lead-panel" aria-label="Example input">
+        <div class="mono">EXAMPLE INPUT</div>
+        <figure class="clip"><video data-src="media/capture.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Site video, 12 s</figcaption></figure>
+        <ul class="chips">
+          <li><b>SITE</b>One room, <span id="dims">4.8 × 3.8 m</span></li>
+          <li><b>TASK</b>Carry a box across the room</li>
+          <li><b>ROBOTS</b>2 × Unitree G1</li>
+          <li><b>SHIFT</b>8 hours</li>
+        </ul>
+      </div>
+      <div class="pip" id="pip"><video data-src="media/capture.mp4" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
+      <div class="team-panel" id="team-panel">
+        <figure class="clip"><video data-src="media/door_team.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Kinematic replay in Isaac Sim. G1 walking from a MuJoCo policy; each robot signs its events</figcaption></figure>
       </div>
       <div class="rail" id="rail" aria-label="Story steps">
-        <button type="button" data-stage="0">CAPTURE</button><button type="button" data-stage="1">RECONSTRUCT</button><button type="button" data-stage="2">BUILD</button>
-        <button type="button" data-stage="3">CHECK</button><button type="button" data-stage="4">RUN</button><button type="button" data-stage="5">DECIDE</button>
+        <button type="button" data-stage="0">INPUT</button><button type="button" data-stage="1">CAPTURE</button><button type="button" data-stage="2">REBUILD</button>
+        <button type="button" data-stage="3">TEAM</button><button type="button" data-stage="4">RUN</button><button type="button" data-stage="5">DECIDE</button>
       </div>
       <aside class="verdict" id="verdict" aria-label="Example verdict">
         <div class="mono">EXAMPLE VERDICT · PLACEHOLDER</div>
@@ -318,7 +350,7 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
 </footer>
 
 <script src="scan.js"></script>
-<script src="robots.js"></script>
-<script src="engine.js?v=5"></script>
+<script src="robots.js?v=2"></script>
+<script src="engine.js?v=6"></script>
 </body>
 </html>
