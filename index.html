@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>robosim Landing</title>
+<!-- Draft for the team. Copy and name are placeholders. Every clip is ours (site/media, rendered by site/tools). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one real scan, read from capture to verdict. Full-bleed canvases up top, quiet expandable rows below. */
+:root {
+  --bg: #0a0c0c;      /* page */
+  --panel: #101414;   /* raised rows, tiles */
+  --line: #222a29;    /* hairlines, struts */
+  --ink: #e4eae7;     /* text, scan points */
+  --dim: #8a9592;     /* secondary text */
+  --accent: #6fe0cf;  /* scan cyan: camera path, shapes that fit */
+  --mid: #e9c35b;     /* heatmap middle */
+  --hot: #ff7a4d;     /* heatmap far */
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --gutter: max(16px, 4vw);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wrap { padding-left: max(var(--gutter), env(safe-area-inset-left, 0px)); padding-right: max(var(--gutter), env(safe-area-inset-right, 0px)); }
+.mono { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--dim); }
+
+/* nav */
+.nav { position: fixed; inset: 0 0 auto; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-top: max(14px, env(safe-area-inset-top, 0px)); padding-bottom: 14px;
+  background: linear-gradient(var(--bg), color-mix(in srgb, var(--bg) 0%, transparent)); }
+.brand { font: 700 17px/1 var(--display); font-stretch: 118%; letter-spacing: 0.01em; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.brand i { width: 9px; height: 9px; border: 1.5px solid var(--accent); transform: rotate(45deg); }
+.nav nav { display: flex; align-items: center; gap: 22px; }
+.nav nav a { text-decoration: none; color: var(--dim); font-size: 14px; }
+.nav nav a:hover { color: var(--ink); }
+.nav nav a.btn { color: var(--bg); }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg);
+  font: 600 14px/1 var(--body); text-decoration: none; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn:hover { filter: brightness(1.1); }
+@media (max-width: 720px) { .nav nav a:not(.btn) { display: none; } }
+
+/* hero */
+.hero { position: relative; min-height: min(100svh, 980px); display: grid; align-items: end; overflow: hidden; }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-copy { position: relative; padding-block: 0 clamp(48px, 9vh, 96px); max-width: 980px; }
+.hero h1 { margin: 0 0 18px; font: 650 clamp(42px, 7.2vw, 104px)/0.93 var(--display); font-stretch: 112%; letter-spacing: -0.025em; text-wrap: balance; }
+.typed { font-family: var(--mono); font-size: clamp(14px, 1.5vw, 17px); color: var(--dim); min-height: 1.6em; }
+.typed b { display: inline-block; width: 0.6em; height: 1.05em; margin-left: 2px; vertical-align: -0.15em; background: var(--accent); animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.readout { position: absolute; right: max(var(--gutter), env(safe-area-inset-right, 0px)); top: 96px; text-align: right; line-height: 1.9; }
+@media (max-width: 720px) { .readout { display: none; } }
+
+/* pinned story */
+.story { position: relative; height: 640vh; }
+.stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.caps { position: absolute; left: 0; right: 0; bottom: clamp(32px, 8vh, 80px); pointer-events: none; }
+.cap { position: absolute; left: 0; bottom: 0; max-width: 560px; opacity: 0; transition: opacity 0.35s, transform 0.35s; transform: translateY(8px); }
+.cap.on { opacity: 1; transform: none; }
+.cap h2 .no { color: var(--accent); margin-right: 0.35em; font-variant-numeric: tabular-nums; }
+.cap h2 { margin: 0 0 8px; font: 650 clamp(28px, 3.6vw, 48px)/1 var(--display); font-stretch: 112%; letter-spacing: -0.02em; }
+.cap p { margin: 0; color: var(--dim); font-size: 17px; }
+.cap .stat { margin-top: 10px; font: 500 13px/1.5 var(--mono); color: var(--ink); }
+.legend { display: inline-flex; gap: 14px; margin-top: 8px; }
+.legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; background: currentColor; }
+.rail { position: absolute; right: max(var(--gutter), env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); display: grid; gap: 10px; }
+.rail button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; justify-content: flex-end; font: 500 11px/1 var(--mono); color: var(--dim); letter-spacing: 0.06em; }
+.rail button::after { content: ""; width: 18px; height: 1px; background: var(--line); transition: width 0.3s, background 0.3s; }
+.rail button.on { color: var(--ink); }
+.rail button.on::after { width: 34px; background: var(--accent); }
+.rail button:focus-visible { outline: 1px solid var(--accent); }
+@media (max-width: 720px) { .rail { display: none; } .cap p { font-size: 15px; } }
+.verdict { position: absolute; right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: clamp(32px, 8vh, 80px); width: min(320px, 100% - 32px);
+  padding: 18px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); opacity: 0; transition: opacity 0.4s; }
+.verdict.on { opacity: 1; }
+.verdict dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 12px 0 0; font-variant-numeric: tabular-nums; }
+.verdict dt { color: var(--dim); font-size: 14px; }
+.verdict dd { margin: 0; text-align: right; font: 500 14px/1.4 var(--mono); }
+@media (max-width: 720px) { .verdict { bottom: auto; top: 84px; } }
+
+/* sections */
+section.block { padding-block: clamp(72px, 12vh, 140px) 0; }
+.block h2.sec { margin: 0 0 8px; font: 650 clamp(30px, 4vw, 54px)/1 var(--display); font-stretch: 112%; letter-spacing: -0.02em; text-wrap: balance; }
+.block .lede { margin: 0 0 32px; color: var(--dim); max-width: 60ch; font-size: 17px; }
+
+details.step { border-top: 1px solid var(--line); }
+details.step:last-child { border-bottom: 1px solid var(--line); }
+details.step summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 48px minmax(120px, 220px) 1fr 24px; gap: 16px; align-items: baseline; padding-block: 22px; }
+details.step summary::-webkit-details-marker { display: none; }
+summary .n { font: 500 12px/1 var(--mono); color: var(--accent); }
+summary .t { font: 600 22px/1.1 var(--display); font-stretch: 112%; }
+summary .l { color: var(--dim); min-width: 0; }
+summary .pm { justify-self: end; width: 14px; height: 14px; position: relative; }
+summary .pm::before, summary .pm::after { content: ""; position: absolute; inset: 6px 0 auto; height: 1.5px; background: var(--ink); transition: transform 0.25s; }
+summary .pm::after { transform: rotate(90deg); }
+details[open] summary .pm::after { transform: rotate(0deg); }
+details.step summary:hover .t { color: var(--accent); }
+.step .body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; padding: 4px 0 28px 64px; }
+.step .body p { margin: 0 0 10px; color: var(--dim); max-width: 52ch; }
+@media (max-width: 720px) {
+  details.step summary { grid-template-columns: 32px 1fr 20px; }
+  summary .l { grid-column: 2; grid-row: 2; }
+  .step .body { grid-template-columns: 1fr; padding-left: 0; }
+}
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  details.step::details-content { height: 0; overflow: clip; transition: height 0.35s ease, content-visibility 0.35s allow-discrete; }
+  details.step[open]::details-content { height: auto; }
+}
+
+.clip { margin: 0; background: var(--panel); border: 1px solid var(--line); }
+.clip video, .clip .empty, .clip canvas.mini { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #050606; }
+.clip .empty { display: grid; place-items: center; color: var(--dim); font: 500 12px/1.5 var(--mono); text-align: center; padding: 16px; }
+.clip figcaption { display: flex; gap: 10px; align-items: baseline; padding: 10px 12px; font-size: 13px; color: var(--dim); }
+.tag { font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 6px; border: 1px solid var(--line); color: var(--dim); white-space: nowrap; }
+.tag.ours { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }
+@media (max-width: 760px) { .tiles { grid-template-columns: 1fr; } }
+.tiles h3 { margin: 14px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
+.tiles p { margin: 0; color: var(--dim); font-size: 16px; }
+
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 32px; align-items: start; }
+@media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+.flow { margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.flow li { background: var(--bg); padding: 14px 16px; display: grid; grid-template-columns: 90px 1fr; gap: 12px; }
+.flow b { font: 500 12px/1.6 var(--mono); color: var(--accent); font-weight: 500; }
+.flow span { color: var(--dim); }
+
+.nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.nums div { padding: 28px 24px 0 0; }
+.nums strong { display: block; font: 600 clamp(36px, 5vw, 64px)/1 var(--display); font-stretch: 112%; font-variant-numeric: tabular-nums; }
+.nums span { color: var(--dim); font-size: 14px; }
+@media (max-width: 720px) { .nums { grid-template-columns: 1fr; } }
+
+.cta { margin-top: clamp(96px, 14vh, 160px); padding-block: clamp(56px, 10vh, 110px); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 24px; align-items: end; justify-content: space-between; }
+.cta h2 { margin: 0; font: 650 clamp(34px, 5vw, 72px)/0.95 var(--display); font-stretch: 112%; letter-spacing: -0.02em; }
+.cta .addr { user-select: all; }
+footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 12px 32px; justify-content: space-between; }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .typed b { animation: none; } .cap, .verdict { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="nav wrap">
+  <a class="brand" href="#top"><i></i>robosim</a>
+  <nav>
+    <a href="#how">How it works</a>
+    <a href="#robots">Robots</a>
+    <a href="#trust">Many owners</a>
+    <a class="btn" href="#contact">Send a site video</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero wrap" aria-label="Intro">
+    <canvas id="hero" aria-hidden="true"></canvas>
+    <div class="readout mono" id="readout"></div>
+    <div class="hero-copy">
+      <h1>Bring your robots into your workplace.</h1>
+      <div class="typed" id="typed" data-text="Test any robot in a copy of your own site before you buy it."></div>
+      <div class="ctas">
+        <a class="btn" href="#contact">Send a site video</a>
+        <a class="btn ghost" href="#story">See it on a real scan</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="story" id="story" aria-label="From site video to verdict">
+    <div class="stage">
+      <canvas id="sim" aria-hidden="true"></canvas>
+      <div class="caps wrap">
+        <div class="cap"><h2><span class="no">01</span>Walk the site once.</h2><p>A phone or a robot camera records the space.</p><div class="stat" id="stat-cap"></div></div>
+        <div class="cap"><h2><span class="no">02</span>We rebuild it in 3D.</h2><p>Camera poses and a dense map of every surface.</p></div>
+        <div class="cap"><h2><span class="no">03</span>A scene a simulator can run.</h2><p>Level floor, walls and clutter as simple shapes.</p><div class="stat" id="stat-build"></div></div>
+        <div class="cap"><h2><span class="no">04</span>Every shape is checked against the scan.</h2><p>Points far from any shape mean the scene is wrong there.</p>
+          <div class="stat" id="stat-check"></div>
+          <div class="legend mono"><span style="color: var(--accent)">under 5 cm</span><span style="color: var(--mid)">5 to 15 cm</span><span style="color: var(--hot)">over 15 cm</span></div></div>
+        <div class="cap"><h2><span class="no">05</span>Your robots do the job here.</h2><p>Placeholder figures until the G1 motion is exported.</p></div>
+        <div class="cap"><h2><span class="no">06</span>Know before you buy.</h2><p>Whether it works, how fast, and what it costs. Then one site at a time.</p></div>
+      </div>
+      <div class="rail" id="rail" aria-label="Story steps">
+        <button type="button" data-stage="0">CAPTURE</button><button type="button" data-stage="1">RECONSTRUCT</button><button type="button" data-stage="2">BUILD</button>
+        <button type="button" data-stage="3">CHECK</button><button type="button" data-stage="4">RUN</button><button type="button" data-stage="5">DECIDE</button>
+      </div>
+      <aside class="verdict" id="verdict" aria-label="Example verdict">
+        <div class="mono">EXAMPLE VERDICT · PLACEHOLDER</div>
+        <dl>
+          <dt>Task</dt><dd>2 × G1 carry box</dd>
+          <dt>Fits the site</dt><dd>TBD</dd>
+          <dt>Cycle time</dt><dd>XX s</dd>
+          <dt>Estimated cost</dt><dd>$XX</dd>
+          <dt>Payback</dt><dd>XX months</dd>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="block wrap" id="how">
+    <h2 class="sec">How it works</h2>
+    <p class="lede">Six steps from one site video to a buying decision. Open any step for the details.</p>
+    <div>
+      <details class="step">
+        <summary><span class="n">01</span><span class="t">Capture</span><span class="l">Phone video, RGB-D or LiDAR of the site.</span><span class="pm"></span></summary>
+        <div class="body">
+          <div><p>One walkthrough is enough. The scan in this page came from a robot-mounted RGB-D camera, 353 frames.</p><p class="mono">INPUT · video or photos · depth and LiDAR optional</p></div>
+          <figure class="clip"><video data-src="media/capture.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>floor4 capture, 12 s</figcaption></figure>
+        </div>
+      </details>
+      <details class="step">
+        <summary><span class="n">02</span><span class="t">Reconstruct</span><span class="l">Camera poses and a dense 3D map.</span><span class="pm"></span></summary>
+        <div class="body">
+          <div><p>Heavy reconstruction runs on a cloud GPU. Output is a mesh in real units, floor and walls included.</p><p class="mono">OUTPUT · poses · point cloud · mesh</p></div>
+          <figure class="clip"><canvas class="mini" data-mode="orbit" aria-label="floor4 point cloud, live"></canvas><figcaption><span class="tag ours">Ours</span>floor4 point cloud, live</figcaption></figure>
+        </div>
+      </details>
+      <details class="step">
+        <summary><span class="n">03</span><span class="t">Build the scene</span><span class="l">A MuJoCo scene with simple collision shapes.</span><span class="pm"></span></summary>
+        <div class="body">
+          <div><p>The floor is leveled, walls become boxes and clutter becomes convex pieces, so a robot can walk and bump into them.</p><p class="mono">EXPORT · MuJoCo · Isaac Sim · URDF</p></div>
+          <figure class="clip"><canvas class="mini" data-mode="shapes" aria-label="12 wall boxes and 96 clutter pieces, live"></canvas><figcaption><span class="tag ours">Ours</span>12 wall boxes and 96 clutter pieces, live</figcaption></figure>
+        </div>
+      </details>
+      <details class="step">
+        <summary><span class="n">04</span><span class="t">Check</span><span class="l">Can we trust the geometry?</span><span class="pm"></span></summary>
+        <div class="body">
+          <div><p>We score the reconstruction against laser scans and walk a G1 into every wall to make sure nothing passes through.</p><p class="mono">SCORED ON · ETH3D · Hilti 2022</p></div>
+          <figure class="clip"><canvas class="mini" data-mode="heat" aria-label="scan vs collision shapes, live"></canvas><figcaption><span class="tag ours">Ours</span>scan vs collision shapes, live</figcaption></figure>
+        </div>
+      </details>
+      <details class="step">
+        <summary><span class="n">05</span><span class="t">Run the task</span><span class="l">The robot does the job in the copy of your site.</span><span class="pm"></span></summary>
+        <div class="body">
+          <div><p>Today a G1 walks in reconstructed scenes. Next: two G1s carrying a box, G1 manipulation and a VLA-driven arm.</p><p class="mono">ROBOTS · Unitree G1 · Go1 · Panda arm</p></div>
+          <figure class="clip"><video data-src="media/walk.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>G1 walking in a reconstructed scene</figcaption></figure>
+        </div>
+      </details>
+      <details class="step">
+        <summary><span class="n">06</span><span class="t">Decide</span><span class="l">Feasibility and cost, before anyone buys.</span><span class="pm"></span></summary>
+        <div class="body">
+          <div><p>A short report: does it fit, how fast is it, what does it cost, and when does it pay back.</p><p class="mono">DELIVERED · report · scene files · videos</p></div>
+          <figure class="clip"><canvas class="mini" data-mode="facility" aria-label="one site, then the next, live"></canvas><figcaption><span class="tag ours">Ours</span>one site, then the next, live</figcaption></figure>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="block wrap" id="robots">
+    <h2 class="sec">Robots we can place</h2>
+    <p class="lede">Any robot with a simulation model. These run in our scenes today or are next.</p>
+    <div class="tiles">
+      <div><figure class="clip"><video data-src="media/walk.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>MuJoCo</figcaption></figure>
+        <h3>G1 walking</h3><p>Walks reconstructed scenes and stops at the walls.</p></div>
+      <div><figure class="clip"><video data-src="media/coop_carry.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>MuJoCo, two 23-DoF G1s</figcaption></figure>
+        <h3>Two G1s, one box</h3><p>Two full-body humanoids carry one box together.</p></div>
+      <div><figure class="clip"><video data-src="media/panda.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>MuJoCo render, scripted motion</figcaption></figure>
+        <h3>Arm pick and place</h3><p>A vision-language model drives an arm through skill calls.</p></div>
+      <div><figure class="clip"><video data-src="media/go2.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>MuJoCo render, scripted gait</figcaption></figure>
+        <h3>Quadrupeds</h3><p>Go1 and Go2 for patrol and inspection routes.</p></div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="trust">
+    <div class="split">
+      <div>
+        <h2 class="sec">Robots from different owners, working together.</h2>
+        <p class="lede">A neighbor's robot can ask yours for help. Yours checks who is asking and decides how far to follow.</p>
+
+      </div>
+      <ol class="flow">
+        <li><b>VERIFY</b><span>Is it really that robot? Signed messages, no replays, no strangers.</span></li>
+        <li><b>DECIDE</b><span>How far do we follow it? Allow, partial or deny, per action.</span></li>
+        <li><b>ACT</b><span>Only allowed actions reach the robot. Some are never allowed.</span></li>
+        <li><b>LOG</b><span>The owner sees one plain line per request.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block wrap" aria-label="Numbers">
+    <div class="nums">
+      <div><strong>XX cm</strong><span>Geometry error against a laser scan</span></div>
+      <div><strong>XX h</strong><span>From site video to verdict</span></div>
+      <div><strong id="num-pts">…</strong><span>Points in the scan on this page</span></div>
+    </div>
+  </section>
+
+  <section class="cta wrap" id="contact">
+    <h2>Start with one site.</h2>
+    <div>
+      <a class="btn" href="mailto:team@example.com?subject=Site%20video">Send a site video</a>
+      <p class="mono addr">team@example.com</p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap mono">
+  <span>robosim · working name · draft</span>
+  <span>All clips are ours. Arm and quadruped motion is scripted for now; real policy runs replace it.</span>
+</footer>
+
+<script src="scan.js"></script>
+<script src="engine.js?v=2"></script>
+</body>
+</html>
