@@ -79,7 +79,7 @@ for (i = 0; i < N; i++) {
 }
 function fmt(n) { return n.toLocaleString('en-US'); }
 function setText(id, s) { var el = document.getElementById(id); if (el) el.innerHTML = s; }
-setText('readout', 'SCAN · floor4_static3<br>' + fmt(N) + ' points · voxel ' + S.voxel_cm + ' cm<br>' + cams.length + ' camera poses<br>' + RW.toFixed(1) + ' × ' + RD.toFixed(1) + ' m');
+setText('readout', 'SCAN · floor4_static3<br>' + fmt(N) + ' points · voxel ' + S.voxel_cm + ' cm<br>' + cams.length + ' camera poses<br>' + RW.toFixed(1) + ' × ' + RD.toFixed(1) + ' m<br>drag to rotate');
 setText('num-pts', fmt(N));
 setText('stat-cap', cams.length + ' camera poses · ' + fmt(N) + ' points');
 setText('stat-build', S.walls.length + ' wall boxes · ' + S.hulls.length + ' clutter pieces');
@@ -155,12 +155,31 @@ var dome = (function () {
 })();
 
 var heroCv = document.getElementById('hero'), heroOn = true, heroT0 = performance.now();
+/* Drag the dome with a mouse or a finger: horizontal turns it, vertical tilts it, and it coasts a little after release.
+   Touch keeps vertical swipes for page scrolling (touch-action: pan-y), so on phones a drag only turns it. */
+var drag = { yaw: 0, pitch: 0, vy: 0, vp: 0, down: false, x: 0, y: 0 };
+if (heroCv) {
+  heroCv.style.cursor = 'grab'; heroCv.style.touchAction = 'pan-y';
+  heroCv.addEventListener('pointerdown', function (e) {
+    drag.down = true; drag.x = e.clientX; drag.y = e.clientY; drag.vy = drag.vp = 0;
+    heroCv.setPointerCapture(e.pointerId); heroCv.style.cursor = 'grabbing';
+  });
+  heroCv.addEventListener('pointermove', function (e) {
+    if (!drag.down) return;
+    drag.vy = -(e.clientX - drag.x) * 0.006; drag.vp = e.pointerType === 'touch' ? 0 : (e.clientY - drag.y) * 0.004;
+    drag.yaw += drag.vy; drag.pitch = clamp(drag.pitch + drag.vp, -CFG.hero.pitch - 0.25, 1.25 - CFG.hero.pitch);
+    drag.x = e.clientX; drag.y = e.clientY;
+    if (REDUCED) drawHero(performance.now());
+  });
+  ['pointerup', 'pointercancel'].forEach(function (n) { heroCv.addEventListener(n, function () { drag.down = false; heroCv.style.cursor = 'grab'; }); });
+}
 function drawHero(now) {
   if (!heroCv) return;
   var dpr = fit(heroCv), W = heroCv.width, H = heroCv.height, ctx = heroCv.getContext('2d'), h = CFG.hero, hs = SMALL ? CFG.heroSmall : h;
   ctx.clearRect(0, 0, W, H);
   var t = REDUCED ? 0 : (now - heroT0), spin = t / 90000 * TAU, R = Math.max(RW, RD) * 0.78, cz = 0.9, far = R * h.dist;
-  var v = view(W, H, { tx: 0, ty: 0, tz: cz, yaw: -0.9 + spin, pitch: h.pitch, dist: R * h.dist, fov: h.fov, ox: hs.ox, oy: hs.oy });
+  if (!drag.down) { drag.yaw += drag.vy; drag.pitch = clamp(drag.pitch + drag.vp, -h.pitch - 0.25, 1.25 - h.pitch); drag.vy *= 0.94; drag.vp *= 0.94; }
+  var v = view(W, H, { tx: 0, ty: 0, tz: cz, yaw: -0.9 + spin + drag.yaw, pitch: h.pitch + drag.pitch, dist: R * h.dist, fov: h.fov, ox: hs.ox, oy: hs.oy });
   ctx.lineWidth = dpr;
   dome.E.forEach(function (e) {      // struts, fading with depth
     var a = dome.V[e[0]], b = dome.V[e[1]];
