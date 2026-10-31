@@ -173,6 +173,37 @@ details.step summary:hover .t { color: var(--accent); }
 .cta .addr { user-select: all; }
 footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 12px 32px; justify-content: space-between; }
 
+
+/* request-a-quote modal */
+dialog.quote { width: min(560px, calc(100% - 32px)); max-height: calc(100% - 48px); overflow: auto; padding: 28px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+dialog.quote::backdrop { background: rgba(5, 6, 6, 0.72); }
+dialog.quote h2 { margin: 0 0 6px; font: 650 30px/1.05 var(--display); font-stretch: 112%; letter-spacing: -0.01em; }
+dialog.quote .sub { margin: 0 0 22px; color: var(--dim); }
+dialog.quote form, dialog.quote [data-view] { display: grid; gap: 16px; }
+dialog.quote [hidden] { display: none !important; }
+dialog.quote .close { position: absolute; top: 10px; right: 12px; background: none; border: 0; color: var(--dim); font-size: 26px; line-height: 1; cursor: pointer; }
+dialog.quote .f { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; min-width: 0; }
+dialog.quote .f > span, dialog.quote legend { font: 500 13px/1.3 var(--body); color: var(--ink); padding: 0; }
+dialog.quote small { color: var(--dim); font-size: 13px; }
+dialog.quote input:not([type=radio]), dialog.quote select, dialog.quote textarea { width: 100%; min-width: 0; padding: 10px 12px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); font: 15px/1.3 var(--body); }
+dialog.quote input:focus, dialog.quote select:focus, dialog.quote textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+dialog.quote .tel { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); gap: 8px; }
+dialog.quote .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+dialog.quote .pills label { cursor: pointer; }
+dialog.quote .pills input { position: absolute; opacity: 0; pointer-events: none; }
+dialog.quote .pills span { display: block; padding: 8px 12px; border: 1px solid var(--line); font-size: 14px; color: var(--dim); }
+dialog.quote .pills input:checked + span { border-color: var(--accent); color: var(--ink); }
+dialog.quote .pills input:focus-visible + span { outline: 2px solid var(--accent); }
+dialog.quote .mrow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 32px; gap: 8px; margin-top: 8px; }
+dialog.quote .x, dialog.quote .add { background: none; border: 1px solid var(--line); color: var(--dim); cursor: pointer; font: 14px var(--body); }
+dialog.quote .add { justify-self: start; margin-top: 8px; padding: 8px 12px; }
+dialog.quote .choices { display: grid; gap: 10px; }
+dialog.quote .choice { display: grid; gap: 4px; text-align: left; padding: 14px 16px; background: var(--bg); border: 1px solid var(--line); color: var(--ink); cursor: pointer; font: 15px var(--body); }
+dialog.quote .choice:first-child { border-color: var(--accent); }
+dialog.quote .choice span { color: var(--dim); }
+dialog.quote .note { margin: 0; color: var(--dim); }
+dialog.quote .btn { justify-self: start; }
+@media (max-width: 480px) { dialog.quote { padding: 22px 18px; } dialog.quote .tel { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .typed b { animation: none; } .cap, .verdict { transition: none; } }
 </style>
 </head>
@@ -185,7 +216,7 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
     <a href="#how">How it works</a>
     <a href="#industry">Industry</a>
     <a href="#trust">Many owners</a>
-    <a class="btn" href="#contact">Send a site video</a>
+    <a class="btn" href="#contact" data-quote>Request a quote</a>
   </nav>
 </header>
 
@@ -197,7 +228,7 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
       <h1>Bring your robots into your workplace.</h1>
       <div class="typed" id="typed" data-text="Test any robot in a copy of your own site before you buy it."></div>
       <div class="ctas">
-        <a class="btn" href="#contact">Send a site video</a>
+        <a class="btn" href="#contact" data-quote>Request a quote</a>
         <a class="btn ghost" href="#story">See it on a real scan</a>
       </div>
     </div>
@@ -338,8 +369,8 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
   <section class="cta wrap" id="contact">
     <h2>Start with one site.</h2>
     <div>
-      <a class="btn" href="mailto:team@example.com?subject=Site%20video">Send a site video</a>
-      <p class="mono addr">team@example.com</p>
+      <button class="btn" type="button" data-quote>Request a quote</button>
+      <p class="mono">Your email only. We use it to reply about your site, nothing else.</p>
     </div>
   </section>
 </main>
@@ -349,6 +380,67 @@ footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border
   <span>All clips are our own MuJoCo and Isaac Sim runs. CarDA motion data and the Depot warehouse (roqsim) are CC BY 4.0.</span>
 </footer>
 
+
+<dialog class="quote" id="quote" aria-labelledby="quote-title">
+  <button class="close" type="button" data-close aria-label="Close">&times;</button>
+
+  <form id="quote-step1" data-view="step1">
+    <h2 id="quote-title">Request a quote</h2>
+    <p class="sub">Leave your email and we will reach out about simulating your site.</p>
+    <label class="f"><span>Work email</span><input type="email" name="email" required autocomplete="email" placeholder="you@company.com"></label>
+    <label class="f"><span>Phone number (optional)</span>
+      <span class="tel"><select name="cc" aria-label="Country code">
+        <option value="+1">+1 US and Canada</option><option value="+82">+82 Korea</option><option value="+44">+44 UK</option>
+        <option value="+49">+49 Germany</option><option value="+81">+81 Japan</option><option value="+86">+86 China</option>
+        <option value="+91">+91 India</option><option value="+33">+33 France</option><option value="+61">+61 Australia</option>
+        <option value="+65">+65 Singapore</option><option value="">Other, type it in</option>
+      </select><input type="tel" name="phone" autocomplete="tel-national" placeholder="555 123 4567"></span></label>
+    <label class="f"><span>Company name (optional)</span><input name="company" autocomplete="organization" placeholder="Acme Metalworks"></label>
+    <button class="btn" type="submit">Request a quote</button>
+    <p class="mono note">We keep your email, phone and company only to reply about this request.</p>
+  </form>
+
+  <div data-view="received" hidden>
+    <h2>Request received.</h2>
+    <p class="sub">We have your email and will be in touch.</p>
+    <div class="choices">
+      <button class="choice" type="button" data-go="step2"><b>Want feedback right away?</b><span>Add a few details now.</span></button>
+      <button class="choice" type="button" data-close><b>No time now?</b><span>We'll email you a short form to fill in later.</span></button>
+    </div>
+  </div>
+
+  <form id="quote-step2" data-view="step2" hidden>
+    <h2>Tell us about your site</h2>
+    <p class="sub">Tell us about your workflow. We'll review its simulation potential.</p>
+    <label class="f"><span>Facility location</span><input name="location" required placeholder="City and country"><small>No street address needed at this stage.</small></label>
+    <fieldset class="f"><legend>What task do you want to automate?</legend>
+      <div class="pills">
+        <label><input type="radio" name="task" value="Material handling and transport" required><span>Material handling and transport</span></label>
+        <label><input type="radio" name="task" value="Assembly and manufacturing"><span>Assembly and manufacturing</span></label>
+        <label><input type="radio" name="task" value="Inspection and quality control"><span>Inspection and quality control</span></label>
+        <label><input type="radio" name="task" value="Warehouse and logistics"><span>Warehouse and logistics</span></label>
+        <label><input type="radio" name="task" value="Other or not sure"><span>Other or not sure</span></label>
+      </div></fieldset>
+    <label class="f"><span>What is your main goal?</span><select name="goal" required>
+      <option value="">Choose one</option><option>Reduce manual labor</option><option>Increase throughput</option>
+      <option>Improve safety</option><option>Cut costs</option><option>Other</option></select></label>
+    <fieldset class="f"><legend>Machines on site</legend><small>We rebuild these in NVIDIA Isaac Sim, so the type plus brand and model helps.</small>
+      <div id="machines"></div><button type="button" class="add" id="add-machine">Add a machine</button></fieldset>
+    <label class="f"><span>A video of the area to rebuild</span><input type="file" name="video" accept="video/*"><small>A phone video is fine: 1 to 3 minutes, walk slowly through the area. Up to 20 MB.</small></label>
+    <label class="f"><span>Or a Google Drive or Dropbox link</span><input type="url" name="videoLink" placeholder="https://"></label>
+    <label class="f"><span>Notes (optional)</span><textarea name="notes" rows="3" placeholder="Shift pattern, part sizes, anything else"></textarea></label>
+    <p class="mono note" id="upload-note" role="status"></p>
+    <button class="btn" type="submit">Send details</button>
+    <p class="mono note">Site details and video are used only to assess your site and build its simulation.</p>
+  </form>
+
+  <div data-view="done" hidden>
+    <h2>Request received.</h2>
+    <p class="sub">Thanks for sharing your site with RoboSim. Our team will review your workflow and decide whether it's suitable for an initial robotics simulation. We may contact you for additional measurements or task details.</p>
+    <button class="btn" type="button" data-close>Close</button>
+  </div>
+</dialog>
+<script src="quote.js"></script>
 <script src="scan.js"></script>
 <script src="robots.js?v=2"></script>
 <script src="engine.js?v=6"></script>
