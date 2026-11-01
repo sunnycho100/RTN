@@ -136,7 +136,7 @@ details.step summary::-webkit-details-marker { display: none; }
 summary .n { font: 500 12px/1 var(--mono); color: var(--accent); }
 summary .t { font: 600 22px/1.1 var(--display); font-stretch: 112%; }
 summary .l { color: var(--dim); min-width: 0; }
-.spec { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 32px; border-top: 1px solid var(--line); }
+.spec { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; border-top: 1px solid var(--line); }
 .spec > div { padding-top: 24px; }
 .spec b { font: 500 12px/1.6 var(--mono); color: var(--accent); letter-spacing: 0.08em; }
 .spec ul { list-style: none; margin: 12px 0 0; padding: 0; }
@@ -543,9 +543,8 @@ dialog.quote .btn { justify-self: start; }
   </section>
 
   <section class="block wrap" id="spec">
-    <h2 class="sec">What we need, what you get.</h2>
+    <h2 class="sec">What you get.</h2>
     <div class="spec">
-      <div><b>WE NEED</b><ul><li>One phone video of the area</li><li>Your stations and target cycle time</li><li>The robots you are weighing</li></ul></div>
       <div><b>YOU GET</b><ul><li>Your floor, rebuilt in 3D</li><li>Each option run against your target</li><li>A film and a written verdict</li></ul></div>
       <div><b>ROBOTS RUN SO FAR</b><ul><li>Unitree G1, H1, Go2</li><li>Franka Panda, UR10e, Doosan M0617</li><li>ANYmal, Spot</li></ul></div>
     </div>
@@ -570,8 +569,9 @@ dialog.quote .btn { justify-self: start; }
   <button class="close" type="button" data-close aria-label="Close">&times;</button>
 
   <form id="quote-step1" data-view="step1">
-    <h2 id="quote-title">Request a quote</h2>
-    <p class="sub">Leave your email and we will reach out about simulating your site.</p>
+    <h2 id="quote-title">Send us one station.</h2>
+    <p class="mono note">A phone video · your target cycle time · the robots you are weighing</p>
+    <p class="sub">Leave your email and we will reach out.</p>
     <label class="f"><span>Work email</span><input type="email" name="email" required autocomplete="email" placeholder="you@company.com"></label>
     <label class="f"><span>Phone number (optional)</span>
       <span class="tel"><select name="cc" aria-label="Country code">
@@ -582,7 +582,7 @@ dialog.quote .btn { justify-self: start; }
       </select><input type="tel" name="phone" autocomplete="tel-national" placeholder="555 123 4567"></span></label>
     <label class="f"><span>Company name (optional)</span><input name="company" autocomplete="organization" placeholder="Acme Metalworks"></label>
     <button class="btn" type="submit">Request a quote</button>
-    <p class="mono note">We keep your email, phone and company only to reply about this request.</p>
+    <p class="mono note">You get back your station rebuilt in 3D, ranked setups and simulated station times. We keep your contact details only to reply.</p>
   </form>
 
   <div data-view="received" hidden>
