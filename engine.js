@@ -4,7 +4,7 @@
 (function () {
 'use strict';
 var DEFAULTS = {
-  hero: { ox: 0.68, oy: 0.42, pitch: 0.32, fov: 0.62, dist: 4.3, strut: 0.22, ray: 0.35 },
+  hero: { ox: 0.68, oy: 0.42, pitch: 0.32, fov: 0.62, dist: 4.3, strut: 0.22 },
   heroSmall: { ox: 0.5, oy: 0.36 },
   story: { ox: 0.56, oy: 0.46, pitch: 0, fov: 0.85 },
   storySmall: { ox: 0.5, oy: 0.42 }
@@ -130,11 +130,11 @@ function fit(cv) {
 }
 function onScreen(el, cb) { new IntersectionObserver(function (es) { cb(es[0].isIntersecting); }).observe(el); }
 
-/* ---- HERO: a capture dome (icosphere struts, camera heads aimed in) around the real scan ---- */
+/* ---- HERO: a dome (icosphere struts) around the real scan, with one scanner at the top ---- */
 var dome = (function () {
   var q = (1 + Math.sqrt(5)) / 2, IV = [[-1, q, 0], [1, q, 0], [-1, -q, 0], [1, -q, 0], [0, -1, q], [0, 1, q], [0, -1, -q], [0, 1, -q], [q, 0, -1], [q, 0, 1], [-q, 0, -1], [-q, 0, 1]];
   var IF = [[0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11], [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8], [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9], [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]];
-  var V = [], E = {}, heads = [], F = 3, idx = {};
+  var V = [], E = {}, F = 3, idx = {};
   function nrm(p) { var l = Math.hypot(p[0], p[1], p[2]); return [p[0] / l, p[1] / l, p[2] / l]; }
   function vid(p) { p = nrm(p); var kk = p.map(function (x) { return x.toFixed(4); }).join(); if (!(kk in idx)) { idx[kk] = V.length; V.push(p); } return idx[kk]; }
   function edge(a, b) { E[Math.min(a, b) + '-' + Math.max(a, b)] = 1; }
@@ -147,9 +147,8 @@ var dome = (function () {
       if (a < F - bb) edge(g[a][bb], g[a + 1][bb]);
       if (a < F - bb && bb > 0) edge(g[a][bb], g[a + 1][bb - 1]);
     }
-    heads.push(nrm([(A[0] + B[0] + Cc[0]) / 3, (A[1] + B[1] + Cc[1]) / 3, (A[2] + B[2] + Cc[2]) / 3]));
   });
-  return { V: V, E: Object.keys(E).map(function (s) { return s.split('-').map(Number); }), heads: heads };
+  return { V: V, E: Object.keys(E).map(function (s) { return s.split('-').map(Number); }) };
 })();
 
 var heroCv = document.getElementById('hero'), heroOn = true, heroT0 = performance.now();
@@ -218,19 +217,26 @@ function drawHero(now) {
     var depth = clamp(1.25 - ((az + P[2]) / 2 - far + R) / (2 * R), 0.12, 1);
     ctx.strokeStyle = rgba(C.ink, h.strut * depth); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(P[0], P[1]); ctx.stroke();
   });
-  dome.heads.forEach(function (hd, j) {   // camera heads aimed at the scan; a few fire a ray
-    if (!proj(v, hd[0] * R, hd[1] * R, hd[2] * R + cz)) return; var ax = P[0], ay = P[1], az = P[2];
-    if (!proj(v, hd[0] * R * 0.9, hd[1] * R * 0.9, hd[2] * R * 0.9 + cz)) return;
-    var depth = clamp(1.25 - (az - far + R) / (2 * R), 0.15, 1);
-    ctx.strokeStyle = rgba(C.acc, 0.85 * depth); ctx.lineWidth = 2.2 * dpr; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(P[0], P[1]); ctx.stroke();
-    var phase = (t / 1400 + j * 0.37) % 1;
-    if (!REDUCED && phase < 0.18 && proj(v, 0, 0, cz * 0.6)) {
-      ctx.lineWidth = dpr; ctx.strokeStyle = rgba(C.acc, h.ray * (1 - phase / 0.18) * depth); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(P[0], P[1]); ctx.stroke();
-    }
-  });
   ctx.lineWidth = dpr;
   var fp = REDUCED ? 1 : clamp((t - 300) / 2600, 0, 1), shown = GROUND * smooth(0, 0.35, fp) + (N - GROUND) * smooth(0.35, 1, fp);
-  drawPoints(ctx, v, function (i) { return i < shown ? lvl((0.35 + 0.07 * SH[i]) * EA[i]) : 0; }, 0.022, 0, 0, SMALL ? 3 : 2, EX, EY, EZ);   // every other point: the 6.5 cm cloud reads as a carpet otherwise
+  // one scanner at the top of the dome sweeps a slow line back and forth across the floor; dots under it light up
+  var scanOn = !REDUCED && t > 3200, sweep = scanOn ? 0.5 - 0.5 * Math.cos(((t - 3200) / 9000) * TAU) : 0, sx = (sweep - 0.5) * RW;
+  drawPoints(ctx, v, function (i) {
+    if (i >= shown) return 0;
+    if (scanOn && Math.abs(EX[i] - sx) < 0.14) return 16 + lvl(0.95);   // accent colour bucket
+    return lvl((0.35 + 0.07 * SH[i]) * EA[i]);
+  }, 0.022, 0, 0, SMALL ? 3 : 2, EX, EY, EZ);   // every other point: the 6.5 cm cloud reads as a carpet otherwise
+  if (proj(v, 0, 0, cz + R)) {
+    var hx = P[0], hy = P[1];
+    if (scanOn && proj(v, sx, -RD / 2, 0)) {
+      var ax = P[0], ay = P[1];
+      if (proj(v, sx, RD / 2, 0)) {   // a faint fan from the scanner to the line it is reading
+        ctx.fillStyle = rgba(C.acc, 0.07); ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(ax, ay); ctx.lineTo(P[0], P[1]); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = rgba(C.acc, 0.8); ctx.lineWidth = 1.4 * dpr; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(P[0], P[1]); ctx.stroke();
+      }
+    }
+    ctx.fillStyle = rgba(C.acc, 0.95); ctx.fillRect(hx - 3 * dpr, hy - 3 * dpr, 6 * dpr, 6 * dpr);   // the scanner
+  }
   if (BOTS && BOTS.h1) {   // two Unitree H1s facing each other in the rebuilt room
     var ha = REDUCED ? 1 : smooth(2900, 4100, t), fr = Math.floor(t / 1000 * BOTS.h1.fps) % BOTS.h1.n;
     if (ha > 0) {
