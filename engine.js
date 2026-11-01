@@ -258,7 +258,7 @@ var capsEl = Array.prototype.slice.call(document.querySelectorAll('.cap')), rail
 var verdictEl = document.getElementById('verdict'), storyOn = false, tShown = 0;
 var KEYS = [  // camera at the start of each stage (input, capture, rebuild, team, run, decide) and the final pull-back
   { yaw: -2.6, pitch: 0.75, dist: 9.0 }, { yaw: -2.3, pitch: 0.62, dist: 8.2 }, { yaw: -1.4, pitch: 0.7, dist: 7.8 },
-  { yaw: -0.9, pitch: 0.85, dist: 8.2 }, { yaw: -0.3, pitch: 0.38, dist: 3.7 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
+  { yaw: -0.9, pitch: 0.85, dist: 8.2 }, { yaw: -0.3, pitch: 0.38, dist: 6.5 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
 KEYS.forEach(function (k, j) { if (j !== 4) k.dist *= Math.max(RW, RD) / 4.83; });   // tuned for a 4.83 m room; stage 04 frames the robots, not the room
 var panels = { lead: document.getElementById('lead-panel'), pip: document.getElementById('pip'), team: document.getElementById('team-panel') };
 function show(el, o) { if (el) { el.style.opacity = o.toFixed(3); el.style.visibility = o > 0.01 ? 'visible' : 'hidden'; } }
@@ -277,12 +277,8 @@ if (window.ROBOTS) {
     var r = window.ROBOTS[k];
     BOTS[k] = { fps: r.fps, n: r.frames, f: r.f, bodies: r.bodies.map(function (b) { return { p: Float32Array.from(b.p, function (x) { return x / 1000; }), c: b.c }; }) };
   });
-  // The arm sits on the largest table-height clutter piece in the scan, so it works a real surface.
-  var table = null;
-  boxes.forEach(function (b) { var top = b.cz + b.hz; if (!b.wall && top > 0.55 && top < 1.05 && b.hx > 0.15 && b.hy > 0.15 && (!table || b.hx * b.hy > table.hx * table.hy)) table = b; });
-  BOTS.arm.at = table ? [table.cx, table.cy, table.cz + table.hz] : [spawn[0] - 1.2, spawn[1] - 1.0, 0];
 }
-function eachBotPoint(R, frame, fn) {   // fn(x, y, z, accent) for every body point, in the robot's frame
+function eachBotPoint(R, frame, fn) {   // fn(x, y, z, accent, body index) for every body point, in the robot's frame
   var fr = R.f[frame];
   R.bodies.forEach(function (b, bi) {
     var o = bi * 7, px = fr[o] / 1000, py = fr[o + 1] / 1000, pz = fr[o + 2] / 1000;
@@ -290,7 +286,7 @@ function eachBotPoint(R, frame, fn) {   // fn(x, y, z, accent) for every body po
     for (var j = 0; j < p.length; j += 3) {
       var lx = p[j], ly = p[j + 1], lz = p[j + 2];
       var tx = 2 * (qy * lz - qz * ly), ty = 2 * (qz * lx - qx * lz), tz = 2 * (qx * ly - qy * lx);   // rotate by the body quaternion
-      fn(lx + qw * tx + (qy * tz - qz * ty) + px, ly + qw * ty + (qz * tx - qx * tz) + py, lz + qw * tz + (qx * ty - qy * tx) + pz, b.c);
+      fn(lx + qw * tx + (qy * tz - qz * ty) + px, ly + qw * ty + (qz * tx - qx * tz) + py, lz + qw * tz + (qx * ty - qy * tx) + pz, b.c, bi);
     }
   });
 }
@@ -302,13 +298,40 @@ function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a, tint) {
     var s = clamp(0.022 * v.f / P[2], 1, 3.4); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
   });
 }
-function pingpong(R, sec) { var k = Math.floor(sec * R.fps) % (2 * R.n - 2); return k < R.n ? k : 2 * R.n - 2 - k; }
+/* Step 04: the WS30 robot team (two rail arms, two G1s, the door) from dots_data.js, in the scan's own plant frame.
+   dots.js parses it; one rigid transform per part per frame, every other point. */
+function wsTeam() { return window.DOTS && window.DOTS.sides && window.DOTS.sides.team; }
+var teamC = null, teamT0 = 0;
+function teamPose(T, pi, k, k2, u) {
+  var fr = T.frames, o0 = k * T.stride + pi * 7, o1 = k2 * T.stride + pi * 7, m = function (j) { return fr[o0 + j] * (1 - u) + fr[o1 + j] * u; };
+  var qx = m(0), qy = m(1), qz = m(2), qw = m(3), ql = Math.hypot(qx, qy, qz, qw) || 1; qx /= ql; qy /= ql; qz /= ql; qw /= ql;
+  return [1 - 2 * (qy * qy + qz * qz), 2 * (qx * qy - qz * qw), 2 * (qx * qz + qy * qw), 2 * (qx * qy + qz * qw), 1 - 2 * (qx * qx + qz * qz),
+    2 * (qy * qz - qx * qw), 2 * (qx * qz - qy * qw), 2 * (qy * qz + qx * qw), 1 - 2 * (qx * qx + qy * qy), m(4) / 1000 - OX, m(5) / 1000 - OY, m(6) / 1000];
+}
+function drawTeam(ctx, v, T, sec, a) {
+  var fi = clamp(sec * 15, 0, T.F - 1), k = Math.floor(fi), k2 = Math.min(k + 1, T.F - 1), u = fi - k, Q = T.pts, cols = [rgba(C.ink, 0.85 * a), rgba(C.acc, a)];
+  T.parts.forEach(function (p, pi) {
+    var r = teamPose(T, pi, k, k2, u);
+    ctx.fillStyle = cols[p.c === 'a' ? 1 : 0];
+    for (var j = p.o * 3; j < (p.o + p.n) * 3; j += 6) {
+      var x = Q[j], y = Q[j + 1], z = Q[j + 2];
+      if (!proj(v, r[9] + r[0] * x + r[1] * y + r[2] * z, r[10] + r[3] * x + r[4] * y + r[5] * z, r[11] + r[6] * x + r[7] * y + r[8] * z)) continue;
+      var s = clamp(0.02 * v.f / P[2], 1, 3); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
+    }
+  });
+}
+function teamCentre(T) {   // mean position of the robot parts at the start, for the step 04 camera
+  var n = 0, x = 0, y = 0;
+  T.parts.forEach(function (p, pi) { if (p.c !== 'a') return; var r = teamPose(T, pi, 0, 0, 0); x += r[9]; y += r[10]; n++; });
+  return [x / n, y / n];
+}
 function drawStory(now) {
   var dpr = fit(simCv), W = simCv.width, H = simCv.height, ctx = simCv.getContext('2d'), so = SMALL ? CFG.storySmall : CFG.story;
   tShown += (storyT() - tShown) * (REDUCED ? 1 : 0.14); var t = tShown;
   var a = Math.min(5, Math.floor(t)), u = smooth(0, 1, t - a), K0 = KEYS[a], K1 = KEYS[a + 1];
-  var focus = BOTS ? smooth(4, 4.35, t) * (1 - smooth(5, 5.35, t)) : 0;   // stage 05 looks at the robots
-  var v = view(W, H, { tx: focus * (spawn[0] - 0.7), ty: focus * (spawn[1] - 0.5), tz: a === 5 ? 0.4 : 0.7, yaw: K0.yaw + (K1.yaw - K0.yaw) * u + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03),
+  var T = wsTeam(); if (T && !teamC) teamC = teamCentre(T);
+  var fc = teamC || [spawn[0] - 0.7, spawn[1] - 0.5], focus = T || BOTS ? smooth(4, 4.35, t) * (1 - smooth(5, 5.35, t)) : 0;   // stage 04 looks at the robots
+  var v = view(W, H, { tx: focus * fc[0], ty: focus * fc[1], tz: a === 5 ? 0.4 : 0.7, yaw: K0.yaw + (K1.yaw - K0.yaw) * u + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03),
     pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch, dist: K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
   ctx.clearRect(0, 0, W, H);
 
@@ -350,13 +373,10 @@ function drawStory(now) {
     ctx.beginPath(); q.forEach(function (c) { seg(ctx, v, o, c); }); seg(ctx, v, q[0], q[1]); seg(ctx, v, q[1], q[3]); seg(ctx, v, q[3], q[2]); seg(ctx, v, q[2], q[0]); ctx.stroke();
   }
 
-  if (robots > 0 && BOTS) {   // the real two-G1 carry at the spawn point, an arm on a scanned table, a Go2 patrolling
-    var sec = REDUCED ? 0 : now / 1000, ra = 0.95 * robots * (1 - 0.5 * fac);
-    drawBot(ctx, v, BOTS.coop, pingpong(BOTS.coop, sec), spawn[0], spawn[1] - 0.3, 0, Math.PI / 2, ra);
-    drawBot(ctx, v, BOTS.arm, Math.floor(sec * BOTS.arm.fps) % BOTS.arm.n, BOTS.arm.at[0], BOTS.arm.at[1], BOTS.arm.at[2], 2.4, ra);
-    var along = (Math.sin(sec / 4) + 1) / 2, back = Math.cos(sec / 4) < 0;
-    drawBot(ctx, v, BOTS.quad, Math.floor(sec * BOTS.quad.fps) % BOTS.quad.n, spawn[0] - 0.4 - along * 2.6, spawn[1] - 1.3, 0, back ? 0 : Math.PI, ra);
-  }
+  if (robots > 0 && T) {   // the WS30 robot team doing the door job, restarted each time step 04 comes into view
+    if (!teamT0) teamT0 = now;
+    drawTeam(ctx, v, T, REDUCED ? T.F / 15 : ((now - teamT0) / 1000) % (T.F / 15 + 2), 0.95 * robots * (1 - 0.5 * fac));
+  } else teamT0 = 0;
 
   var cur = Math.min(5, Math.floor(clamp(t, 0, 5.999)));
   capsEl.forEach(function (el, j) { el.classList.toggle('on', j === cur); });
@@ -370,12 +390,12 @@ if (runCv && towIn && BOTS && BOTS.quad && !REDUCED) {
   tow.classList.add('wait');
   var YAW = 0.5, PITCH = 0.32, cyw = Math.cos(YAW), syw = Math.sin(YAW), cp = Math.cos(PITCH), sp = Math.sin(PITCH);
   var dog = function (fr, fn) {   // three-quarter view of the Go2: screen x, height above the feet
-    eachBotPoint(BOTS.quad, fr, function (x, y, z) { var xr = x * cyw - y * syw, yr = x * syw + y * cyw; fn(xr, z * cp + yr * sp); });
+    eachBotPoint(BOTS.quad, fr, function (x, y, z, c, bi) { var xr = x * cyw - y * syw, yr = x * syw + y * cyw; fn(xr, z * cp + yr * sp, bi); });
   };
   var vMin = 1e9, vTop = -1e9, xMin = 1e9, xMax = -1e9;
   dog(0, function (x, v) { vMin = Math.min(vMin, v); vTop = Math.max(vTop, v); xMin = Math.min(xMin, x); xMax = Math.max(xMax, x); });
   var RUN0 = 900, ARRIVE = 1700, LAG = 90, SETTLE = 450, LET_GO = 300, ACC = 300;   // ms
-  var bgc = rgba(rgb(css('--bg')), 1), dotc = rgba(C.acc, 1), done = false, pts = [];
+  var bgc = rgba(rgb(css('--bg')), 1), YELLOW = '#f7c600', LEG = '#4a4d4c', done = false, pts = [];   // Spot colours: yellow body, dark lower legs
   (function runLoop(now) {
     var dpr = fit(runCv), ctx = runCv.getContext('2d'), W = runCv.width, t = now - heroT0 - RUN0;
     ctx.clearRect(0, 0, W, runCv.height);
@@ -403,10 +423,9 @@ if (runCv && towIn && BOTS && BOTS.quad && !REDUCED) {
       ctx.quadraticCurveTo((ax + bx) / 2, (ay + by) / 2 + 2 * sag, bx, by); ctx.stroke();
     }
     var fr = Math.floor(t / 1000 * BOTS.quad.fps * 2) % BOTS.quad.n, q = Math.max(2.4 * dpr, h / 34);   // trot at double speed: a run
-    pts.length = 0; dog(fr, function (x, vz) { pts.push(D + x * s, base - (vz - vMin) * s); });
-    [[bgc, q + 5 * dpr], [dotc, q]].forEach(function (ly) {   // dark cutout so it reads over the text, then the dots in one colour
-      ctx.fillStyle = ly[0]; for (var j = 0; j < pts.length; j += 2) ctx.fillRect(pts[j] - ly[1] / 2, pts[j + 1] - ly[1] / 2, ly[1], ly[1]);
-    });
+    pts.length = 0; dog(fr, function (x, vz, bi) { pts.push(D + x * s, base - (vz - vMin) * s, bi > 0 && bi % 3 === 0); });   // bodies: base, then hip, thigh, calf per leg
+    ctx.fillStyle = bgc; for (var j = 0; j < pts.length; j += 3) ctx.fillRect(pts[j] - (q + 5 * dpr) / 2, pts[j + 1] - (q + 5 * dpr) / 2, q + 5 * dpr, q + 5 * dpr);   // dark cutout so it reads over the text
+    for (j = 0; j < pts.length; j += 3) { ctx.fillStyle = pts[j + 2] ? LEG : YELLOW; ctx.fillRect(pts[j] - q / 2, pts[j + 1] - q / 2, q, q); }
   })(performance.now());
 }
 onScreen(story, function (on) { storyOn = on; });

@@ -21,6 +21,7 @@
     return { pts: pts, parts: parts, frames: a.subarray(np * 3), stride: parts.length * 7 + 6, F: meta.frames, fov: meta.fov_deg * Math.PI / 180 };
   }
   var sides = { today: parse(M.sides.today, D.today), team: parse(M.sides.team, D.team) };
+  D.sides = sides;   // engine.js also draws the team inside the scan at story step 04
   var ev = document.getElementById('dots-events'), bar = document.getElementById('dots-bar');
   var NAMES = [[/team/i, 'Team formed'], [/picked/i, 'Door picked up'], [/delivered/i, 'Door delivered'], [/glass/i, 'Glass placed'],
     [/screw/i, 'Screw driven'], [/complete/i, 'Station done']];   // customer-facing names: no arm ids or station codes
