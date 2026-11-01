@@ -153,15 +153,9 @@ var dome = (function () {
 })();
 
 var heroCv = document.getElementById('hero'), heroOn = true, heroT0 = performance.now();
-/* Intro: every point starts on a shell around the room and flies to its place, then two H1s fade in. */
-var HX = new Float32Array(N), HY = new Float32Array(N), HZ = new Float32Array(N), SX = new Float32Array(N), SY = new Float32Array(N), SZ = new Float32Array(N), DEL = new Float32Array(N);
-(function () {
-  var seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }, R0 = Math.max(RW, RD) * 0.75;
-  for (i = 0; i < N; i++) {
-    var th = rnd() * TAU, ph = Math.acos(2 * rnd() - 1);
-    SX[i] = R0 * Math.sin(ph) * Math.cos(th); SY[i] = R0 * Math.sin(ph) * Math.sin(th); SZ[i] = 0.9 + R0 * Math.cos(ph); DEL[i] = rnd() * 0.4;
-  }
-})();
+/* Intro: the floor appears first, then everything above it rises in height order (scan.js lists the ground points
+   first, then the rest by rising z), then the robots fade in. */
+var GROUND = S.ground_count || 0;
 /* Drag the dome with a mouse or a finger: horizontal turns it, vertical tilts it, and it coasts a little after release.
    Touch keeps vertical swipes for page scrolling (touch-action: pan-y), so on phones a drag only turns it. */
 var drag = { yaw: 0, pitch: 0, vy: 0, vp: 0, down: false, x: 0, y: 0 };
@@ -206,13 +200,8 @@ function drawHero(now) {
     }
   });
   ctx.lineWidth = dpr;
-  var fp = REDUCED ? 1 : clamp((t - 300) / 2600, 0, 1), xs = X, ys = Y, zs = Z;
-  if (fp < 1) {
-    for (i = 0; i < N; i++) { var e = smooth(0, 1, clamp(fp * 1.4 - DEL[i], 0, 1));
-      HX[i] = SX[i] + (X[i] - SX[i]) * e; HY[i] = SY[i] + (Y[i] - SY[i]) * e; HZ[i] = SZ[i] + (Z[i] - SZ[i]) * e; }
-    xs = HX; ys = HY; zs = HZ;
-  }
-  drawPoints(ctx, v, function (i) { return lvl(0.35 + 0.07 * SH[i]); }, 0.022, 0, 0, SMALL ? 2 : 1, xs, ys, zs);
+  var fp = REDUCED ? 1 : clamp((t - 300) / 2600, 0, 1), shown = GROUND * smooth(0, 0.35, fp) + (N - GROUND) * smooth(0.35, 1, fp);
+  drawPoints(ctx, v, function (i) { return i < shown ? lvl(0.35 + 0.07 * SH[i]) : 0; }, 0.022, 0, 0, SMALL ? 2 : 1);
   if (BOTS && BOTS.h1) {   // two Unitree H1s facing each other in the rebuilt room
     var ha = REDUCED ? 1 : smooth(2900, 4100, t), fr = Math.floor(t / 1000 * BOTS.h1.fps) % BOTS.h1.n;
     if (ha > 0) {

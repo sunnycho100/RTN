@@ -304,6 +304,7 @@ dialog.quote .btn { justify-self: start; }
 .abc-lines i::after { content: attr(data-l); position: absolute; top: -18px; right: 4px; font: 500 11px/1 var(--mono); color: var(--dim); white-space: nowrap; }
 .abc-lines i.takt::after { top: auto; bottom: -18px; color: var(--hot); }
 .abc-vid { margin-top: 24px; }
+.abc-eg { margin: 0 0 10px; color: var(--dim); font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
 .abc-stnote { margin: 34px 0 0; min-height: 1.6em; color: var(--dim); font-size: 15px; max-width: 70ch; }
 
 .abc-note { margin-top: clamp(48px, 8vh, 80px); padding-top: 18px; border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; color: var(--dim); font-size: 14px; }
@@ -389,8 +390,8 @@ dialog.quote .btn { justify-self: start; }
       <aside class="verdict" id="verdict" aria-label="Example verdict">
         <div class="mono">EXAMPLE VERDICT · CAR-DOOR LINE</div>
         <dl>
-          <dt>Setup</dt><dd>Option C, 3 cobots</dd>
-          <dt>Holds takt</dt><dd>Yes</dd>
+          <dt>Setup</dt><dd>Robot at every station</dd>
+          <dt>Hits target</dt><dd>Yes</dd>
           <dt>Cycle time</dt><dd>224 s</dd>
           <dt>Install cost</dt><dd>$437k</dd>
           <dt>Payback</dt><dd>3.3 years</dd>
@@ -400,8 +401,9 @@ dialog.quote .btn { justify-self: start; }
   </section>
 
   <section class="block wrap abc" id="options" aria-labelledby="abc-h">
+  <p class="abc-eg">Example: a car-door assembly line</p>
   <h2 class="sec" id="abc-h">Three ways to fix this line.</h2>
-  <p class="lede">Every setup the line allows, scored. Three kept.</p>
+  <p class="lede">Your options, ranked by what you care about most.</p>
 
   <!-- 1. many to few -->
   <div class="abc-funnel">
@@ -409,8 +411,8 @@ dialog.quote .btn { justify-self: start; }
     <div>
       <ol class="abc-steps" id="abc-steps" aria-live="polite">
         <li><b>1,219</b><span>designs built</span><small>Robot or none at each station, layout changes, task splits</small></li>
-        <li><b>40</b><span>not beaten on every count</span><small>Cost, return, cycle time, worker strain, robots to install</small></li>
-        <li><b>31</b><span>still ahead after line simulation</span><small>30 simulated shifts each, same random events for all</small></li>
+        <li><b>40</b><span>worth a closer look</span><small>Cost, return, cycle time, worker strain, robots to install</small></li>
+        <li><b>31</b><span>still ahead in a simulated shift</span><small>30 simulated shifts each, same random events for all</small></li>
         <li><b>10</b><span>practical</span><small>No extra hire, money back within 5 years</small></li>
         <li><b>3</b><span>options for you</span><small>Together the best pick for 88% of priorities</small></li>
       </ol>
@@ -421,7 +423,7 @@ dialog.quote .btn { justify-self: start; }
   <!-- 2. priorities -->
   <div class="abc-part" id="abc-ask">
     <h3 class="abc-h3">What matters most to you?</h3>
-    <p class="abc-sub">How often each option wins across 20,000 weightings. Gray: a two-robot setup.</p>
+    <p class="abc-sub">How often each option comes out on top.</p>
     <div class="abc-seg" role="group" aria-label="Priority" id="abc-seg"></div>
     <p class="abc-why" id="abc-why" aria-live="polite"></p>
     <div class="abc-share" id="abc-share" aria-hidden="true"></div>
@@ -432,14 +434,14 @@ dialog.quote .btn { justify-self: start; }
   <!-- 3. station cycles -->
   <div class="abc-part">
     <h3 class="abc-h3">Does each station make the cut?</h3>
-    <p class="abc-sub"><span class="abc-tag">Simulated, 990 runs</span> Slowest 5% of cycles, seconds per door. Cap: 228 s.</p>
+    <p class="abc-sub"><span class="abc-tag">Simulated, 990 runs</span> Slowest 5% of cycles, seconds per door. Target: 228 s.</p>
     <div class="abc-tabs" role="group" aria-label="Show stations for" id="abc-tabs"></div>
     <div class="abc-st" id="abc-st"><div class="abc-lines" id="abc-lines"></div></div>
     <p class="abc-stnote" id="abc-stnote" aria-live="polite"></p>
-    <figure class="clip abc-vid"><video data-src="media/ws10_human_vs_cell.mp4" poster="media/posters/ws10_human_vs_cell.jpg" muted loop playsinline preload="none" style="aspect-ratio: 32 / 9"></video><figcaption><span class="tag ours">Ours</span><span class="tag">5× speed</span>WS10 on one clock: worker alone, worker with cobot</figcaption></figure>
+    <figure class="clip abc-vid"><video data-src="media/ws10_human_vs_cell.mp4" poster="media/posters/ws10_human_vs_cell.jpg" muted loop playsinline preload="none" style="aspect-ratio: 32 / 9"></video><figcaption><span class="tag ours">Ours</span><span class="tag">5× speed</span>Station 1 on one clock: worker alone, worker with a robot arm</figcaption></figure>
   </div>
 
-  <p class="abc-note"><span class="abc-tag">IE estimate</span><span>Funnel and cards: time study and line simulation from video and motion capture. Data: CarDA, Stellantis Melfi line, CC BY 4.0.</span></p>
+  <p class="abc-note"><span class="abc-tag">Estimate</span><span>Funnel and cards come from a time study and a line simulation. Shares come from 20,000 random mixes of priorities; gray is a two-robot setup. Data: CarDA, CC BY 4.0.</span></p>
 </section>
 
   <section class="block wrap" id="film">
@@ -528,8 +530,8 @@ dialog.quote .btn { justify-self: start; }
   <section class="block wrap" id="spec">
     <h2 class="sec">What we need, what you get.</h2>
     <div class="spec">
-      <div><b>WE NEED</b><ul><li>One phone video of the area</li><li>Your stations and takt target</li><li>The robots you are weighing</li></ul></div>
-      <div><b>YOU GET</b><ul><li>Your floor, rebuilt in 3D</li><li>Each option run against your takt</li><li>A film and a written verdict</li></ul></div>
+      <div><b>WE NEED</b><ul><li>One phone video of the area</li><li>Your stations and target cycle time</li><li>The robots you are weighing</li></ul></div>
+      <div><b>YOU GET</b><ul><li>Your floor, rebuilt in 3D</li><li>Each option run against your target</li><li>A film and a written verdict</li></ul></div>
       <div><b>ROBOTS RUN SO FAR</b><ul><li>Unitree G1, H1, Go2</li><li>Franka Panda, UR10e, Doosan M0617</li><li>ANYmal, Spot</li></ul></div>
     </div>
   </section>
@@ -609,9 +611,9 @@ dialog.quote .btn { justify-self: start; }
   </div>
 </dialog>
 <script src="quote.js"></script>
-<script src="options.js?v=2"></script>
-<script src="scan.js?v=3"></script>
+<script src="options.js?v=3"></script>
+<script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=10"></script>
+<script src="engine.js?v=11"></script>
 </body>
 </html>

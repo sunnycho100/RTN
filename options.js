@@ -4,22 +4,22 @@
 (() => {
   // ---- data (s5x headline, config/demo_regress.yaml) ----
   const OPT = {
-    A: { title: "Layout only", desc: "AMR kitting brings parts to all three stations. No robot.", adds: "START HERE",
+    A: { title: "Better layout, no robot arms", desc: "A mobile robot brings parts to every station.", adds: "START HERE",
          capex: 54000, npv: 41221, overrun: 41.1, strain: 80.0, payback: 2.3, doors: 13.6, share: 24 },
-    B: { title: "One robot at WS20", desc: "A, plus one Doosan M0617 on a track at the slowest station.", adds: "BUILDS ON A",
+    B: { title: "One robot at the slowest station", desc: "A, plus a collaborative robot arm on a track.", adds: "BUILDS ON A",
          capex: 190625, npv: 238291, overrun: 28.0, strain: 36.8, payback: 1.8, doors: 14.1, share: 38 },
-    C: { title: "Three robots", desc: "B, plus the same robot at WS10 and WS30.", adds: "BUILDS ON B",
+    C: { title: "One robot at every station", desc: "B, plus the same arm at the other two stations.", adds: "BUILDS ON B",
          capex: 436876, npv: 97006, overrun: 5.3, strain: 13.1, payback: 3.3, doors: 14.9, share: 26 },
   };
   // station cycle p95 in s from the MuJoCo runs on 30 shared draws (carda/options_abc/summary.json): Today is the worker
   // alone, A at walk x0.5, C with the worker leaving the door after their part
   const SIM = { Today: [294.7, 328.7, 254.4], A: [262.8, 296.3, 247.0], B: [262.8, 197.2, 247.0], C: [223.7, 197.2, 220.5] };
-  const STATIONS = [["WS10", "glass"], ["WS20", "mirror"], ["WS30", "speaker"]];
+  const STATIONS = [["Station 1", "glass"], ["Station 2", "mirror"], ["Station 3", "speaker"]];
   const CAP = 228, TAKT = 240, AXIS = 340;
   const KPI = [   // [key, label, format, lower is better]
     ["capex", "Install cost", v => "$" + Math.round(v / 1000) + "k", true],
-    ["npv", "5-year NPV", v => "$" + Math.round(v / 1000) + "k", false],
-    ["overrun", "Cycles over takt", v => Math.round(v) + "%", true],
+    ["npv", "5-year return", v => "$" + Math.round(v / 1000) + "k", false],
+    ["overrun", "Cycles over target", v => Math.round(v) + "%", true],
     ["strain", "Awkward posture", v => Math.round(v) + " s per door", true],
   ];
   // share of the 20,000 weightings where each option holds the best practical design, split by top-weighted criterion
@@ -28,7 +28,7 @@
     { id: "all",    label: "Weigh all equally",     lead: "With no single priority",        s: { A: 24, B: 38, C: 26, X: 12 } },
     { id: "spend",  label: "Spend less up front",   lead: "When install cost comes first",  s: { A: 56, B: 40, C: 0, X: 4 } },
     { id: "return", label: "Best 5-year return",    lead: "When return comes first",        s: { A: 4, B: 75, C: 12, X: 10 } },
-    { id: "takt",   label: "Hit takt every cycle",  lead: "When hitting takt comes first",  s: { A: 1, B: 10, C: 71, X: 17 } },
+    { id: "takt",   label: "Hit the target every cycle",  lead: "When hitting the target comes first",  s: { A: 1, B: 10, C: 71, X: 17 } },
     { id: "strain", label: "Less worker strain",    lead: "When worker strain comes first", s: { A: 0, B: 26, C: 47, X: 27 } },
   ];
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -156,7 +156,7 @@
 
   $("abc-seg").innerHTML = PRI.map(p => `<button type="button" data-p="${p.id}" aria-pressed="false">${p.label}</button>`).join("");
   const segs = [...$("abc-seg").querySelectorAll("button")];
-  const NAME = { A: "A", B: "B", C: "C", X: "two robots" };
+  const NAME = { A: "A", B: "B", C: "C", X: "other setups" };
   const setPriority = id => {
     const p = PRI.find(q => q.id === id);
     const win = ["A", "B", "C"].reduce((a, b) => p.s[b] > p.s[a] ? b : a);
@@ -175,13 +175,13 @@
   const tabs = [...$("abc-tabs").querySelectorAll("button")];
   $("abc-st").insertAdjacentHTML("beforeend", STATIONS.map(([s, what]) => `
     <div class="abc-row"><span><b>${s}</b>${what}</span><div class="abc-track"><i></i><em></em></div></div>`).join(""));
-  $("abc-lines").innerHTML = `<i style="left:${CAP / AXIS * 100}%" data-l="228 s cap"></i><i class="takt" style="left:${TAKT / AXIS * 100}%" data-l="240 s takt"></i>`;
+  $("abc-lines").innerHTML = `<i style="left:${CAP / AXIS * 100}%" data-l="228 s target"></i><i class="takt" style="left:${TAKT / AXIS * 100}%" data-l="240 s line pace"></i>`;
   const tracks = [...document.querySelectorAll(".abc-track")];
   const NOTE = {
-    Today: "Worker alone, no robot. Every station runs over takt.",
-    A: "Kitting halves walking, but every station stays over the cap.",
-    B: "The robot takes WS20 under the cap. WS10 and WS30 stay over.",
-    C: "Holds 228 s if the worker steps away after their part.",
+    Today: "Worker alone, no robot. Every station runs slower than the line.",
+    A: "Parts come to the worker, but every station stays over the target.",
+    B: "The robot brings station 2 under the target. Stations 1 and 3 stay over.",
+    C: "Every station hits the target if the worker steps away after their part.",
   };
   let shown = false, view = "B";
   const showView = v => {
