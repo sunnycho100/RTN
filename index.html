@@ -504,7 +504,6 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
       <span class="tel"><span class="cc"><input name="cc" id="cc" value="+1" role="combobox" aria-label="Country code" aria-autocomplete="list" aria-expanded="false" aria-controls="cc-list" autocomplete="off" inputmode="tel" placeholder="+1"><ul id="cc-list" role="listbox" aria-label="Country codes" hidden></ul></span><input type="tel" name="phone" autocomplete="tel-national" placeholder="555 123 4567"></span></label>
     <label class="f"><span>Company name (optional)</span><input name="company" autocomplete="organization" placeholder=""></label>
     <button class="btn" type="submit"><span class="lbl"><span class="a">Request a quote</span><span class="b" aria-hidden="true">Sending</span></span><span class="arr" aria-hidden="true">→</span></button>
-    <p class="note">We only use your details to reply.</p>
   </form>
 
   <div data-view="received" hidden>
@@ -518,8 +517,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 
   <form id="quote-step2" data-view="step2" hidden>
     <h2>Tell us about your site</h2>
-    <p class="sub">Tell us about your workflow. We'll review its simulation potential.</p>
-    <label class="f"><span>Facility location</span><input name="location" required placeholder="City and country"><small>No street address needed at this stage.</small></label>
+    <label class="f"><span>Facility location</span><input name="location" required placeholder="City and country"></label>
     <fieldset class="f"><legend>What task do you want to automate?</legend>
       <div class="pills">
         <label><input type="radio" name="task" value="Material handling and transport" required><span>Material handling and transport</span></label>
@@ -531,23 +529,22 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <label class="f"><span>What is your main goal?</span><select name="goal" required>
       <option value="">Choose one</option><option>Reduce manual labor</option><option>Increase throughput</option>
       <option>Improve safety</option><option>Cut costs</option><option>Other</option></select></label>
-    <fieldset class="f"><legend>Machines on site</legend><small>We rebuild these in NVIDIA Isaac Sim, so the type plus brand and model helps.</small>
+    <fieldset class="f"><legend>Machines on site</legend>
       <div id="machines"></div><button type="button" class="add" id="add-machine">Add a machine</button></fieldset>
-    <label class="f"><span>A video of the area to rebuild</span><input type="file" name="video" accept="video/*"><small>A phone video is fine: 1 to 3 minutes, walk slowly through the area. Up to 20 MB.</small></label>
-    <label class="f"><span>Or a Google Drive or Dropbox link</span><input type="url" name="videoLink" placeholder="https://"></label>
+    <label class="f"><span>A video of the area</span><input type="file" name="video" accept="video/*"><small>Phone or camera recording</small></label>
+    <label class="f"><span>Or a Google Drive link</span><input type="url" name="videoLink" placeholder="https://"></label>
     <label class="f"><span>Notes (optional)</span><textarea name="notes" rows="3" placeholder="Shift pattern, part sizes, anything else"></textarea></label>
     <p class="note" id="upload-note" role="status"></p>
     <button class="btn" type="submit"><span class="lbl"><span class="a">Send details</span><span class="b" aria-hidden="true">Sending</span></span><span class="arr" aria-hidden="true">→</span></button>
-    <p class="note">Site details and video are used only to assess your site and build its simulation.</p>
   </form>
 
   <div data-view="done" hidden>
     <h2>Request received.</h2>
-    <p class="sub">Thanks for sharing your site with RTOS. Our team will review your workflow and decide whether it's suitable for an initial robotics simulation. We may contact you for additional measurements or task details.</p>
+    <p class="sub">Thanks. We'll review your site and get back to you.</p>
     <button class="btn" type="button" data-close>Close</button>
   </div>
 </dialog>
-<script src="quote.js?v=4"></script>
+<script src="quote.js?v=5"></script>
 <script src="options.js?v=5"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>

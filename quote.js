@@ -114,8 +114,8 @@
   var rows = document.getElementById('machines');
   function addRow() {
     var r = document.createElement('div'); r.className = 'mrow';
-    r.innerHTML = '<input placeholder="Machine type, for example CNC mill" aria-label="Machine type">' +
-      '<input placeholder="Brand and model, for example Haas VF-2" aria-label="Brand and model">' +
+    r.innerHTML = '<input placeholder="Type, e.g. CNC mill" aria-label="Machine type">' +
+      '<input placeholder="Model, e.g. Haas VF-2" aria-label="Brand and model">' +
       '<button type="button" class="x" aria-label="Remove this machine">&times;</button>';
     r.querySelector('.x').addEventListener('click', function () { r.remove(); });
     rows.appendChild(r);
@@ -134,12 +134,12 @@
     var details = { location: String(d.get('location')).trim(), task: d.get('task'), goal: d.get('goal'), machines: machines,
       videoLink: String(d.get('videoLink') || '').trim(), notes: String(d.get('notes') || '').trim(),
       details: true, detailsAt: new Date().toISOString() };
-    if (file && file.size > 20 * 1024 * 1024) { note.textContent = 'This video is over 20 MB. Please share a Drive or Dropbox link instead.'; return; }
+    if (file && file.size > 20 * 1024 * 1024) { note.textContent = 'This video is too large to upload here. Please share a Google Drive link instead.'; return; }
     var btn = f2.querySelector('[type=submit]'); btn.disabled = true; btn.classList.add('sending'); note.textContent = '';
     var s = await store;
     if (file && s && s.assets) {   // without a backend the file never leaves the browser
       try { details.videoAsset = (await s.assets.upload(file)).id; }
-      catch (err) { note.textContent = "The video didn't upload. Please share a Drive or Dropbox link instead."; btn.disabled = false; btn.classList.remove('sending'); return; }
+      catch (err) { note.textContent = "The video didn't upload. Please share a Google Drive link instead."; btn.disabled = false; btn.classList.remove('sending'); return; }
     }
     await save(details, true);
     btn.disabled = false; btn.classList.remove('sending');
