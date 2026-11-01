@@ -5,18 +5,17 @@
   // ---- data (s5x headline, config/demo_regress.yaml) ----
   const OPT = {
     A: { title: "Layout only", desc: "AMR kitting brings parts to all three stations. No robot.", adds: "START HERE",
-         capex: 54000, npv: 41221, overrun: 41.1, strain: 80.0, payback: 2.3, doors: 13.6, share: 24,
-         st: [233.6, 233.2, 239.9] },
+         capex: 54000, npv: 41221, overrun: 41.1, strain: 80.0, payback: 2.3, doors: 13.6, share: 24 },
     B: { title: "One robot at WS20", desc: "A, plus one Doosan M0617 on a track at the slowest station.", adds: "BUILDS ON A",
-         capex: 190625, npv: 238291, overrun: 28.0, strain: 36.8, payback: 1.8, doors: 14.1, share: 38,
-         st: [233.6, 160.2, 239.9] },
+         capex: 190625, npv: 238291, overrun: 28.0, strain: 36.8, payback: 1.8, doors: 14.1, share: 38 },
     C: { title: "Three robots", desc: "B, plus the same robot at WS10 and WS30.", adds: "BUILDS ON B",
-         capex: 436876, npv: 97006, overrun: 5.3, strain: 13.1, payback: 3.3, doors: 14.9, share: 26,
-         st: [201.7, 160.2, 211.1] },
+         capex: 436876, npv: 97006, overrun: 5.3, strain: 13.1, payback: 3.3, doors: 14.9, share: 26 },
   };
-  const TODAY = [254.7, 262.5, 246.7];   // s5 as-is standard time; WS20 measured, WS10 and WS30 partly assumed
+  // station cycle p95 in s from the MuJoCo runs on 30 shared draws (carda/options_abc/summary.json): Today is the worker
+  // alone, A at walk x0.5, C with the worker leaving the door after their part
+  const SIM = { Today: [294.7, 328.7, 254.4], A: [262.8, 296.3, 247.0], B: [262.8, 197.2, 247.0], C: [223.7, 197.2, 220.5] };
   const STATIONS = [["WS10", "glass"], ["WS20", "mirror"], ["WS30", "speaker"]];
-  const CAP = 228, TAKT = 240, AXIS = 270;
+  const CAP = 228, TAKT = 240, AXIS = 340;
   const KPI = [   // [key, label, format, lower is better]
     ["capex", "Install cost", v => "$" + Math.round(v / 1000) + "k", true],
     ["npv", "5-year NPV", v => "$" + Math.round(v / 1000) + "k", false],
@@ -171,7 +170,7 @@
   segs.forEach(b => b.addEventListener("click", () => setPriority(b.dataset.p)));
 
   // ---- 3. station cycles ----
-  const VIEWS = { Today: TODAY, A: OPT.A.st, B: OPT.B.st, C: OPT.C.st };
+  const VIEWS = SIM;
   $("abc-tabs").innerHTML = Object.keys(VIEWS).map(k => `<button type="button" data-v="${k}" aria-pressed="false">${k}</button>`).join("");
   const tabs = [...$("abc-tabs").querySelectorAll("button")];
   $("abc-st").insertAdjacentHTML("beforeend", STATIONS.map(([s, what]) => `
@@ -179,10 +178,10 @@
   $("abc-lines").innerHTML = `<i style="left:${CAP / AXIS * 100}%" data-l="228 s cap"></i><i class="takt" style="left:${TAKT / AXIS * 100}%" data-l="240 s takt"></i>`;
   const tracks = [...document.querySelectorAll(".abc-track")];
   const NOTE = {
-    Today: "Today all three stations run over takt. WS20 is measured; WS10 and WS30 are partly assumed, since the clips show only part of their cycle.",
-    A: "Kitting cuts walking, but every station stays above the 228 s cap. It works only if the AMR halves walking time.",
-    B: "The robot takes WS20 well under the cap. WS10 and WS30 still run close to takt with people alone.",
-    C: "In simulation all three stations clear the 228 s cap, but only when the worker leaves the door after their part.",
+    Today: "Worker alone, no robot. Every station runs over takt.",
+    A: "Kitting halves walking, but every station stays over the cap.",
+    B: "The robot takes WS20 under the cap. WS10 and WS30 stay over.",
+    C: "Holds 228 s if the worker steps away after their part.",
   };
   let shown = false, view = "B";
   const showView = v => {
