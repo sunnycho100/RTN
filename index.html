@@ -91,6 +91,8 @@ a { color: inherit; }
 .rail button::after { content: ""; width: 18px; height: 1px; background: var(--line); transition: width 0.3s, background 0.3s; }
 .rail button.on { color: var(--ink); }
 .rail button.on::after { width: 34px; background: var(--accent); }
+.rail button.done { color: var(--ink); }
+.rail button.done::after { background: var(--accent); }
 .rail button:focus-visible { outline: 1px solid var(--accent); }
 @media (max-width: 720px) { .rail { display: none; } .cap { max-width: calc(100vw - 2 * var(--gutter)); } .cap p { font-size: 15px; } }
 .team-panel { position: absolute; top: 88px; bottom: calc(clamp(32px, 8vh, 80px) + 190px); left: max(var(--gutter), env(safe-area-inset-left, 0px)); right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); display: grid; place-items: center; opacity: 0; visibility: hidden; }
@@ -136,9 +138,6 @@ section.block { padding-block: clamp(72px, 12vh, 140px) 0; }
 @media (max-width: 760px) { .spec { grid-template-columns: 1fr; } }
 
 .clip { margin: 0; background: var(--panel); border: 1px solid var(--line); }
-.pair { position: relative; }
-.pair span { position: absolute; top: 10px; font: 500 13px/1 var(--body); color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7); }
-.pair .l { left: 12px; } .pair .r { left: calc(50% + 12px); }
 /* drag to compare: the camera frame is clipped over the rebuild at --p */
 .ba { position: relative; --p: 50%; cursor: ew-resize; touch-action: pan-y; user-select: none; }
 .ba img { display: block; width: 100%; height: auto; pointer-events: none; }
@@ -436,6 +435,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
       <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video></figure>
     </details>
     <figure class="clip wide" style="margin-top: 24px"><div class="ba"><img src="media/ws30_sim.jpg" loading="lazy" width="1280" height="628" alt="Our Isaac Sim rebuild of the WS30 station, seen from the calibrated camera."><img class="top" src="media/ws30_cam.jpg" loading="lazy" width="1280" height="628" alt="A real CarDA camera frame of the WS30 station."><span class="l">Camera</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the camera frame with the 3D reconstruction"></div></figure>
+    <figure class="clip wide" style="margin-top: 24px"><div class="ba"><img src="media/photo_sim.jpg" loading="lazy" width="1200" height="600" alt="The same warehouse view rebuilt in Isaac Sim from that one photo."><img class="top" src="media/photo_src.jpg" loading="lazy" width="1200" height="600" alt="A warehouse photo with a forklift."><span class="l">Photo</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the photo with the 3D reconstruction"></div><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim</figcaption></figure>
     <script>
     document.querySelectorAll('.ba').forEach(function (ba) {   // drag anywhere on the image, or use the arrow keys on the hidden range
       var r = ba.querySelector('input'), drag = false;
@@ -447,7 +447,6 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
       ['pointerup', 'pointercancel'].forEach(function (n) { ba.addEventListener(n, function () { drag = false; }); });
     });
     </script>
-    <figure class="clip wide" style="margin-top: 24px"><div class="pair"><img src="media/photo_pair.jpg" loading="lazy" width="1600" height="532" style="display: block; width: 100%; height: auto" alt="Left: a warehouse photo with a forklift. Right: the same view rebuilt in Isaac Sim from that one photo."><span class="l">Photo</span><span class="r">3D reconstruction</span></div><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim</figcaption></figure>
   </section>
 
 
@@ -546,7 +545,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 <script src="options.js?v=5"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=27"></script>
+<script src="engine.js?v=28"></script>
 <script src="dots_data.js?v=4"></script>
 <script src="dots.js?v=3"></script>
 </body>

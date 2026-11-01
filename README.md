@@ -38,7 +38,7 @@ All clips are our own runs. None come from other companies' sites.
 | `door_team.mp4` | WS30 rebuild in Isaac Sim: two UR20 rail arms and two G1s do the door job, kinematic replay, real time. Kept for the demo video, not on the page |
 | `door_team_v3c.mp4` | Whole floor, car-door station: the WS30 team job, v3c (G1 A drives the screw, G1 B sets a full-size pane with a suction lifter), no overlays, real time |
 | `process_film.mp4` | Process film on the CarDA WS30 station: record, label, rebuild in Isaac Sim, automate |
-| `photo_pair.jpg` | One public-domain warehouse photo (Lance Cheung, USDA, via Wikimedia Commons) beside our Isaac Sim rebuild from the same camera |
+| `photo_src.jpg`, `photo_sim.jpg` | One public-domain warehouse photo (Lance Cheung, USDA, via Wikimedia Commons) and our Isaac Sim rebuild from the same camera; the page stacks them in a drag-to-compare slider |
 | `ws30_cam.jpg`, `ws30_sim.jpg` | A CarDA WS30 OUT camera frame and our Isaac Sim rebuild from the same calibrated camera, cropped to match; the page stacks them in a drag-to-compare slider |
 | `g1coop_factory.mp4` | Seohee's 20-robot factory, v3 overview (first 10 s) with realistic loads (welded T-frame, steel sheet bundle, KLT tote): her MuJoCo run rendered in Isaac Sim (visual port, MuJoCo decides all motion) |
 | `close_3g1_tframe.mp4`, `close_2g1_sheets.mp4`, `close_1g1_tote.mp4` | Close-ups from Seohee's factory, v3 (the tote clip is off the page for now: the tote is carried tilted): G1s carrying a welded T-frame, a steel sheet bundle and a KLT tote |

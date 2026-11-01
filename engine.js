@@ -394,7 +394,7 @@ function drawStory(now) {
 
   var cur = Math.min(5, Math.floor(clamp(t, 0, 5.999)));
   capsEl.forEach(function (el, j) { el.classList.toggle('on', j === cur); });
-  railBtns.forEach(function (b) { b.classList.toggle('on', +b.dataset.stage === cur); });
+  railBtns.forEach(function (b) { b.classList.toggle('on', +b.dataset.stage === cur); b.classList.toggle('done', +b.dataset.stage < cur); });   // steps already passed stay lit
   if (verdictEl) verdictEl.classList.toggle('on', t > 5.45);
 }
 /* ---- hero runner: a Go2 trots in towing "your workplace." on a leash; the words slide out after "into" and settle,
