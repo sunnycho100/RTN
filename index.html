@@ -195,8 +195,11 @@ details.step summary:hover .t { color: var(--accent); }
 .nums span { color: var(--dim); font-size: 14px; }
 @media (max-width: 720px) { .nums { grid-template-columns: 1fr; } }
 
-.cta { margin-top: clamp(96px, 14vh, 160px); padding-block: clamp(56px, 10vh, 110px); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 24px; align-items: end; justify-content: space-between; }
-.cta h2 { margin: 0; font: 650 clamp(34px, 5vw, 72px)/0.95 var(--display); font-stretch: 112%; letter-spacing: -0.02em; }
+.cta { margin-top: clamp(96px, 14vh, 160px); padding-block: clamp(64px, 12vh, 130px); border-top: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 32px; text-align: center; }
+.cta > div { display: grid; justify-items: center; gap: 16px; }
+.cta .btn { padding: 20px 40px; font-size: 20px; font-weight: 600; background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.cta p.mono { margin: 0; font-size: 12px; color: var(--dim); }
+.cta h2 { margin: 0; font: 650 clamp(32px, 5vw, 72px)/0.95 var(--display); font-stretch: 112%; letter-spacing: -0.02em; white-space: nowrap; }
 .cta .addr { user-select: all; }
 footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 12px 32px; justify-content: space-between; }
 
@@ -533,7 +536,7 @@ dialog.quote .btn { justify-self: start; }
 
 <footer class="wrap mono">
   <span>RTOS · Real to Simulation · draft</span>
-  <span>All clips are our own MuJoCo and Isaac Sim runs. CarDA motion data and the Depot warehouse (roqsim) are CC BY 4.0.</span>
+  <span>Simulation clips are our own MuJoCo and Isaac Sim runs. CarDA footage and motion data, and the Depot world by Open Robotics, are CC BY 4.0.</span>
 </footer>
 
 
