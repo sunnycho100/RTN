@@ -159,7 +159,7 @@
     const rest = Object.entries(p.s).filter(([k, v]) => k !== win && v > 0).sort((a, b) => b[1] - a[1])
       .map(([k, v]) => `${NAME[k]} ${v}%`).join(", ");
     $("abc-why").innerHTML = `${p.lead}, <b>option ${win}</b> comes out on top ${p.s[win]}% of the time. ${rest ? "Then " + rest + "." : ""}`;
-    $("abc-share").innerHTML = ["A", "B", "C", "X"].map(k => `<i class="${k === win ? "win" : k === "X" ? "x" : ""}" style="flex-basis:${p.s[k]}%">${p.s[k] >= 7 ? (k === "X" ? "" : k + " ") + p.s[k] + "%" : ""}</i>`).join("");
+    $("abc-share").innerHTML = ["A", "B", "C", "X"].map(k => `<i class="${k === win ? "win" : k === "X" ? "x" : ""}" style="flex-basis:${p.s[k]}%">${p.s[k] >= 7 ? (k === "X" ? ($("abc-share").clientWidth * p.s[k] / 100 > 72 ? "Other " : "") : k + " ") + p.s[k] + "%" : ""}</i>`).join("");
     pick(win);
   };
   segs.forEach(b => b.addEventListener("click", () => setPriority(b.dataset.p)));
