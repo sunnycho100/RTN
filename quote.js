@@ -41,6 +41,42 @@
     } catch (err) { return false; }
   }
 
+  // Country code: type digits or a country name; the list filters by prefix, and a code not in it is kept as typed.
+  var CODES = [['1', 'US and Canada'], ['7', 'Kazakhstan'], ['20', 'Egypt'], ['27', 'South Africa'], ['31', 'Netherlands'], ['32', 'Belgium'],
+    ['33', 'France'], ['34', 'Spain'], ['36', 'Hungary'], ['39', 'Italy'], ['40', 'Romania'], ['41', 'Switzerland'], ['43', 'Austria'],
+    ['44', 'United Kingdom'], ['45', 'Denmark'], ['46', 'Sweden'], ['47', 'Norway'], ['48', 'Poland'], ['49', 'Germany'], ['52', 'Mexico'],
+    ['55', 'Brazil'], ['60', 'Malaysia'], ['61', 'Australia'], ['62', 'Indonesia'], ['63', 'Philippines'], ['64', 'New Zealand'],
+    ['65', 'Singapore'], ['66', 'Thailand'], ['81', 'Japan'], ['82', 'Korea'], ['84', 'Vietnam'], ['86', 'China'], ['90', 'Turkey'],
+    ['91', 'India'], ['351', 'Portugal'], ['353', 'Ireland'], ['358', 'Finland'], ['420', 'Czechia'], ['852', 'Hong Kong'], ['886', 'Taiwan'],
+    ['966', 'Saudi Arabia'], ['971', 'United Arab Emirates'], ['972', 'Israel']];
+  var cc = document.getElementById('cc'), ccList = document.getElementById('cc-list'), ccMatch = [], ccAt = -1;
+  function ccOpen(open) { ccList.hidden = !open; cc.setAttribute('aria-expanded', open); if (!open) cc.removeAttribute('aria-activedescendant'); }
+  function ccFilter() {
+    var q = cc.value.trim().toLowerCase(), digits = q.replace(/[^0-9]/g, ''), name = q.replace(/^\+?[0-9 ]*/, '');
+    ccMatch = CODES.filter(function (c) { return digits ? c[0].indexOf(digits) === 0 : !name || c[1].toLowerCase().indexOf(name) === 0; });
+    ccAt = ccMatch.length ? 0 : -1;
+    ccList.innerHTML = ccMatch.map(function (c, i) { return '<li role="option" id="cc-' + i + '" aria-selected="' + (i === ccAt) + '"><b>+' + c[0] + '</b>' + c[1] + '</li>'; }).join('');
+    ccOpen(ccMatch.length > 0); ccMark();
+  }
+  function ccMark() {
+    [].forEach.call(ccList.children, function (li, i) { li.setAttribute('aria-selected', i === ccAt); });
+    if (ccAt >= 0) { cc.setAttribute('aria-activedescendant', 'cc-' + ccAt); ccList.children[ccAt].scrollIntoView({ block: 'nearest' }); }
+  }
+  function ccPick(i) { cc.value = '+' + ccMatch[i][0]; ccOpen(false); }
+  cc.addEventListener('input', ccFilter);
+  cc.addEventListener('focus', function () { cc.select(); ccFilter(); });
+  cc.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault(); if (ccList.hidden) return ccFilter();
+      ccAt = (ccAt + (e.key === 'ArrowDown' ? 1 : ccMatch.length - 1)) % ccMatch.length; ccMark();
+    } else if (e.key === 'Enter' && !ccList.hidden && ccAt >= 0) { e.preventDefault(); ccPick(ccAt); }
+    else if (e.key === 'Escape' && !ccList.hidden) { e.preventDefault(); e.stopPropagation(); ccOpen(false); }
+  });
+  ccList.addEventListener('mousedown', function (e) { var li = e.target.closest('li'); if (li) { e.preventDefault(); ccPick([].indexOf.call(ccList.children, li)); } });
+  cc.addEventListener('blur', function () {   // keep a code that is not in the list, written as +digits
+    ccOpen(false); var d = cc.value.replace(/[^0-9]/g, ''); cc.value = d ? '+' + d : '';
+  });
+
   var f1 = document.getElementById('quote-step1');
   f1.addEventListener('submit', async function (e) {
     e.preventDefault();

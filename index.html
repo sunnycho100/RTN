@@ -210,6 +210,11 @@ dialog.quote small { color: var(--dim); font-size: 13px; }
 dialog.quote input:not([type=radio]), dialog.quote select, dialog.quote textarea { width: 100%; min-width: 0; padding: 10px 12px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); font: 15px/1.3 var(--body); }
 dialog.quote input:focus, dialog.quote select:focus, dialog.quote textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 dialog.quote .tel { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); gap: 8px; }
+dialog.quote .cc { position: relative; }
+dialog.quote .cc ul { position: absolute; z-index: 2; left: 0; right: 0; top: calc(100% + 4px); max-height: 220px; overflow: auto; margin: 0; padding: 4px 0; list-style: none; background: var(--panel); border: 1px solid var(--line); }
+dialog.quote .cc li { padding: 8px 12px; font-size: 14px; color: var(--dim); cursor: pointer; }
+dialog.quote .cc li b { color: var(--ink); font: 500 14px/1 var(--mono); margin-right: 8px; }
+dialog.quote .cc li[aria-selected="true"], dialog.quote .cc li:hover { background: var(--bg); color: var(--ink); }
 dialog.quote .pills { display: flex; flex-wrap: wrap; gap: 8px; }
 dialog.quote .pills label { cursor: pointer; }
 dialog.quote .pills input { position: absolute; opacity: 0; pointer-events: none; }
@@ -536,12 +541,7 @@ dialog.quote .btn { justify-self: start; }
     <p class="sub">Leave your email and we will reach out.</p>
     <label class="f"><span>Work email</span><input type="email" name="email" required autocomplete="email" placeholder="you@company.com"></label>
     <label class="f"><span>Phone number (optional)</span>
-      <span class="tel"><select name="cc" aria-label="Country code">
-        <option value="+1">+1 US and Canada</option><option value="+82">+82 Korea</option><option value="+44">+44 UK</option>
-        <option value="+49">+49 Germany</option><option value="+81">+81 Japan</option><option value="+86">+86 China</option>
-        <option value="+91">+91 India</option><option value="+33">+33 France</option><option value="+61">+61 Australia</option>
-        <option value="+65">+65 Singapore</option><option value="">Other, type it in</option>
-      </select><input type="tel" name="phone" autocomplete="tel-national" placeholder="555 123 4567"></span></label>
+      <span class="tel"><span class="cc"><input name="cc" id="cc" value="+1" role="combobox" aria-label="Country code" aria-autocomplete="list" aria-expanded="false" aria-controls="cc-list" autocomplete="off" inputmode="tel" placeholder="+1"><ul id="cc-list" role="listbox" aria-label="Country codes" hidden></ul></span><input type="tel" name="phone" autocomplete="tel-national" placeholder="555 123 4567"></span></label>
     <label class="f"><span>Company name (optional)</span><input name="company" autocomplete="organization" placeholder="Acme Metalworks"></label>
     <button class="btn" type="submit">Request a quote</button>
     <p class="mono note">You get back your station rebuilt in 3D, ranked setups and simulated station times. We keep your contact details only to reply.</p>
@@ -587,7 +587,7 @@ dialog.quote .btn { justify-self: start; }
     <button class="btn" type="button" data-close>Close</button>
   </div>
 </dialog>
-<script src="quote.js"></script>
+<script src="quote.js?v=2"></script>
 <script src="options.js?v=4"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
