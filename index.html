@@ -143,7 +143,7 @@ section.block { padding-block: clamp(72px, 12vh, 140px) 0; }
 .ba img { display: block; width: 100%; height: auto; pointer-events: none; }
 .ba img.top { position: absolute; inset: 0; height: 100%; object-fit: cover; clip-path: inset(0 calc(100% - var(--p)) 0 0); }
 .ba span { position: absolute; top: 10px; font: 500 13px/1 var(--body); color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7); }
-.ba .l { left: 12px; } .ba .r { right: 12px; }
+.ba .l { left: 12px; opacity: clamp(0, calc((var(--pn, 50) - 10) / 12), 1); } .ba .r { right: 12px; opacity: clamp(0, calc((90 - var(--pn, 50)) / 12), 1); }
 .ba i { position: absolute; top: 0; bottom: 0; left: var(--p); width: 2px; margin-left: -1px; background: #fff; pointer-events: none; }
 .ba i::after { content: "\2039\2002\203A"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%;
   display: grid; place-items: center; background: #fff; color: var(--bg); font: 600 18px/1 var(--body); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4); }
@@ -439,7 +439,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <script>
     document.querySelectorAll('.ba').forEach(function (ba) {   // drag anywhere on the image, or use the arrow keys on the hidden range
       var r = ba.querySelector('input'), drag = false;
-      function set(v) { r.value = v; ba.style.setProperty('--p', v + '%'); }
+      function set(v) { r.value = v; ba.style.setProperty('--p', v + '%'); ba.style.setProperty('--pn', v); }   // --pn fades each corner label as the handle covers it
       function at(e) { var b = ba.getBoundingClientRect(); set(Math.max(0, Math.min(100, (e.clientX - b.left) / b.width * 100)).toFixed(1)); }
       r.addEventListener('input', function () { set(r.value); });
       ba.addEventListener('pointerdown', function (e) { drag = true; ba.setPointerCapture(e.pointerId); at(e); });
