@@ -292,7 +292,7 @@ function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a, tint, sc) {
 /* Step 04: the WS30 robot team (two rail arms, two G1s, the door) from dots_data.js, in the scan's own plant frame.
    dots.js parses it; one rigid transform per part per frame, every other point. */
 function wsTeam() { return window.DOTS && window.DOTS.sides && window.DOTS.sides.team; }
-var teamC = null, teamT0 = 0;
+var teamB = null, teamC = null, teamT0 = 0;
 function teamPose(T, pi, k, k2, u) {
   var fr = T.frames, o0 = k * T.stride + pi * 7, o1 = k2 * T.stride + pi * 7, m = function (j) { return fr[o0 + j] * (1 - u) + fr[o1 + j] * u; };
   var qx = m(0), qy = m(1), qz = m(2), qw = m(3), ql = Math.hypot(qx, qy, qz, qw) || 1; qx /= ql; qy /= ql; qz /= ql; qw /= ql;
@@ -311,16 +311,19 @@ function drawTeam(ctx, v, T, sec, a) {
     }
   });
 }
-function teamCentre(T) {   // mean position of the robot parts at the start, for the step 04 camera
-  var n = 0, x = 0, y = 0;
-  T.parts.forEach(function (p, pi) { if (p.c !== 'a') return; var r = teamPose(T, pi, 0, 0, 0); x += r[9]; y += r[10]; n++; });
-  return [x / n, y / n];
+function teamBox(T) {   // where the robots work over the whole run: frames the step 04 camera and the floor grid
+  var b = [1e9, -1e9, 1e9, -1e9];
+  for (var k = 0; k < T.F; k += 15) T.parts.forEach(function (p, pi) {
+    if (p.c !== 'a') return; var r = teamPose(T, pi, k, k, 0);
+    b[0] = Math.min(b[0], r[9]); b[1] = Math.max(b[1], r[9]); b[2] = Math.min(b[2], r[10]); b[3] = Math.max(b[3], r[10]);
+  });
+  return b;
 }
 function drawStory(now) {
   var dpr = fit(simCv), W = simCv.width, H = simCv.height, ctx = simCv.getContext('2d'), so = SMALL ? CFG.storySmall : CFG.story;
   tShown += (storyT() - tShown) * (REDUCED ? 1 : 0.14); var t = tShown;
   var a = Math.min(5, Math.floor(t)), u = smooth(0, 1, t - a), K0 = KEYS[a], K1 = KEYS[a + 1];
-  var T = wsTeam(); if (T && !teamC) teamC = teamCentre(T);
+  var T = wsTeam(); if (T && !teamB) { teamB = teamBox(T); teamC = [(teamB[0] + teamB[1]) / 2, (teamB[2] + teamB[3]) / 2]; }
   var fc = teamC || [spawn[0] - 0.7, spawn[1] - 0.5], focus = T || BOTS ? smooth(4, 4.35, t) * (1 - smooth(5, 5.35, t)) : 0;   // stage 04 looks at the robots
   var v = view(W, H, { tx: focus * fc[0], ty: focus * fc[1], tz: a === 5 ? 0.4 : 0.7, yaw: K0.yaw + (K1.yaw - K0.yaw) * u + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03),
     pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch, dist: K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
@@ -331,9 +334,12 @@ function drawStory(now) {
   show(panels.lead, 1 - smooth(0.75, 1, t)); show(panels.pip, smooth(2, 2.2, t) * (1 - smooth(2.8, 3, t))); show(panels.team, team);
 
   ctx.lineWidth = dpr; ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath();     // floor grid
-  var gx = RW / 2 + 0.6, gy = RD / 2 + 0.6;
-  for (g = -gx; g <= gx + 1e-6; g += 0.5) seg(ctx, v, [g, -gy, 0], [g, gy, 0]);
-  for (g = -gy; g <= gy + 1e-6; g += 0.5) seg(ctx, v, [-gx, g, 0], [gx, g, 0]);
+  // the grid covers the scan and, when the robot team works past the scanned edge, the simulated floor under it too
+  var x0 = -RW / 2 - 0.6, x1 = RW / 2 + 0.6, y0 = -RD / 2 - 0.6, y1 = RD / 2 + 0.6;
+  if (teamB) { x0 = Math.min(x0, teamB[0] - 1); x1 = Math.max(x1, teamB[1] + 1); y0 = Math.min(y0, teamB[2] - 1); y1 = Math.max(y1, teamB[3] + 1); }
+  x0 = Math.floor(x0 * 2) / 2; y0 = Math.floor(y0 * 2) / 2;
+  for (g = x0; g <= x1 + 1e-6; g += 0.5) seg(ctx, v, [g, y0, 0], [g, y1, 0]);
+  for (g = y0; g <= y1 + 1e-6; g += 0.5) seg(ctx, v, [x0, g, 0], [x1, g, 0]);
   ctx.stroke();
 
   if (fac > 0) {   // facility: copies of the room around it (the zoom-out)

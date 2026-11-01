@@ -142,6 +142,9 @@ section.block { padding-block: clamp(72px, 12vh, 140px) 0; }
 @media (max-width: 760px) { .spec { grid-template-columns: 1fr; } }
 
 .clip { margin: 0; background: var(--panel); border: 1px solid var(--line); }
+.pair { position: relative; }
+.pair span { position: absolute; top: 10px; font: 500 13px/1 var(--body); color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7); }
+.pair .l { left: 12px; } .pair .r { left: calc(50% + 12px); }
 details.film > summary { list-style: none; cursor: pointer; margin-bottom: 4px; }
 details.film > summary::-webkit-details-marker { display: none; }
 details.film > summary .len { color: var(--dim); font: 500 12px/1 var(--mono); margin-left: 4px; }
@@ -157,6 +160,7 @@ details.film[open] > summary { margin-bottom: 16px; }
 .tiles h3 { margin: 14px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
 .tiles p { margin: 0; color: var(--dim); font-size: 16px; }
 .clip.wide video { aspect-ratio: 16 / 9; }
+#industry .next { margin-top: 56px; }
 .close3 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
 @media (max-width: 720px) { .close3 { grid-template-columns: 1fr; } }
 .cap-h { margin: 16px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
@@ -453,8 +457,8 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
       <summary class="btn ghost"><span aria-hidden="true">▶</span>Watch the process<span class="len">29 s</span></summary>
       <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>CarDA footage, CC BY 4.0. Rebuild and robots are ours</figcaption></figure>
     </details>
-    <figure class="clip wide" style="margin-top: 24px"><img src="media/ws30_real_vs_rebuild.jpg" loading="lazy" width="1600" height="450" style="display: block; width: 100%; height: auto" alt="Left: a real CarDA camera frame of the WS30 station. Right: our Isaac Sim rebuild seen from the same calibrated camera."><figcaption><span class="tag ours">Ours</span>Same camera, real and rebuilt. CarDA, CC BY 4.0</figcaption></figure>
-    <figure class="clip wide" style="margin-top: 24px"><img src="media/photo_vs_rebuild.jpg" loading="lazy" width="1600" height="532" style="display: block; width: 100%; height: auto" alt="Left: a warehouse photo with a forklift. Right: the same view rebuilt in Isaac Sim from that one photo."><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim. Photo: Lance Cheung, USDA, public domain</figcaption></figure>
+    <figure class="clip wide" style="margin-top: 24px"><div class="pair"><img src="media/ws30_pair.jpg" loading="lazy" width="1600" height="392" style="display: block; width: 100%; height: auto" alt="Left: a real CarDA camera frame of the WS30 station. Right: our Isaac Sim rebuild seen from the same calibrated camera."><span class="l">Camera</span><span class="r">3D reconstruction</span></div><figcaption><span class="tag ours">Ours</span>Same camera, real and rebuilt. CarDA, CC BY 4.0</figcaption></figure>
+    <figure class="clip wide" style="margin-top: 24px"><div class="pair"><img src="media/photo_pair.jpg" loading="lazy" width="1600" height="532" style="display: block; width: 100%; height: auto" alt="Left: a warehouse photo with a forklift. Right: the same view rebuilt in Isaac Sim from that one photo."><span class="l">Photo</span><span class="r">3D reconstruction</span></div><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim. Photo: Lance Cheung, USDA, public domain</figcaption></figure>
   </section>
 
 
@@ -462,6 +466,10 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <h2 class="sec">A whole floor, not one cell.</h2>
     <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Seohee's MuJoCo run in Isaac Sim. Depot by Open Robotics, CC BY 4.0</figcaption></figure>
     <h3 class="cap-h">20 robots in one metal shop</h3><div class="close3"><div><figure class="clip"><video data-src="media/close_3g1_tframe.mp4" poster="media/posters/close_3g1_tframe.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Welded T-frame, 3 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_2g1_sheets.mp4" poster="media/posters/close_2g1_sheets.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Steel sheet bundle, 2 G1s</figcaption></figure></div></div>
+    <div class="next">
+      <figure class="clip wide"><video data-src="media/door_team_clean.mp4" poster="media/posters/door_team_clean.jpg" muted loop playsinline preload="none" aria-label="Two rail arms and two humanoid robots fit the glass and drive the screws on a car door at the rebuilt station"></video></figure>
+      <h3 class="cap-h">Car-door station</h3>
+    </div>
   </section>
 
   <section class="block wrap" id="trust">
@@ -568,8 +576,8 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 <script src="options.js?v=4"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=17"></script>
-<script src="dots_data.js"></script>
+<script src="engine.js?v=18"></script>
+<script src="dots_data.js?v=3"></script>
 <script src="dots.js?v=2"></script>
 </body>
 </html>
