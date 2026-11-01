@@ -32,8 +32,8 @@ All clips are our own runs. None come from other companies' sites.
 
 | Clip | Source |
 |---|---|
-| `ws30_site.mp4` | 12 s of the CarDA WS30 IN camera, cycle 003 (CarDA, CC BY 4.0) |
-| `ws30_site_out.mp4` | The same 12 s from the WS30 OUT camera, for the story's source-video inset |
+| `ws30_site.mp4` | 12 s of the CarDA WS30 IN camera, cycle 003 (CarDA, CC BY 4.0). Kept, not on the page |
+| `ws30_site_out.mp4` | The same 12 s from the WS30 OUT camera. Kept, not on the page |
 | `door_team.mp4` | WS30 rebuild in Isaac Sim: two UR20 rail arms and two G1s do the door job, kinematic replay, real time. Kept for the demo video, not on the page |
 | `door_team_v3c.mp4` | Whole floor, car-door station: the WS30 team job, v3c (G1 A drives the screw, G1 B sets a full-size pane with a suction lifter), no overlays, real time |
 | `process_film.mp4` | Process film on the CarDA WS30 station: record, label, rebuild in Isaac Sim, automate |

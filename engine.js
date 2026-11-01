@@ -4,7 +4,7 @@
 (function () {
 'use strict';
 var DEFAULTS = {
-  hero: { ox: 0.58, oy: 0.48, pitch: 0.32, fov: 0.62, dist: 1.9 },   // the floor and robots fill the hero behind the headline
+  hero: { ox: 0.72, oy: 0.48, pitch: 0.32, fov: 0.62, dist: 1.9 },   // the floor and robots fill the hero behind the headline
   heroSmall: { ox: 0.5, oy: 0.4 },
   story: { ox: 0.56, oy: 0.46, pitch: 0, fov: 0.85 },
   storySmall: { ox: 0.5, oy: 0.42 }
@@ -139,15 +139,23 @@ var HSC = 1.6, PED_H = 0.75 * HSC, PED = (function () {
   for (z = 0; z < PED_H; z += st) for (x = -w; x <= w + 1e-6; x += st) p.push(x, -w, z, x, w, z, -w, x, z, w, x, z);   // sides
   return p;
 })();
-function drawPed(ctx, v, ox, oy, a) {
+function drawPed(ctx, v, ox, oy, a, zc) {
   ctx.fillStyle = rgba(C.ink, 0.5 * a);
   for (var j = 0; j < PED.length; j += 3) {
-    if (!proj(v, ox + PED[j], oy + PED[j + 1], PED[j + 2])) continue;
+    if (PED[j + 2] > zc || !proj(v, ox + PED[j], oy + PED[j + 1], PED[j + 2])) continue;
     var s = clamp(0.02 * v.f / P[2], 0.8, 2.4); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
   }
 }
 /* Intro: the floor appears first, then everything above it rises in height order (scan.js lists the ground points
-   first, then the rest by rising z), then the robots fade in. */
+   first, then the rest by rising z), then each robot is placed: it builds up from the floor in place while a tag reads the
+   build height in real metres (the hero draws robots 1.6x life size), and the tag fades once the robot is whole. */
+var MONO = css('--mono');
+function botTop(R) { if (R.top == null) { R.top = 0; eachBotPoint(R, 0, function (x, y, z) { R.top = Math.max(R.top, z); }); } return R.top; }
+function zTag(ctx, v, dpr, ox, oy, z, a) {
+  if (a <= 0 || !proj(v, ox, oy, z)) return;
+  ctx.font = 11 * dpr + 'px ' + MONO; ctx.fillStyle = rgba(C.acc, a);
+  ctx.fillText('z = ' + (z / HSC).toFixed(6), P[0] + 12 * dpr, P[1] + 4 * dpr);
+}
 var GROUND = S.ground_count || 0;
 /* Hero only: points near the floor's four edges drift up and a little outward and fade, so the scan dissolves instead of
    stopping at a hard rectangle. The band width wobbles along each edge so no two sides look the same. */
@@ -197,22 +205,18 @@ function drawHero(now) {
   ctx.lineWidth = dpr;
   var fp = REDUCED ? 1 : clamp((t - 300) / 2600, 0, 1), shown = GROUND * smooth(0, 0.35, fp) + (N - GROUND) * smooth(0.35, 1, fp);
   drawPoints(ctx, v, function (i) { return i < shown ? lvl((0.35 + 0.07 * SH[i]) * EA[i]) : 0; }, 0.022, 0, 0, SMALL ? 3 : 2, EX, EY, EZ);   // every other point: the 6.5 cm cloud reads as a carpet otherwise
-  if (BOTS && BOTS.h1) {   // two Unitree H1s facing each other in the rebuilt room
-    var ha = REDUCED ? 1 : smooth(2900, 4100, t), fr = Math.floor(t / 1000 * BOTS.h1.fps) % BOTS.h1.n;
-    if (ha > 0) {
-      drawBot(ctx, v, BOTS.h1, fr, -RW * 0.27, -0.2, (1 - ha) * 0.8, 0, 0.95 * ha, true, HSC);
-      drawBot(ctx, v, BOTS.h1, (fr + 20) % BOTS.h1.n, RW * 0.27, 0.2, (1 - ha) * 0.8, Math.PI, 0.95 * ha, true, HSC);
-    }
-    var ra = REDUCED ? 1 : smooth(3600, 4800, t), sec = t / 1000;   // then two arms on raised platforms and a Go2 trotting across
-    if (ra > 0) {
-      var fa = Math.floor(sec * BOTS.arm.fps) % BOTS.arm.n;
-      [-1, 1].forEach(function (side, j) {
-        drawPed(ctx, v, side * RW * 0.13, RD * 0.28, ra);
-        drawBot(ctx, v, BOTS.arm, (fa + j * 45) % BOTS.arm.n, side * RW * 0.13, RD * 0.28, PED_H + (1 - ra) * 0.8, -Math.PI / 2, 0.95 * ra, true, HSC);
-      });
-      var u = (Math.sin(sec / 3) + 1) / 2;
-      drawBot(ctx, v, BOTS.quad, Math.floor(sec * BOTS.quad.fps) % BOTS.quad.n, RW * (u - 0.5) * 0.6, -RD * 0.3, (1 - ra) * 0.8, Math.cos(sec / 3) < 0 ? Math.PI : 0, 0.95 * ra, true, HSC);
-    }
+  if (BOTS && BOTS.h1) {   // all placed at once: two Unitree H1s facing each other, two arms on raised platforms, a Go2 trotting across
+    var sec = t / 1000, fr = Math.floor(sec * BOTS.h1.fps) % BOTS.h1.n, fa = Math.floor(sec * BOTS.arm.fps) % BOTS.arm.n, u = (Math.sin(sec / 3) + 1) / 2;
+    [[BOTS.h1, fr, -RW * 0.27, -0.2, 0, 0], [BOTS.h1, (fr + 20) % BOTS.h1.n, RW * 0.27, 0.2, 0, Math.PI],
+     [BOTS.arm, fa, -RW * 0.13, RD * 0.28, PED_H, -Math.PI / 2], [BOTS.arm, (fa + 45) % BOTS.arm.n, RW * 0.13, RD * 0.28, PED_H, -Math.PI / 2],
+     [BOTS.quad, Math.floor(sec * BOTS.quad.fps) % BOTS.quad.n, RW * (u - 0.5) * 0.6, -RD * 0.3, 0, Math.cos(sec / 3) < 0 ? Math.PI : 0]].forEach(function (r) {
+      var t0 = 2900, k = REDUCED ? 1 : smooth(t0, t0 + 1000, t);
+      if (k <= 0) return;
+      var zc = (r[4] + botTop(r[0]) * HSC) * k;
+      if (r[4]) drawPed(ctx, v, r[2], r[3], 1, zc);
+      drawBot(ctx, v, r[0], r[1], r[2], r[3], r[4], r[5], 0.95, true, HSC, zc);
+      if (!REDUCED) zTag(ctx, v, dpr, r[2], r[3], zc, 0.9 * smooth(t0, t0 + 150, t) * (1 - smooth(t0 + 1600, t0 + 2000, t)));
+    });
   }
 }
 if (heroCv) {
@@ -229,7 +233,7 @@ var KEYS = [  // camera at the start of each stage (input, capture, rebuild, tea
   { yaw: -2.6, pitch: 0.75, dist: 9.0 }, { yaw: -2.3, pitch: 0.62, dist: 8.2 }, { yaw: -1.4, pitch: 0.7, dist: 7.8 },
   { yaw: -0.9, pitch: 0.85, dist: 8.2 }, { yaw: -0.3, pitch: 0.38, dist: 6.5 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
 KEYS.forEach(function (k, j) { if (j !== 4) k.dist *= Math.max(RW, RD) / 4.83; });   // tuned for a 4.83 m room; stage 04 frames the robots, not the room
-var panels = { lead: document.getElementById('lead-panel'), pip: document.getElementById('pip'), team: document.getElementById('team-panel') };
+var teamPanel = document.getElementById('team-panel');
 var panes = Array.prototype.slice.call(document.querySelectorAll('#team-panel .dots-panes > div')), scanT0 = 0;
 function show(el, o) { if (el) { el.style.opacity = o.toFixed(3); el.style.visibility = o > 0.01 ? 'visible' : 'hidden'; } }
 function storyT() { var span = story.offsetHeight - innerHeight; return clamp(-story.getBoundingClientRect().top / span, 0, 1) * 6; }
@@ -260,12 +264,12 @@ function eachBotPoint(R, frame, fn) {   // fn(x, y, z, accent, body index) for e
     }
   });
 }
-function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a, tint, sc) {
+function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a, tint, sc, zc) {   // zc: draw only points up to this height
   var cy = Math.cos(yaw), sy = Math.sin(yaw), cols = [rgba(C.ink, a), rgba(C.acc, a)];
-  sc = sc || 1;
+  sc = sc || 1; if (zc == null) zc = Infinity;
   eachBotPoint(R, frame, function (wx, wy, wz, c) {
     wx *= sc; wy *= sc; wz *= sc;
-    if (!proj(v, ox + cy * wx - sy * wy, oy + sy * wx + cy * wy, oz + wz)) return;
+    if (oz + wz > zc || !proj(v, ox + cy * wx - sy * wy, oy + sy * wx + cy * wy, oz + wz)) return;
     ctx.fillStyle = tint ? cols[1] : cols[c];
     var s = clamp(0.022 * v.f / P[2], 1, 3.4); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
   });
@@ -325,7 +329,7 @@ function drawStory(now) {
   if (t < 0.85) scanT0 = 0; else if (!scanT0) scanT0 = now;
   var sw = REDUCED || t >= 2 ? 1 : scanT0 ? smooth(0, 1, (now - scanT0) / 1800) : 0, sx = -RW / 2 - 0.3 + sw * (RW + 0.6);
   ctx.globalAlpha = 1 - team;   // step 03 hands the canvas to the side-by-side views below
-  show(panels.lead, 1 - smooth(0.75, 1, t)); show(panels.pip, smooth(2, 2.2, t) * (1 - smooth(2.8, 3, t))); show(panels.team, team);
+  show(teamPanel, team);
 
   ctx.lineWidth = dpr; ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath();     // floor grid
   // the grid covers the scan and, when the robot team works past the scanned edge, the simulated floor under it too

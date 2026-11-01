@@ -100,13 +100,6 @@ a { color: inherit; }
 .rail button.on::after { width: 34px; background: var(--accent); }
 .rail button:focus-visible { outline: 1px solid var(--accent); }
 @media (max-width: 720px) { .rail { display: none; } .cap { max-width: calc(100vw - 2 * var(--gutter)); } .cap p { font-size: 15px; } }
-.lead-panel { position: absolute; right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); top: 50%; transform: translateY(-50%); width: min(520px, 44vw); display: grid; gap: 12px; opacity: 0; visibility: hidden; }
-.chips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.chips li { background: var(--panel); border: 1px solid var(--line); padding: 10px 12px; font-size: 15px; }
-.chips b { display: block; font: 500 11px/1.5 var(--mono); color: var(--accent); letter-spacing: 0.06em; }
-.pip { position: absolute; right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); top: 96px; width: min(340px, 32vw); border: 1px solid var(--line); background: #050606; opacity: 0; visibility: hidden; }
-.pip video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-.pip span { display: block; padding: 6px 8px; }
 .team-panel { position: absolute; top: 88px; bottom: calc(clamp(32px, 8vh, 80px) + 190px); left: max(var(--gutter), env(safe-area-inset-left, 0px)); right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); display: grid; place-items: center; opacity: 0; visibility: hidden; }
 .team-panel .clip { width: 100%; height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
 .team-panel .clip.dots { height: auto; display: block; background: none; border: 0; }   /* engine.js draws the two views straight into the story canvas */
@@ -120,14 +113,7 @@ a { color: inherit; }
 .dots-bar { position: relative; height: 1px; margin: 8px 12px 0; background: var(--line); }
 .dots-bar i { position: absolute; left: 0; top: 0; height: 1px; width: 0; background: var(--accent); }
 @media (max-width: 720px) { .dots-panes { grid-template-columns: 1fr; gap: 8px; } }
-@media (max-width: 1100px) {
-  .lead-panel { top: 80px; transform: none; width: min(460px, 48vw); }
-  .lead-panel .chips { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .lead-panel .chips li { padding: 6px 8px; font-size: 12px; }
-}
 @media (max-width: 720px) {
-  .lead-panel { left: 16px; right: 16px; width: auto; top: 76px; transform: none; }
-  .pip { right: 16px; top: 70px; width: 48vw; }
   .team-panel { left: 16px; right: 16px; top: 70px; bottom: 210px; }
 }
 .verdict { position: absolute; right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: clamp(32px, 8vh, 80px); width: min(320px, 100% - 32px);
@@ -414,17 +400,6 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
         <div class="cap"><h2><span class="no">04</span>Your robots do the job here.</h2><div class="stat">Two rail arms and two G1s, kinematic replay</div></div>
         <div class="cap"><h2><span class="no">05</span>Know before you buy.</h2></div>
       </div>
-      <div class="lead-panel" id="lead-panel" aria-label="Example input">
-        <div class="mono">EXAMPLE INPUT</div>
-        <figure class="clip"><video data-src="media/ws30_site.mp4" poster="media/posters/ws30_site.jpg" muted loop playsinline preload="none"></video></figure>
-        <ul class="chips">
-          <li><b>SITE</b>Car-door line, WS30</li>
-          <li><b>TASK</b>Fit the speaker, drive 4 screws</li>
-          <li><b>ROBOTS</b>2 UR20 rail arms + 2 Unitree G1</li>
-          <li><b>SHIFT</b>8 hours</li>
-        </ul>
-      </div>
-      <div class="pip" id="pip"><video data-src="media/ws30_site_out.mp4" poster="media/posters/ws30_site_out.jpg" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
       <div class="team-panel" id="team-panel">
         <figure class="clip dots">
           <div class="dots-panes"><div><span class="mono">Today</span></div><div class="team"><span class="mono">With a robot team</span></div></div>
@@ -608,7 +583,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 <script src="options.js?v=4"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=23"></script>
+<script src="engine.js?v=26"></script>
 <script src="dots_data.js?v=4"></script>
 <script src="dots.js?v=3"></script>
 </body>
