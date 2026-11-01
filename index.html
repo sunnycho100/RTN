@@ -173,12 +173,6 @@ details.film[open] > summary { margin-bottom: 16px; }
 .cap-h { margin: 16px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
 .cap-p { margin: 0; color: var(--dim); font-size: 16px; max-width: 70ch; }
 
-.nums { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); }
-.nums div { padding: 28px 24px 0 0; }
-.nums strong { display: block; font: 600 clamp(36px, 5vw, 64px)/1 var(--display); font-stretch: 112%; font-variant-numeric: tabular-nums; }
-.nums span { color: var(--dim); font-size: 14px; }
-@media (max-width: 720px) { .nums { grid-template-columns: 1fr; } }
-
 .cta { margin-top: clamp(96px, 14vh, 160px); padding-block: clamp(64px, 12vh, 130px); border-top: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 32px; text-align: center; }
 .cta > div { display: grid; justify-items: center; gap: 16px; }
 .cta .btn { padding: 20px 40px; font-size: 20px; font-weight: 600; background: var(--accent); border-color: var(--accent); color: var(--bg); }
@@ -458,13 +452,6 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <div class="next">
       <figure class="clip wide"><video data-src="media/door_team_hq.mp4" poster="media/posters/door_team_hq.jpg" muted loop playsinline preload="none" aria-label="Two rail arms and two humanoid robots fit the glass and drive the screws on a car door at the rebuilt station"></video></figure>
       <h3 class="cap-h">Car-door station</h3>
-    </div>
-  </section>
-
-  <section class="block wrap" aria-label="Numbers">
-    <div class="nums">
-      <div><strong>79%</strong><span>within 5 cm of a laser scan</span></div>
-      <div><strong>990</strong><span>simulated runs</span></div>
     </div>
   </section>
 
