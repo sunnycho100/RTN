@@ -121,6 +121,7 @@ details.step summary::-webkit-details-marker { display: none; }
 summary .n { font: 500 12px/1 var(--mono); color: var(--accent); }
 summary .t { font: 600 22px/1.1 var(--display); font-stretch: 112%; }
 summary .l { color: var(--dim); min-width: 0; }
+.faq-a { margin: 0; color: var(--dim); max-width: 64ch; font-size: 17px; }
 summary .pm { justify-self: end; width: 14px; height: 14px; position: relative; }
 summary .pm::before, summary .pm::after { content: ""; position: absolute; inset: 6px 0 auto; height: 1.5px; background: var(--ink); transition: transform 0.25s; }
 summary .pm::after { transform: rotate(90deg); }
@@ -516,6 +517,24 @@ dialog.quote .btn { justify-self: start; }
       <div><strong>79%</strong><span>of a scanned loading area within 5 cm of a laser scan</span></div>
       <div><strong>1,219</strong><span>car-door line designs scored</span></div>
       <div><strong id="num-pts">…</strong><span>Points in the scan on this page</span></div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="faq">
+    <h2 class="sec">Questions plant managers ask</h2>
+    <div>
+      <details class="step">
+        <summary><span class="n">?</span><span class="t">What do you need from my plant?</span><span class="l"></span><span class="pm"></span></summary>
+        <div class="body" style="grid-template-columns: 1fr"><p class="faq-a">One phone walkthrough of the area and the task. Depth or LiDAR helps but is optional.</p></div>
+      </details>
+      <details class="step">
+        <summary><span class="n">?</span><span class="t">Which robots can you test?</span><span class="l"></span><span class="pm"></span></summary>
+        <div class="body" style="grid-template-columns: 1fr"><p class="faq-a">Any robot with a simulation model. Today we run Unitree G1 and H1, Go2, Universal Robots arms and Franka arms in MuJoCo and Isaac Sim.</p></div>
+      </details>
+      <details class="step">
+        <summary><span class="n">?</span><span class="t">How close is the simulation to my floor?</span><span class="l"></span><span class="pm"></span></summary>
+        <div class="body" style="grid-template-columns: 1fr"><p class="faq-a">We check rebuilt geometry against laser scans (79% within 5 cm on a public loading area) and show seconds per station against your takt.</p></div>
+      </details>
     </div>
   </section>
 
