@@ -66,7 +66,7 @@ a { color: inherit; }
 .stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .caps { position: absolute; left: 0; right: 0; bottom: clamp(32px, 8vh, 80px); pointer-events: none; }
-.cap { position: absolute; left: 0; bottom: 0; max-width: 560px; opacity: 0; transition: opacity 0.35s, transform 0.35s; transform: translateY(8px); }
+.cap { position: absolute; left: max(var(--gutter), env(safe-area-inset-left, 0px)); bottom: 0; max-width: 560px; opacity: 0; transition: opacity 0.35s, transform 0.35s; transform: translateY(8px); }
 .cap.on { opacity: 1; transform: none; }
 .cap h2 .no { color: var(--accent); margin-right: 0.35em; font-variant-numeric: tabular-nums; }
 .cap h2 { margin: 0 0 8px; font: 650 clamp(28px, 3.6vw, 48px)/1 var(--display); font-stretch: 112%; letter-spacing: -0.02em; }
@@ -213,7 +213,6 @@ dialog.quote .note { margin: 0; color: var(--dim); }
 dialog.quote .btn { justify-self: start; }
 @media (max-width: 480px) { dialog.quote { padding: 22px 18px; } dialog.quote .tel { grid-template-columns: 1fr; } }
 /* ---------- options section ---------- */
-.abc { max-width: 1240px; margin-inline: auto; }
 .abc button { font: inherit; color: inherit; }
 .abc-h3 { margin: 0 0 6px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
 .abc-sub { margin: 0 0 18px; color: var(--dim); font-size: 15px; max-width: 62ch; }
@@ -385,13 +384,13 @@ dialog.quote .btn { justify-self: start; }
         <button type="button" data-stage="3">TEAM</button><button type="button" data-stage="4">RUN</button><button type="button" data-stage="5">DECIDE</button>
       </div>
       <aside class="verdict" id="verdict" aria-label="Example verdict">
-        <div class="mono">EXAMPLE VERDICT · PLACEHOLDER</div>
+        <div class="mono">EXAMPLE VERDICT · CAR-DOOR LINE</div>
         <dl>
-          <dt>Task</dt><dd>2 × G1 carry box</dd>
-          <dt>Fits the site</dt><dd>TBD</dd>
-          <dt>Cycle time</dt><dd>XX s</dd>
-          <dt>Estimated cost</dt><dd>$XX</dd>
-          <dt>Payback</dt><dd>XX months</dd>
+          <dt>Setup</dt><dd>Option C, 3 cobots</dd>
+          <dt>Holds takt</dt><dd>Yes</dd>
+          <dt>Cycle time</dt><dd>224 s</dd>
+          <dt>Install cost</dt><dd>$437k</dd>
+          <dt>Payback</dt><dd>3.3 years</dd>
         </dl>
       </aside>
     </div>
