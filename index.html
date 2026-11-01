@@ -378,7 +378,7 @@ dialog.quote .btn { justify-self: start; }
       </div>
       <div class="pip" id="pip"><video data-src="media/capture.mp4" poster="media/posters/capture.jpg" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
       <div class="team-panel" id="team-panel">
-        <figure class="clip"><video data-src="media/door_split.mp4" poster="media/posters/door_split.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Left: one worker, a G1 standing in. Right: rail arms and G1s. Kinematic replay</figcaption></figure>
+        <figure class="clip"><video data-src="media/door_split.mp4" poster="media/posters/door_split.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Left: a real worker's motion, CarDA CC BY 4.0. Right: rail arms and G1s, kinematic replay</figcaption></figure>
       </div>
       <div class="rail" id="rail" aria-label="Story steps">
         <button type="button" data-stage="0">INPUT</button><button type="button" data-stage="1">CAPTURE</button><button type="button" data-stage="2">REBUILD</button>
@@ -434,7 +434,7 @@ dialog.quote .btn { justify-self: start; }
     <div class="abc-tabs" role="group" aria-label="Show stations for" id="abc-tabs"></div>
     <div class="abc-st" id="abc-st"><div class="abc-lines" id="abc-lines"></div></div>
     <p class="abc-stnote" id="abc-stnote" aria-live="polite"></p>
-    <figure class="clip abc-vid"><video data-src="media/ws10_human_vs_cell.mp4" poster="media/posters/ws10_human_vs_cell.jpg" muted loop playsinline preload="none" style="aspect-ratio: 32 / 9"></video><figcaption><span class="tag ours">Ours</span>WS10 on one clock: worker alone, worker with cobot</figcaption></figure>
+    <figure class="clip abc-vid"><video data-src="media/ws10_human_vs_cell.mp4" poster="media/posters/ws10_human_vs_cell.jpg" muted loop playsinline preload="none" style="aspect-ratio: 32 / 9"></video><figcaption><span class="tag ours">Ours</span><span class="tag">5× speed</span>WS10 on one clock: worker alone, worker with cobot</figcaption></figure>
   </div>
 
   <p class="abc-note"><span class="abc-tag">IE estimate</span><span>Funnel and cards: time study and line simulation from video and motion capture. Data: CarDA, Stellantis Melfi line, CC BY 4.0.</span></p>
@@ -464,10 +464,10 @@ dialog.quote .btn { justify-self: start; }
         </div>
       </details>
       <details class="step">
-        <summary><span class="n">03</span><span class="t">Build the scene</span><span class="l">A MuJoCo scene with simple collision shapes.</span><span class="pm"></span></summary>
+        <summary><span class="n">03</span><span class="t">Build the scene</span><span class="l">Machines placed in a simulator scene.</span><span class="pm"></span></summary>
         <div class="body">
-          <div><p class="mono">EXPORT · MuJoCo · Isaac Sim · URDF</p></div>
-          <figure class="clip"><canvas class="mini" data-mode="shapes" aria-label="12 wall boxes and 96 clutter pieces, live"></canvas><figcaption><span class="tag ours">Ours</span>12 wall boxes and 96 clutter pieces, live</figcaption></figure>
+          <div><p class="mono">EXPORT · MuJoCo · Isaac Sim</p></div>
+          <figure class="clip"><img src="media/photo_vs_rebuild.jpg" loading="lazy" width="1600" height="532" style="display: block; width: 100%; height: auto" alt="Left: a warehouse photo with a forklift. Right: the same view rebuilt in Isaac Sim from that one photo."><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim. Photo: Lance Cheung, USDA, public domain</figcaption></figure>
         </div>
       </details>
       <details class="step">
@@ -496,7 +496,7 @@ dialog.quote .btn { justify-self: start; }
 
   <section class="block wrap" id="industry">
     <h2 class="sec">A whole floor, not one cell.</h2>
-    <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Seohee's MuJoCo run in Isaac Sim. Depot by roqsim, CC BY 4.0</figcaption></figure>
+    <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Seohee's MuJoCo run in Isaac Sim. Depot by Open Robotics, CC BY 4.0</figcaption></figure>
     <h3 class="cap-h">20 robots in one metal shop</h3><div class="close3"><div><figure class="clip"><video data-src="media/close_3g1_tframe.mp4" poster="media/posters/close_3g1_tframe.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Welded T-frame, 3 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_2g1_sheets.mp4" poster="media/posters/close_2g1_sheets.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Steel sheet bundle, 2 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_1g1_tote.mp4" poster="media/posters/close_1g1_tote.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>KLT tote, 1 G1</figcaption></figure></div></div>
     <div class="next">
       <figure class="clip wide"><video data-src="media/carda_line.mp4" poster="media/posters/carda_line.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Kinematic replay, UR10e in place of a Doosan M0617. CarDA, CC BY 4.0</figcaption></figure>
