@@ -9,17 +9,39 @@
   if (!dlg) return;
   var views = {};
   dlg.querySelectorAll('[data-view]').forEach(function (v) { views[v.dataset.view] = v; });
-  function go(name) {
+  var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches, trigger = null;
+  function show(name, animate) {
     Object.keys(views).forEach(function (k) { views[k].hidden = k !== name; });
-    var first = views[name].querySelector('input, select, textarea, button');
-    if (first) first.focus();
+    var v = views[name]; v.classList.remove('enter');
+    if (animate) { void v.offsetWidth; v.classList.add('enter'); }
+    var first = v.querySelector('input, select, textarea, button');   // focus moves in on desktop; on phones it would pop the keyboard
+    if (first && matchMedia('(min-width: 601px)').matches) first.focus({ preventScroll: true });
+  }
+  // A step change fades the old view out (150 ms), eases the panel height to the new view (280 ms) and lets it rise in.
+  function go(name) {
+    var cur = Object.keys(views).filter(function (k) { return !views[k].hidden; })[0];
+    if (!dlg.open || !cur || cur === name) return show(name, false);
+    var h0 = dlg.offsetHeight; views[cur].classList.add('leave');
+    setTimeout(function () {
+      views[cur].classList.remove('leave'); show(name, true);
+      if (REDUCED) return;
+      var h1 = dlg.offsetHeight; dlg.style.height = h0 + 'px'; void dlg.offsetHeight;
+      dlg.style.transition = 'height 280ms cubic-bezier(0.16, 1, 0.3, 1)'; dlg.style.height = h1 + 'px';
+      setTimeout(function () { dlg.style.height = dlg.style.transition = ''; }, 300);
+    }, REDUCED ? 120 : 150);
+  }
+  function closeQuote() {   // let the close animation play, then hand focus back to whatever opened the form
+    if (!dlg.open || dlg.classList.contains('closing')) return;
+    dlg.classList.add('closing');
+    setTimeout(function () { dlg.classList.remove('closing'); dlg.close(); if (trigger) trigger.focus(); }, REDUCED ? 120 : 160);
   }
   document.querySelectorAll('[data-quote]').forEach(function (b) {
-    b.addEventListener('click', function (e) { e.preventDefault(); go('step1'); dlg.showModal(); });
+    b.addEventListener('click', function (e) { e.preventDefault(); trigger = b; dlg.showModal(); show('step1', false); });   // after showModal, which would focus the close button
   });
-  dlg.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', function () { dlg.close(); }); });
+  dlg.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', closeQuote); });
   dlg.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', function () { go(b.dataset.go); }); });
-  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });   // a click on the backdrop closes it
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) closeQuote(); });   // a click on the backdrop closes it
+  dlg.addEventListener('cancel', function (e) { e.preventDefault(); closeQuote(); });   // Esc
 
   // null means no backend: the confirmation still shows, nothing is stored
   var store = (async function () {
@@ -82,10 +104,10 @@
     e.preventDefault();
     var d = new FormData(f1), email = String(d.get('email')).trim(), phone = String(d.get('phone') || '').trim();
     key = email.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 120);
-    var btn = f1.querySelector('[type=submit]'); btn.disabled = true;
+    var btn = f1.querySelector('[type=submit]'); btn.disabled = true; btn.classList.add('sending');
     await save({ email: email, phone: phone ? d.get('cc') + ' ' + phone : '', company: String(d.get('company') || '').trim(),
       details: false, createdAt: new Date().toISOString() });
-    btn.disabled = false;
+    btn.disabled = false; btn.classList.remove('sending');
     go('received');
   });
 
@@ -113,14 +135,14 @@
       videoLink: String(d.get('videoLink') || '').trim(), notes: String(d.get('notes') || '').trim(),
       details: true, detailsAt: new Date().toISOString() };
     if (file && file.size > 20 * 1024 * 1024) { note.textContent = 'This video is over 20 MB. Please share a Drive or Dropbox link instead.'; return; }
-    var btn = f2.querySelector('[type=submit]'); btn.disabled = true; note.textContent = '';
+    var btn = f2.querySelector('[type=submit]'); btn.disabled = true; btn.classList.add('sending'); note.textContent = '';
     var s = await store;
     if (file && s && s.assets) {   // without a backend the file never leaves the browser
       try { details.videoAsset = (await s.assets.upload(file)).id; }
-      catch (err) { note.textContent = "The video didn't upload. Please share a Drive or Dropbox link instead."; btn.disabled = false; return; }
+      catch (err) { note.textContent = "The video didn't upload. Please share a Drive or Dropbox link instead."; btn.disabled = false; btn.classList.remove('sending'); return; }
     }
     await save(details, true);
-    btn.disabled = false;
+    btn.disabled = false; btn.classList.remove('sending');
     go('done');
   });
 })();
