@@ -171,6 +171,20 @@ function drawPed(ctx, v, ox, oy, a) {
 /* Intro: the floor appears first, then everything above it rises in height order (scan.js lists the ground points
    first, then the rest by rising z), then the robots fade in. */
 var GROUND = S.ground_count || 0;
+/* Hero only: points near the floor's four edges drift up and a little outward and fade, so the scan dissolves instead of
+   stopping at a hard rectangle. The band width wobbles along each edge so no two sides look the same. */
+var EX = new Float32Array(N), EY = new Float32Array(N), EZ = new Float32Array(N), EA = new Float32Array(N);
+(function () {
+  var seed = 11, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }, hx = RW / 2, hy = RD / 2;
+  for (i = 0; i < N; i++) {
+    var dx = hx - Math.abs(X[i]), dy = hy - Math.abs(Y[i]), d = Math.min(dx, dy);
+    var band = 0.9 + 0.35 * Math.sin(X[i] * 1.7 + Y[i] * 2.3), e = clamp(1 - d / band, 0, 1), r = rnd(); e *= e;
+    EX[i] = X[i] + (dx < dy ? Math.sign(X[i]) * e * r * 0.3 : 0);
+    EY[i] = Y[i] + (dx < dy ? 0 : Math.sign(Y[i]) * e * r * 0.3);
+    EZ[i] = Z[i] + e * (0.1 + 0.8 * r * r);
+    EA[i] = 1 - 0.55 * e;
+  }
+})();
 /* Drag the dome with a mouse or a finger: horizontal turns it, vertical tilts it, and it coasts a little after release.
    Touch keeps vertical swipes for page scrolling (touch-action: pan-y), so on phones a drag only turns it. */
 var drag = { yaw: 0, pitch: 0, vy: 0, vp: 0, down: false, x: 0, y: 0 };
@@ -216,7 +230,7 @@ function drawHero(now) {
   });
   ctx.lineWidth = dpr;
   var fp = REDUCED ? 1 : clamp((t - 300) / 2600, 0, 1), shown = GROUND * smooth(0, 0.35, fp) + (N - GROUND) * smooth(0.35, 1, fp);
-  drawPoints(ctx, v, function (i) { return i < shown ? lvl(0.35 + 0.07 * SH[i]) : 0; }, 0.022, 0, 0, SMALL ? 3 : 2);   // every other point: the 6.5 cm cloud reads as a carpet otherwise
+  drawPoints(ctx, v, function (i) { return i < shown ? lvl((0.35 + 0.07 * SH[i]) * EA[i]) : 0; }, 0.022, 0, 0, SMALL ? 3 : 2, EX, EY, EZ);   // every other point: the 6.5 cm cloud reads as a carpet otherwise
   if (BOTS && BOTS.h1) {   // two Unitree H1s facing each other in the rebuilt room
     var ha = REDUCED ? 1 : smooth(2900, 4100, t), fr = Math.floor(t / 1000 * BOTS.h1.fps) % BOTS.h1.n;
     if (ha > 0) {
