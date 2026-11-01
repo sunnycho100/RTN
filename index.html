@@ -204,6 +204,117 @@ dialog.quote .choice span { color: var(--dim); }
 dialog.quote .note { margin: 0; color: var(--dim); }
 dialog.quote .btn { justify-self: start; }
 @media (max-width: 480px) { dialog.quote { padding: 22px 18px; } dialog.quote .tel { grid-template-columns: 1fr; } }
+/* ---------- options section ---------- */
+.abc { max-width: 1240px; margin-inline: auto; }
+.abc button { font: inherit; color: inherit; }
+.abc-h3 { margin: 0 0 6px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
+.abc-sub { margin: 0 0 18px; color: var(--dim); font-size: 15px; max-width: 62ch; }
+.abc-part { margin-top: clamp(56px, 9vh, 96px); }
+
+/* 1. funnel: one square per design */
+.abc-funnel { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.abc-funnel canvas { display: block; width: 100%; }
+.abc-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: flex-end; min-height: 16rem; }
+.abc-steps li { display: grid; grid-template-columns: 76px 1fr; gap: 2px 14px; padding: 8px 0; color: var(--ink); }
+.abc-steps b { grid-row: span 2; font: 600 26px/1 var(--display); font-stretch: 112%; font-variant-numeric: tabular-nums; text-align: right; }
+.abc-steps span { font-weight: 500; }
+.abc-steps small { font-size: 13px; color: var(--dim); }
+/* one step at a time: earlier steps shrink into a dim trail above the current one */
+.abc-steps.play li { display: none; }
+.abc-steps.play li.past { display: grid; grid-template-columns: 6ch 1fr; padding: 3px 0 3px 12px; border-left: 1px solid var(--line); color: var(--dim); font-size: 13px; }
+.abc-steps.play li.past b { grid-row: auto; font: 500 13px/1.5 var(--mono); }
+.abc-steps.play li.past span { font-weight: 400; }
+.abc-steps.play li.past small { display: none; }
+.abc-steps.play li.now { display: block; padding: 18px 0 0; animation: abc-in 0.5s ease both; }
+.abc-steps.play li.now b { display: block; text-align: left; font: 650 clamp(64px, 8vw, 112px)/0.95 var(--display); font-stretch: 112%; letter-spacing: -0.02em; color: var(--accent); }
+.abc-steps.play li.now span { display: block; margin-top: 10px; font: 600 clamp(20px, 2vw, 26px)/1.15 var(--display); font-stretch: 110%; }
+.abc-steps.play li.now small { display: block; margin-top: 6px; font-size: 15px; }
+@keyframes abc-in { from { opacity: 0; transform: translateY(14px); } }
+.abc-replay { all: unset; cursor: pointer; margin-top: 14px; font: 500 12px/1 var(--mono); letter-spacing: 0.06em; color: var(--dim); }
+.abc-replay[hidden] { display: none; }
+.abc-replay:hover { color: var(--ink); }
+.abc-replay:focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; }
+/* the options wait until the funnel lands on 3 */
+#abc-ask { transition: opacity 0.7s ease, transform 0.7s ease; }
+#abc-ask.abc-wait { opacity: 0; transform: translateY(24px); }
+
+/* 2. priority */
+.abc-seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.abc-seg button { cursor: pointer; padding: 10px 14px; border: 1px solid var(--line); background: transparent; font-size: 14px; transition: border-color 0.2s, background 0.2s; }
+.abc-seg button:hover { border-color: var(--dim); }
+.abc-seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.abc-why { margin: 18px 0 10px; font-size: 17px; min-height: 1.6em; }
+.abc-why b { color: var(--accent); font-weight: 600; }
+.abc-share { display: flex; height: 26px; border: 1px solid var(--line); background: var(--panel); }
+.abc-share i { display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; font: 500 11px/1 var(--mono); font-style: normal;
+  color: var(--dim); border-right: 1px solid var(--bg); transition: flex-basis 0.6s ease, background 0.3s, color 0.3s; }
+.abc-share i.win { background: var(--accent); color: var(--bg); }
+.abc-share i.x { background: var(--line); }
+
+/* 3. cards: A, then A plus a robot, then B plus two more */
+.abc-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+.abc-card { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; padding: 20px; background: var(--panel); border: 1px solid var(--line);
+  transition: border-color 0.3s, opacity 0.3s; position: relative; }
+.abc-card:hover { border-color: var(--dim); }
+.abc-card.on { border-color: var(--accent); }
+.abc-cards.picked .abc-card:not(.on) { opacity: 0.55; }
+.abc-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.abc-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.abc-letter { font: 650 44px/1 var(--display); font-stretch: 112%; }
+.abc-card.on .abc-letter { color: var(--accent); }
+.abc-card h4 { margin: 14px 0 4px; font: 600 22px/1.1 var(--display); font-stretch: 110%; }
+.abc-card p { margin: 0 0 18px; color: var(--dim); font-size: 15px; }
+.abc-kpis { margin: auto 0 0; display: grid; gap: 14px; }
+.abc-kpi { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 14px; }
+.abc-kpi dt { color: var(--dim); }
+.abc-kpi dd { margin: 0; font: 500 14px/1.4 var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.abc-kpi dd em { font-style: normal; color: var(--accent); margin-left: 6px; font-size: 11px; letter-spacing: 0.06em; }
+.abc-bar { grid-column: 1 / -1; height: 6px; background: var(--line); }
+.abc-bar i { display: block; height: 100%; width: 0; background: color-mix(in srgb, var(--ink) 38%, transparent); transition: width 0.9s cubic-bezier(.2,.7,.2,1); }
+.abc-bar i.best { background: var(--accent); }
+.abc-foot { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
+
+/* 4. station cycles */
+.abc-tabs { display: flex; gap: 0; border: 1px solid var(--line); width: max-content; margin-bottom: 20px; }
+.abc-tabs button { cursor: pointer; padding: 8px 16px; background: transparent; border: 0; border-right: 1px solid var(--line); font: 500 13px/1 var(--mono); color: var(--dim); }
+.abc-tabs button:last-child { border-right: 0; }
+.abc-tabs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.abc-st { position: relative; display: grid; gap: 14px; }
+.abc-row { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: center; }
+.abc-row span { font-size: 14px; color: var(--dim); }
+.abc-row span b { display: block; font: 500 13px/1.2 var(--mono); color: var(--ink); }
+.abc-track { position: relative; height: 30px; }
+.abc-track > i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); transition: width 0.8s cubic-bezier(.2,.7,.2,1), background 0.4s; }
+.abc-track > i.over { background: var(--mid); }
+.abc-track > em { position: absolute; top: 50%; transform: translateY(-50%); font: 500 13px/1 var(--mono); font-style: normal; color: var(--bg); padding-left: 8px; transition: left 0.8s cubic-bezier(.2,.7,.2,1); white-space: nowrap; }
+.abc-track > em { left: 0; }
+.abc-lines { position: absolute; top: -8px; bottom: -8px; left: 126px; right: 0; pointer-events: none; }
+.abc-lines i { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--ink); }
+.abc-lines i.takt { border-left-style: solid; border-color: var(--hot); }
+.abc-lines i::after { content: attr(data-l); position: absolute; top: -18px; right: 4px; font: 500 11px/1 var(--mono); color: var(--dim); white-space: nowrap; }
+.abc-lines i.takt::after { top: auto; bottom: -18px; color: var(--hot); }
+.abc-stnote { margin: 34px 0 0; min-height: 1.6em; color: var(--dim); font-size: 15px; max-width: 70ch; }
+
+.abc-note { margin-top: clamp(48px, 8vh, 80px); padding-top: 18px; border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; color: var(--dim); font-size: 14px; }
+.abc-tag { font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 6px; border: 1px solid var(--mid); color: var(--mid); white-space: nowrap; }
+
+@media (max-width: 860px) {
+  .abc-funnel { grid-template-columns: 1fr; gap: 20px; }
+  .abc-cards { grid-template-columns: 1fr; }
+  .abc-steps small { display: none; }
+  .abc-steps button { padding: 9px 0; }
+}
+@media (max-width: 520px) {
+  .abc-row { grid-template-columns: 76px 1fr; }
+  .abc-lines { left: 90px; }
+  .abc-row span { font-size: 12px; }
+  .abc-note { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .abc-bar i, .abc-track > i, .abc-track > em, .abc-share i, #abc-ask { transition: none; }
+  .abc-steps.play li.now { animation: none; }
+}
+
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .typed b { animation: none; } .cap, .verdict { transition: none; } }
 </style>
 </head>
@@ -212,6 +323,7 @@ dialog.quote .btn { justify-self: start; }
 <header class="nav wrap">
   <a class="brand" href="#top"><i></i>robosim</a>
   <nav>
+    <a href="#options">Options</a>
     <a href="#film">Film</a>
     <a href="#how">How it works</a>
     <a href="#industry">Industry</a>
@@ -275,6 +387,48 @@ dialog.quote .btn { justify-self: start; }
       </aside>
     </div>
   </section>
+
+  <section class="block wrap abc" id="options" aria-labelledby="abc-h">
+  <h2 class="sec" id="abc-h">Three ways to fix this line.</h2>
+  <p class="lede">We built every robot setup the line allows, scored each one, and kept three. You pick by what matters most to you.</p>
+
+  <!-- 1. many to few -->
+  <div class="abc-funnel">
+    <canvas id="abc-dots" role="img" aria-label="1,219 squares, one per design, narrowing to 3 options"></canvas>
+    <div>
+      <ol class="abc-steps" id="abc-steps" aria-live="polite">
+        <li><b>1,219</b><span>designs built</span><small>Robot or none at each station, layout changes, task splits</small></li>
+        <li><b>40</b><span>not beaten on every count</span><small>Cost, return, cycle time, worker strain, robots to install</small></li>
+        <li><b>31</b><span>still ahead after line simulation</span><small>30 simulated shifts each, same random events for all</small></li>
+        <li><b>10</b><span>practical</span><small>No extra hire, money back within 5 years</small></li>
+        <li><b>3</b><span>options for you</span><small>Together the best pick for 88% of priorities</small></li>
+      </ol>
+      <button type="button" class="abc-replay" id="abc-replay" hidden>REPLAY</button>
+    </div>
+  </div>
+
+  <!-- 2. priorities -->
+  <div class="abc-part" id="abc-ask">
+    <h3 class="abc-h3">What matters most to you?</h3>
+    <p class="abc-sub">We tried 20,000 ways to weigh cost, return, cycle time, worker strain and robot count, and counted which option comes out on top. Gray is a two-robot setup that wins too rarely to make the three.</p>
+    <div class="abc-seg" role="group" aria-label="Priority" id="abc-seg"></div>
+    <p class="abc-why" id="abc-why" aria-live="polite"></p>
+    <div class="abc-share" id="abc-share" aria-hidden="true"></div>
+
+    <div class="abc-cards" id="abc-cards"></div>
+  </div>
+
+  <!-- 3. station cycles -->
+  <div class="abc-part">
+    <h3 class="abc-h3">Does each station make the cut?</h3>
+    <p class="abc-sub">Seconds per door at each station. The plan holds 5% of takt in reserve, so the cap is 228 s.</p>
+    <div class="abc-tabs" role="group" aria-label="Show stations for" id="abc-tabs"></div>
+    <div class="abc-st" id="abc-st"><div class="abc-lines" id="abc-lines"></div></div>
+    <p class="abc-stnote" id="abc-stnote" aria-live="polite"></p>
+  </div>
+
+  <p class="abc-note"><span class="abc-tag">IE estimate</span><span>Time study, line balancing and line simulation from video and motion capture. Robot cell simulations of all three options are running now, so these numbers can move. Data: CarDA, Stellantis Melfi line, CC BY 4.0.</span></p>
+</section>
 
   <section class="block wrap" id="film">
     <h2 class="sec">From a scan to a working robot.</h2>
@@ -441,6 +595,7 @@ dialog.quote .btn { justify-self: start; }
   </div>
 </dialog>
 <script src="quote.js"></script>
+<script src="options.js"></script>
 <script src="scan.js"></script>
 <script src="robots.js?v=2"></script>
 <script src="engine.js?v=6"></script>
