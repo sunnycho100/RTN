@@ -153,6 +153,21 @@ var dome = (function () {
 })();
 
 var heroCv = document.getElementById('hero'), heroOn = true, heroT0 = performance.now();
+/* Hero robots are drawn 1.6x life size so they read at globe size; each arm stands on a raised platform of dots
+   (0.6 m square, 0.75 m tall before scaling), like a workbench. */
+var HSC = 1.6, PED_H = 0.75 * HSC, PED = (function () {
+  var p = [], w = 0.3 * HSC, st = 0.05 * HSC, x, y, z;
+  for (x = -w; x <= w + 1e-6; x += st) for (y = -w; y <= w + 1e-6; y += st) p.push(x, y, PED_H);   // top
+  for (z = 0; z < PED_H; z += st) for (x = -w; x <= w + 1e-6; x += st) p.push(x, -w, z, x, w, z, -w, x, z, w, x, z);   // sides
+  return p;
+})();
+function drawPed(ctx, v, ox, oy, a) {
+  ctx.fillStyle = rgba(C.ink, 0.5 * a);
+  for (var j = 0; j < PED.length; j += 3) {
+    if (!proj(v, ox + PED[j], oy + PED[j + 1], PED[j + 2])) continue;
+    var s = clamp(0.02 * v.f / P[2], 0.8, 2.4); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
+  }
+}
 /* Intro: the floor appears first, then everything above it rises in height order (scan.js lists the ground points
    first, then the rest by rising z), then the robots fade in. */
 var GROUND = S.ground_count || 0;
@@ -205,14 +220,18 @@ function drawHero(now) {
   if (BOTS && BOTS.h1) {   // two Unitree H1s facing each other in the rebuilt room
     var ha = REDUCED ? 1 : smooth(2900, 4100, t), fr = Math.floor(t / 1000 * BOTS.h1.fps) % BOTS.h1.n;
     if (ha > 0) {
-      drawBot(ctx, v, BOTS.h1, fr, -RW * 0.27, -0.2, (1 - ha) * 0.8, 0, 0.95 * ha, true);
-      drawBot(ctx, v, BOTS.h1, (fr + 20) % BOTS.h1.n, RW * 0.27, 0.2, (1 - ha) * 0.8, Math.PI, 0.95 * ha, true);
+      drawBot(ctx, v, BOTS.h1, fr, -RW * 0.27, -0.2, (1 - ha) * 0.8, 0, 0.95 * ha, true, HSC);
+      drawBot(ctx, v, BOTS.h1, (fr + 20) % BOTS.h1.n, RW * 0.27, 0.2, (1 - ha) * 0.8, Math.PI, 0.95 * ha, true, HSC);
     }
-    var ra = REDUCED ? 1 : smooth(3600, 4800, t), sec = t / 1000;   // then an arm at the back wall and a Go2 trotting across
+    var ra = REDUCED ? 1 : smooth(3600, 4800, t), sec = t / 1000;   // then two arms on raised platforms and a Go2 trotting across
     if (ra > 0) {
-      drawBot(ctx, v, BOTS.arm, Math.floor(sec * BOTS.arm.fps) % BOTS.arm.n, 0, RD * 0.3, (1 - ra) * 0.8, -Math.PI / 2, 0.95 * ra, true);
+      var fa = Math.floor(sec * BOTS.arm.fps) % BOTS.arm.n;
+      [-1, 1].forEach(function (side, j) {
+        drawPed(ctx, v, side * RW * 0.13, RD * 0.28, ra);
+        drawBot(ctx, v, BOTS.arm, (fa + j * 45) % BOTS.arm.n, side * RW * 0.13, RD * 0.28, PED_H + (1 - ra) * 0.8, -Math.PI / 2, 0.95 * ra, true, HSC);
+      });
       var u = (Math.sin(sec / 3) + 1) / 2;
-      drawBot(ctx, v, BOTS.quad, Math.floor(sec * BOTS.quad.fps) % BOTS.quad.n, RW * (u - 0.5) * 0.6, -RD * 0.3, (1 - ra) * 0.8, Math.cos(sec / 3) < 0 ? Math.PI : 0, 0.95 * ra, true);
+      drawBot(ctx, v, BOTS.quad, Math.floor(sec * BOTS.quad.fps) % BOTS.quad.n, RW * (u - 0.5) * 0.6, -RD * 0.3, (1 - ra) * 0.8, Math.cos(sec / 3) < 0 ? Math.PI : 0, 0.95 * ra, true, HSC);
     }
   }
 }
@@ -260,9 +279,11 @@ function eachBotPoint(R, frame, fn) {   // fn(x, y, z, accent, body index) for e
     }
   });
 }
-function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a, tint) {
+function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a, tint, sc) {
   var cy = Math.cos(yaw), sy = Math.sin(yaw), cols = [rgba(C.ink, a), rgba(C.acc, a)];
+  sc = sc || 1;
   eachBotPoint(R, frame, function (wx, wy, wz, c) {
+    wx *= sc; wy *= sc; wz *= sc;
     if (!proj(v, ox + cy * wx - sy * wy, oy + sy * wx + cy * wy, oz + wz)) return;
     ctx.fillStyle = tint ? cols[1] : cols[c];
     var s = clamp(0.022 * v.f / P[2], 1, 3.4); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
