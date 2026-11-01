@@ -9,11 +9,11 @@
 <meta property="og:url" content="https://www.rltosim.com/">
 <meta property="og:title" content="RTOS · Real to Simulation">
 <meta property="og:description" content="Test any robot in simulation before you buy it.">
-<meta property="og:image" content="https://www.rltosim.com/media/og.jpg?v=3">
+<meta property="og:image" content="https://www.rltosim.com/media/og.jpg?v=4">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-14 -14 28 28'><rect x='-14' y='-14' width='28' height='28' rx='6' fill='%230a0c0c'/><path d='M-7.3 -5.8L-1.4 -9.2M1.4 -9.2L7.3 -5.8M8.7 -3.4L8.7 -1.6M-8.7 -3.4L-8.7 -1.6M-8.7 1.6L-8.7 3.4M-7.1 0L-1.6 0M1.6 0L7.1 0M1.4 0.8L7.3 4.2M0 -8.4L0 -1.6M0 1.6L0 8.4M8.7 1.6L8.7 3.4M7.3 5.8L1.4 9.2M-1.4 9.2L-7.3 5.8' stroke='%236cb4f7' stroke-width='2.4' stroke-linecap='round'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-35 -60 220 220'><rect x='-35' y='-60' width='220' height='220' rx='44' fill='%230a0c0c'/><path fill='%23fff' d='M139.0 53.2L140.1 52.2L141.2 51.2L142.2 50.1L143.2 49.0L144.1 47.9L144.9 46.7L145.7 45.4L146.5 44.1L147.1 42.8L147.7 41.5L148.2 40.1L148.7 38.7L149.1 37.3L149.4 35.9L149.7 34.4L149.9 32.9L150.0 31.5L150.0 30.0L150.0 28.0L150.0 26.5L149.9 25.1L149.7 23.6L149.4 22.1L149.1 20.7L148.7 19.3L148.2 17.9L147.7 16.5L147.1 15.2L146.5 13.9L145.7 12.6L144.9 11.3L144.1 10.1L143.2 9.0L142.2 7.9L141.2 6.8L140.1 5.8L139.0 4.8L137.9 3.9L136.7 3.1L135.4 2.3L134.1 1.5L132.8 0.9L131.5 0.3L130.7 0.0L18.0 0.0L0.0 0.0L0.0 16.0L0.0 42.0L0.0 58.0L0.0 100.0L18.0 100.0L18.0 58.0L18.0 42.0L18.0 16.0L120.0 16.0L120.6 16.0L121.2 16.1L121.8 16.1L122.3 16.2L122.9 16.4L123.5 16.5L124.0 16.7L124.6 16.9L125.1 17.2L125.7 17.4L126.2 17.7L126.7 18.0L127.1 18.4L127.6 18.7L128.1 19.1L128.5 19.5L128.9 19.9L129.3 20.4L129.6 20.9L130.0 21.3L130.3 21.8L130.6 22.3L130.8 22.9L131.1 23.4L131.3 24.0L131.5 24.5L131.6 25.1L131.8 25.7L131.9 26.2L131.9 26.8L132.0 27.4L132.0 28.0L132.0 30.0L132.0 30.6L131.9 31.2L131.9 31.8L131.8 32.3L131.6 32.9L131.5 33.5L131.3 34.0L131.1 34.6L130.8 35.1L130.6 35.7L130.3 36.2L130.0 36.7L129.6 37.1L129.3 37.6L128.9 38.1L128.5 38.5L128.1 38.9L127.6 39.3L127.1 39.6L126.7 40.0L126.2 40.3L125.7 40.6L125.1 40.8L124.6 41.1L124.0 41.3L123.5 41.5L122.9 41.6L122.3 41.8L121.8 41.9L121.2 41.9L120.6 42.0L120.0 42.0L26.0 42.0L26.0 58.0L73.0 58.0L125.0 100.0L150.0 100.0L98.0 58.0L130.7 58.0L131.5 57.7L132.8 57.1L134.1 56.5L135.4 55.7L136.7 54.9L137.9 54.1Z'/></svg>">
 <!-- Draft for the team. Copy and name are placeholders. Every clip is ours (site/media, rendered by site/tools). -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,15 +47,9 @@ a { color: inherit; }
 .nav { position: fixed; inset: 0 0 auto; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px;
   padding-top: max(14px, env(safe-area-inset-top, 0px)); padding-bottom: 14px;
   background: linear-gradient(var(--bg), color-mix(in srgb, var(--bg) 0%, transparent)); }
-.brand { font: 700 17px/1 var(--display); font-stretch: 118%; letter-spacing: 0.01em; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-/* logo: R, T, O and S drawn on one hexagon, then stacked into the mark; strokes shared by more letters stack brighter */
-.brand svg { overflow: visible; flex: none; }
-.brand g { opacity: 0.7; animation: lg-merge 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.65s both; }
-.brand line { stroke: #6cb4f7; stroke-width: 1.7; stroke-linecap: round; stroke-dasharray: 1 1; animation: lg-draw 0.26s ease-out var(--d) both; }
-.brand span { animation: lg-fade 0.4s ease-out 2.1s both; }
-@keyframes lg-draw { from { stroke-dashoffset: 1; opacity: 0; } 15% { opacity: 1; } }
-@keyframes lg-merge { from { transform: translateX(var(--x)); opacity: 1; } }
-@keyframes lg-fade { from { opacity: 0; } }
+.brand { display: flex; align-items: center; }
+.brand svg { display: block; height: 25px; width: auto; }   /* the RTOS wordmark: cap height is the full svg height */
+@media (max-width: 720px) { .brand svg { height: 20px; } }
 .nav nav { display: flex; align-items: center; gap: 22px; }
 .nav nav a { text-decoration: none; color: var(--dim); font-size: 14px; }
 .nav nav a:hover { color: var(--ink); }
@@ -338,32 +332,13 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
   .abc-bar i,   .abc-steps.play li.now { animation: none; }
 }
 
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .brand g, .brand line, .brand span { animation: none; } .typed b { animation: none; } .cap, .verdict { transition: none; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .typed b { animation: none; } .cap, .verdict { transition: none; } }
 </style>
 </head>
 <body>
 
 <header class="nav wrap">
-  <a class="brand" href="#top"><svg id="logo" width="20" height="23" viewBox="-10 -11.5 20 23" aria-hidden="true"></svg><span>RTOS</span></a>
-  <script>
-  (function () {   // each letter is polylines over named hexagon points; every segment is its own stroke, trimmed so joints show gaps
-    var P = { T: [0, -10], UR: [8.66, -5], MR: [8.66, 0], LR: [8.66, 5], B: [0, 10], LL: [-8.66, 5], ML: [-8.66, 0], UL: [-8.66, -5], C: [0, 0] };
-    var W = ['UL ML LL|UL T UR MR C ML|C LR', 'UL T UR|T C B', 'UL T UR MR LR B LL ML UL', 'UR T UL ML C MR LR B LL'], k = 0, h = '';
-    W.forEach(function (w, i) {
-      h += '<g style="--x:' + 24 * i + 'px">';
-      w.split('|').forEach(function (s) {
-        s = s.split(' ');
-        for (var j = 1; j < s.length; j++) {
-          var a = P[s[j - 1]], b = P[s[j]], dx = b[0] - a[0], dy = b[1] - a[1], u = 1.5 / Math.hypot(dx, dy);
-          h += '<line pathLength="1" style="--d:' + (0.15 + 0.031 * k++).toFixed(3) + 's" x1="' + (a[0] + dx * u).toFixed(2) + '" y1="' + (a[1] + dy * u).toFixed(2)
-            + '" x2="' + (b[0] - dx * u).toFixed(2) + '" y2="' + (b[1] - dy * u).toFixed(2) + '"/>';
-        }
-      });
-      h += '</g>';
-    });
-    document.getElementById('logo').innerHTML = h;
-  })();
-  </script>
+  <a class="brand" href="#top" aria-label="RTOS"><svg viewBox="0 0 700 100" width="175" height="25" aria-hidden="true"><path fill="#fff" fill-rule="evenodd" d="M233.0 16.0L233.0 0.0L180.0 0.0L180.0 16.0ZM571.3 1.3L569.9 1.8L568.5 2.3L567.2 2.9L565.9 3.5L564.6 4.3L563.3 5.1L562.1 5.9L561.0 6.8L559.9 7.8L558.8 8.8L557.8 9.9L556.8 11.0L555.9 12.1L555.1 13.3L554.3 14.6L553.5 15.9L552.9 17.2L552.3 18.5L551.8 19.9L551.3 21.3L550.9 22.7L550.6 24.1L550.3 25.6L550.1 27.1L550.0 28.5L550.0 30.0L550.0 42.0L550.0 58.0L568.0 58.0L568.0 42.0L568.0 28.0L568.0 27.4L568.1 26.8L568.1 26.2L568.2 25.7L568.4 25.1L568.5 24.5L568.7 24.0L568.9 23.4L569.2 22.9L569.4 22.3L569.7 21.8L570.0 21.3L570.4 20.9L570.7 20.4L571.1 19.9L571.5 19.5L571.9 19.1L572.4 18.7L572.9 18.4L573.3 18.0L573.8 17.7L574.3 17.4L574.9 17.2L575.4 16.9L576.0 16.7L576.5 16.5L577.1 16.4L577.7 16.2L578.2 16.1L578.8 16.1L579.4 16.0L580.0 16.0L700.0 16.0L700.0 0.0L580.0 0.0L578.5 0.0L577.1 0.1L575.6 0.3L574.1 0.6L572.7 0.9ZM139.0 53.2L140.1 52.2L141.2 51.2L142.2 50.1L143.2 49.0L144.1 47.9L144.9 46.7L145.7 45.4L146.5 44.1L147.1 42.8L147.7 41.5L148.2 40.1L148.7 38.7L149.1 37.3L149.4 35.9L149.7 34.4L149.9 32.9L150.0 31.5L150.0 30.0L150.0 28.0L150.0 26.5L149.9 25.1L149.7 23.6L149.4 22.1L149.1 20.7L148.7 19.3L148.2 17.9L147.7 16.5L147.1 15.2L146.5 13.9L145.7 12.6L144.9 11.3L144.1 10.1L143.2 9.0L142.2 7.9L141.2 6.8L140.1 5.8L139.0 4.8L137.9 3.9L136.7 3.1L135.4 2.3L134.1 1.5L132.8 0.9L131.5 0.3L130.7 0.0L18.0 0.0L0.0 0.0L0.0 16.0L0.0 42.0L0.0 58.0L0.0 100.0L18.0 100.0L18.0 58.0L18.0 42.0L18.0 16.0L120.0 16.0L120.6 16.0L121.2 16.1L121.8 16.1L122.3 16.2L122.9 16.4L123.5 16.5L124.0 16.7L124.6 16.9L125.1 17.2L125.7 17.4L126.2 17.7L126.7 18.0L127.1 18.4L127.6 18.7L128.1 19.1L128.5 19.5L128.9 19.9L129.3 20.4L129.6 20.9L130.0 21.3L130.3 21.8L130.6 22.3L130.8 22.9L131.1 23.4L131.3 24.0L131.5 24.5L131.6 25.1L131.8 25.7L131.9 26.2L131.9 26.8L132.0 27.4L132.0 28.0L132.0 30.0L132.0 30.6L131.9 31.2L131.9 31.8L131.8 32.3L131.6 32.9L131.5 33.5L131.3 34.0L131.1 34.6L130.8 35.1L130.6 35.7L130.3 36.2L130.0 36.7L129.6 37.1L129.3 37.6L128.9 38.1L128.5 38.5L128.1 38.9L127.6 39.3L127.1 39.6L126.7 40.0L126.2 40.3L125.7 40.6L125.1 40.8L124.6 41.1L124.0 41.3L123.5 41.5L122.9 41.6L122.3 41.8L121.8 41.9L121.2 41.9L120.6 42.0L120.0 42.0L26.0 42.0L26.0 58.0L73.0 58.0L125.0 100.0L150.0 100.0L98.0 58.0L130.7 58.0L131.5 57.7L132.8 57.1L134.1 56.5L135.4 55.7L136.7 54.9L137.9 54.1ZM241.0 0.0L241.0 16.0L241.0 100.0L259.0 100.0L259.0 16.0L320.0 16.0L320.0 0.0L259.0 0.0ZM374.1 0.6L372.7 0.9L371.3 1.3L369.9 1.8L368.5 2.3L367.2 2.9L365.9 3.5L364.6 4.3L363.3 5.1L362.1 5.9L361.0 6.8L359.9 7.8L358.8 8.8L357.8 9.9L356.8 11.0L355.9 12.1L355.1 13.3L354.3 14.6L353.5 15.9L352.9 17.2L352.3 18.5L351.8 19.9L351.3 21.3L350.9 22.7L350.6 24.1L350.3 25.6L350.1 27.1L350.0 28.5L350.0 30.0L350.0 70.0L350.0 71.5L350.1 72.9L350.3 74.4L350.6 75.9L350.9 77.3L351.3 78.7L351.8 80.1L352.3 81.5L352.9 82.8L353.5 84.1L354.3 85.4L355.1 86.7L355.9 87.9L356.8 89.0L357.8 90.1L358.8 91.2L359.9 92.2L361.0 93.2L362.1 94.1L363.3 94.9L364.6 95.7L365.9 96.5L367.2 97.1L368.5 97.7L369.9 98.2L371.3 98.7L372.7 99.1L374.1 99.4L375.6 99.7L377.1 99.9L378.5 100.0L380.0 100.0L490.0 100.0L491.5 100.0L492.9 99.9L494.4 99.7L495.9 99.4L497.3 99.1L498.7 98.7L500.1 98.2L501.5 97.7L502.8 97.1L504.1 96.5L505.4 95.7L506.7 94.9L507.9 94.1L509.0 93.2L510.1 92.2L511.2 91.2L512.2 90.1L513.2 89.0L514.1 87.9L514.9 86.7L515.7 85.4L516.5 84.1L517.1 82.8L517.7 81.5L518.2 80.1L518.7 78.7L519.1 77.3L519.4 75.9L519.7 74.4L519.9 72.9L520.0 71.5L520.0 70.0L520.0 30.0L520.0 28.5L519.9 27.1L519.7 25.6L519.4 24.1L519.1 22.7L518.7 21.3L518.2 19.9L517.7 18.5L517.1 17.2L516.5 15.9L515.7 14.6L514.9 13.3L514.1 12.1L513.2 11.0L512.2 9.9L511.2 8.8L510.1 7.8L509.0 6.8L507.9 5.9L506.7 5.1L505.4 4.3L504.1 3.5L502.8 2.9L501.5 2.3L500.1 1.8L498.7 1.3L497.3 0.9L495.9 0.6L494.4 0.3L492.9 0.1L491.5 0.0L490.0 0.0L388.0 0.0L388.0 16.0L490.0 16.0L490.6 16.0L491.2 16.1L491.8 16.1L492.3 16.2L492.9 16.4L493.5 16.5L494.0 16.7L494.6 16.9L495.1 17.2L495.7 17.4L496.2 17.7L496.7 18.0L497.1 18.4L497.6 18.7L498.1 19.1L498.5 19.5L498.9 19.9L499.3 20.4L499.6 20.9L500.0 21.3L500.3 21.8L500.6 22.3L500.8 22.9L501.1 23.4L501.3 24.0L501.5 24.5L501.6 25.1L501.8 25.7L501.9 26.2L501.9 26.8L502.0 27.4L502.0 28.0L502.0 72.0L502.0 72.6L501.9 73.2L501.9 73.8L501.8 74.3L501.6 74.9L501.5 75.5L501.3 76.0L501.1 76.6L500.8 77.1L500.6 77.7L500.3 78.2L500.0 78.7L499.6 79.1L499.3 79.6L498.9 80.1L498.5 80.5L498.1 80.9L497.6 81.3L497.1 81.6L496.7 82.0L496.2 82.3L495.7 82.6L495.1 82.8L494.6 83.1L494.0 83.3L493.5 83.5L492.9 83.6L492.3 83.8L491.8 83.9L491.2 83.9L490.6 84.0L490.0 84.0L380.0 84.0L379.4 84.0L378.8 83.9L378.2 83.9L377.7 83.8L377.1 83.6L376.5 83.5L376.0 83.3L375.4 83.1L374.9 82.8L374.3 82.6L373.8 82.3L373.3 82.0L372.9 81.6L372.4 81.3L371.9 80.9L371.5 80.5L371.1 80.1L370.7 79.6L370.4 79.1L370.0 78.7L369.7 78.2L369.4 77.7L369.2 77.1L368.9 76.6L368.7 76.0L368.5 75.5L368.4 74.9L368.2 74.3L368.1 73.8L368.1 73.2L368.0 72.6L368.0 72.0L368.0 28.0L368.0 27.4L368.1 26.8L368.1 26.2L368.2 25.7L368.4 25.1L368.5 24.5L368.7 24.0L368.9 23.4L369.2 22.9L369.4 22.3L369.7 21.8L370.0 21.3L370.4 20.9L370.7 20.4L371.1 19.9L371.5 19.5L371.9 19.1L372.4 18.7L372.9 18.4L373.3 18.0L373.8 17.7L374.3 17.4L374.9 17.2L375.4 16.9L376.0 16.7L376.5 16.5L377.1 16.4L377.7 16.2L378.2 16.1L378.8 16.1L379.4 16.0L380.0 16.0L380.0 0.0L378.5 0.0L377.1 0.1L375.6 0.3ZM671.8 58.1L672.3 58.2L672.9 58.4L673.5 58.5L674.0 58.7L674.6 58.9L675.1 59.2L675.7 59.4L676.2 59.7L676.7 60.0L677.1 60.4L677.6 60.7L678.1 61.1L678.5 61.5L678.9 61.9L679.3 62.4L679.6 62.9L680.0 63.3L680.3 63.8L680.6 64.3L680.8 64.9L681.1 65.4L681.3 66.0L681.5 66.5L681.6 67.1L681.8 67.7L681.9 68.2L681.9 68.8L682.0 69.4L682.0 70.0L682.0 72.0L682.0 72.6L681.9 73.2L681.9 73.8L681.8 74.3L681.6 74.9L681.5 75.5L681.3 76.0L681.1 76.6L680.8 77.1L680.6 77.7L680.3 78.2L680.0 78.7L679.6 79.1L679.3 79.6L678.9 80.1L678.5 80.5L678.1 80.9L677.6 81.3L677.1 81.6L676.7 82.0L676.2 82.3L675.7 82.6L675.1 82.8L674.6 83.1L674.0 83.3L673.5 83.5L672.9 83.6L672.3 83.8L671.8 83.9L671.2 83.9L670.6 84.0L670.0 84.0L550.0 84.0L550.0 100.0L680.7 100.0L681.5 99.7L682.8 99.1L684.1 98.5L685.4 97.7L686.7 96.9L687.9 96.1L689.0 95.2L690.1 94.2L691.2 93.2L692.2 92.1L693.2 91.0L694.1 89.9L694.9 88.7L695.7 87.4L696.5 86.1L697.1 84.8L697.7 83.5L698.2 82.1L698.7 80.7L699.1 79.3L699.4 77.9L699.7 76.4L699.9 74.9L700.0 73.5L700.0 72.0L700.0 70.0L700.0 68.5L699.9 67.1L699.7 65.6L699.4 64.1L699.1 62.7L698.7 61.3L698.2 59.9L697.7 58.5L697.1 57.2L696.5 55.9L695.7 54.6L694.9 53.3L694.1 52.1L693.2 51.0L692.2 49.9L691.2 48.8L690.1 47.8L689.0 46.8L687.9 45.9L686.7 45.1L685.4 44.3L684.1 43.5L682.8 42.9L681.5 42.3L680.7 42.0L576.0 42.0L576.0 58.0L670.0 58.0L670.6 58.0L671.2 58.1Z"/></svg></a>
   <nav>
     <a href="#options">Example</a>
     <a href="#story">How it works</a>
