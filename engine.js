@@ -147,7 +147,7 @@ function drawPed(ctx, v, ox, oy, a, zc) {
   }
 }
 /* Intro: the floor appears first, then everything above it rises in height order (scan.js lists the ground points
-   first, then the rest by rising z), then each robot is placed: it builds up from the floor in place while a tag reads the
+   first, then the rest by rising z) while each robot is placed alongside: it builds up from the floor in place while a tag reads the
    build height in real metres (the hero draws robots 1.6x life size), and the tag fades once the robot is whole. */
 var MONO = css('--mono');
 function botTop(R) { if (R.top == null) { R.top = 0; eachBotPoint(R, 0, function (x, y, z) { R.top = Math.max(R.top, z); }); } return R.top; }
@@ -210,12 +210,12 @@ function drawHero(now) {
     [[BOTS.h1, fr, -RW * 0.27, -0.2, 0, 0], [BOTS.h1, (fr + 20) % BOTS.h1.n, RW * 0.27, 0.2, 0, Math.PI],
      [BOTS.arm, fa, -RW * 0.13, RD * 0.28, PED_H, -Math.PI / 2], [BOTS.arm, (fa + 45) % BOTS.arm.n, RW * 0.13, RD * 0.28, PED_H, -Math.PI / 2],
      [BOTS.quad, Math.floor(sec * BOTS.quad.fps) % BOTS.quad.n, RW * (u - 0.5) * 0.6, -RD * 0.3, 0, Math.cos(sec / 3) < 0 ? Math.PI : 0]].forEach(function (r) {
-      var t0 = 2900, k = REDUCED ? 1 : smooth(t0, t0 + 1000, t);
+      var t0 = 1210, k = REDUCED ? 1 : smooth(t0, 2900, t);   // the same window as the scan's rise above the floor
       if (k <= 0) return;
       var zc = (r[4] + botTop(r[0]) * HSC) * k;
       if (r[4]) drawPed(ctx, v, r[2], r[3], 1, zc);
       drawBot(ctx, v, r[0], r[1], r[2], r[3], r[4], r[5], 0.95, true, HSC, zc);
-      if (!REDUCED) zTag(ctx, v, dpr, r[2], r[3], zc, 0.9 * smooth(t0, t0 + 150, t) * (1 - smooth(t0 + 1600, t0 + 2000, t)));
+      if (!REDUCED) zTag(ctx, v, dpr, r[2], r[3], zc, 0.9 * smooth(t0, t0 + 150, t) * (1 - smooth(3500, 3900, t)));
     });
   }
 }
