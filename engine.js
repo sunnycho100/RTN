@@ -350,7 +350,7 @@ function drawStory(now) {
   drawPoints(ctx, v, function (i) {   // the scan: revealed behind the sweep, then the rebuilt room
     if (X[i] > sx) return 0;
     if (sw < 1 && X[i] > sx - 0.14) return 16 + lvl(0.95 * dots);   // the strip being read, in accent
-    return lvl(dots * (1 - robots * (1 - fac)) * (0.38 + 0.065 * SH[i]));   // step 04 shows only what moves on the grid floor; the scan returns for the zoom-out
+    return lvl(dots * (i < GROUND ? 1 : 1 - robots * (1 - fac)) * (0.38 + 0.065 * SH[i]));   // the rebuilt ground stays from step 02 on; step 04 hides the rest of the static scan until the zoom-out
   }, 0.03, 0, 0, SMALL ? 2 : 1);
 
   var path = smooth(0.9, 1.05, t) * (1 - smooth(1.7, 2.3, t)) * (1 - smooth(0.85, 1, sw));   // the phone and the strip it reads, gone once the pass ends
@@ -386,6 +386,7 @@ function drawStory(now) {
       var Sd = j ? T : Td, pv = sideCam(Sd, sec, pw, ph); pv.cx += px; pv.cy += py;
       ctx.save(); ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip();
       ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath(); grid(ctx, pv, fl.x[0] - OX, fl.x[1] - OX, fl.y[0] - OY, fl.y[1] - OY); ctx.stroke();
+      drawPoints(ctx, pv, function (i) { return i < GROUND ? lvl(0.22 + 0.04 * SH[i]) : 0; }, 0.03, 0, 0, SMALL ? 2 : 1);   // the same rebuilt ground as steps 02 and 04, dimmer up close
       drawTeam(ctx, pv, Sd, sec, 0.95);
       ctx.restore();
     });
