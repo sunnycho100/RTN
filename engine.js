@@ -1,11 +1,11 @@
 /* Shared animation engine for the landing page drafts (index.html, v2.html).
-   Draws the real scan (scan.js) on two 2D canvases: #hero (a capture dome around the scan) and #sim (a pinned scroll story).
+   Draws the real scan (scan.js) on two 2D canvases: #hero (the scan with robots on it) and #sim (a pinned scroll story).
    Colors come from the page's CSS tokens; layout knobs come from window.SITE (see DEFAULTS). No libraries. */
 (function () {
 'use strict';
 var DEFAULTS = {
-  hero: { ox: 0.68, oy: 0.42, pitch: 0.32, fov: 0.62, dist: 4.3, strut: 0.22 },
-  heroSmall: { ox: 0.5, oy: 0.36 },
+  hero: { ox: 0.58, oy: 0.48, pitch: 0.32, fov: 0.62, dist: 1.9 },   // the floor and robots fill the hero behind the headline
+  heroSmall: { ox: 0.5, oy: 0.4 },
   story: { ox: 0.56, oy: 0.46, pitch: 0, fov: 0.85 },
   storySmall: { ox: 0.5, oy: 0.42 }
 };
@@ -56,18 +56,12 @@ for (i = 0; i < N; i++) { var x0 = S.pts[4 * i] / 100, y0 = S.pts[4 * i + 1] / 1
   if (x0 < minx) minx = x0; if (x0 > maxx) maxx = x0; if (y0 < miny) miny = y0; if (y0 > maxy) maxy = y0; }
 var OX = (minx + maxx) / 2, OY = (miny + maxy) / 2, RW = maxx - minx, RD = maxy - miny;
 for (i = 0; i < N; i++) { X[i] = S.pts[4 * i] / 100 - OX; Y[i] = S.pts[4 * i + 1] / 100 - OY; Z[i] = S.pts[4 * i + 2] / 100; SH[i] = S.pts[4 * i + 3]; }
-var cams = [];
-for (k = 0; k < S.cams.length; k += 6) cams.push({ x: S.cams[k] / 100 - OX, y: S.cams[k + 1] / 100 - OY, z: S.cams[k + 2] / 100,
-  fx: S.cams[k + 3] / 100, fy: S.cams[k + 4] / 100, fz: S.cams[k + 5] / 100 });
 function box(b, wall) { return { cx: b[0] / 100 - OX, cy: b[1] / 100 - OY, cz: b[2] / 100, hx: b[3] / 100, hy: b[4] / 100, hz: b[5] / 100, c: Math.cos(b[6]), s: Math.sin(b[6]), wall: wall }; }
 var boxes = S.walls.map(function (b) { return box(b, true); }).concat(S.hulls.map(function (b) { return box(b, false); }));
 
-/* Per point: which camera saw it first (capture reveal), and distance to the nearest simple shape (check stage). */
-var reveal = new Float32Array(N), near5 = 0, near15 = 0;
+/* Per point: distance to the nearest simple shape (check stage). */
+var near5 = 0, near15 = 0;
 for (i = 0; i < N; i++) {
-  var best = 1e9, bi = 0;
-  for (k = 0; k < cams.length; k++) { var dx = X[i] - cams[k].x, dy = Y[i] - cams[k].y, dd = dx * dx + dy * dy; if (dd < best) { best = dd; bi = k; } }
-  reveal[i] = bi / (cams.length - 1);
   var d = Math.abs(Z[i]);  // the floor slab
   for (k = 0; k < boxes.length; k++) {
     var b = boxes[k], ex = X[i] - b.cx, ey = Y[i] - b.cy;
@@ -96,6 +90,13 @@ function proj(v, x, y, z) {
   P[0] = v.cx + v.f * (dx * v.rx + dy * v.ry) / zc; P[1] = v.cy - v.f * (dx * v.ux + dy * v.uy + dz * v.uz) / zc; P[2] = zc; return true;
 }
 function seg(ctx, v, a, b) { if (!proj(v, a[0], a[1], a[2])) return; var x = P[0], y = P[1]; if (!proj(v, b[0], b[1], b[2])) return; ctx.moveTo(x, y); ctx.lineTo(P[0], P[1]); }
+function grid(ctx, v, x0, x1, y0, y1) {   // 0.5 m floor grid in 0.5 m pieces: a line passing behind a close camera loses only its near piece
+  x0 = Math.floor(x0 * 2) / 2; y0 = Math.floor(y0 * 2) / 2;
+  for (var gx = x0; gx <= x1 + 1e-6; gx += 0.5) for (var gy = y0; gy <= y1 + 1e-6; gy += 0.5) {
+    if (gy + 0.5 <= y1 + 1e-6) seg(ctx, v, [gx, gy, 0], [gx, gy + 0.5, 0]);
+    if (gx + 0.5 <= x1 + 1e-6) seg(ctx, v, [gx, gy, 0], [gx + 0.5, gy, 0]);
+  }
+}
 var EDGES = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
 function boxEdges(ctx, v, b, dx, dy) {
   var c = [], sx, sy, sz;
@@ -128,27 +129,7 @@ function fit(cv) {
 }
 function onScreen(el, cb) { new IntersectionObserver(function (es) { cb(es[0].isIntersecting); }).observe(el); }
 
-/* ---- HERO: a dome (icosphere struts) around the real scan, with one scanner at the top ---- */
-var dome = (function () {
-  var q = (1 + Math.sqrt(5)) / 2, IV = [[-1, q, 0], [1, q, 0], [-1, -q, 0], [1, -q, 0], [0, -1, q], [0, 1, q], [0, -1, -q], [0, 1, -q], [q, 0, -1], [q, 0, 1], [-q, 0, -1], [-q, 0, 1]];
-  var IF = [[0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11], [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8], [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9], [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]];
-  var V = [], E = {}, F = 3, idx = {};
-  function nrm(p) { var l = Math.hypot(p[0], p[1], p[2]); return [p[0] / l, p[1] / l, p[2] / l]; }
-  function vid(p) { p = nrm(p); var kk = p.map(function (x) { return x.toFixed(4); }).join(); if (!(kk in idx)) { idx[kk] = V.length; V.push(p); } return idx[kk]; }
-  function edge(a, b) { E[Math.min(a, b) + '-' + Math.max(a, b)] = 1; }
-  IF.forEach(function (f) {
-    var A = IV[f[0]], B = IV[f[1]], Cc = IV[f[2]], g = [], a, bb;
-    for (a = 0; a <= F; a++) { g[a] = []; for (bb = 0; bb <= F - a; bb++) { var c = F - a - bb;
-      g[a][bb] = vid([(A[0] * a + B[0] * bb + Cc[0] * c) / F, (A[1] * a + B[1] * bb + Cc[1] * c) / F, (A[2] * a + B[2] * bb + Cc[2] * c) / F]); } }
-    for (a = 0; a <= F; a++) for (bb = 0; bb <= F - a; bb++) {
-      if (bb < F - a) edge(g[a][bb], g[a][bb + 1]);
-      if (a < F - bb) edge(g[a][bb], g[a + 1][bb]);
-      if (a < F - bb && bb > 0) edge(g[a][bb], g[a + 1][bb - 1]);
-    }
-  });
-  return { V: V, E: Object.keys(E).map(function (s) { return s.split('-').map(Number); }) };
-})();
-
+/* ---- HERO: the real scan with robots on it, large behind the headline; drag to turn it, shift-drag or right-drag to move it ---- */
 var heroCv = document.getElementById('hero'), heroOn = true, heroT0 = performance.now();
 /* Hero robots are drawn 1.6x life size so they read at globe size; each arm stands on a raised platform of dots
    (0.6 m square, 0.75 m tall before scaling), like a workbench. */
@@ -182,20 +163,25 @@ var EX = new Float32Array(N), EY = new Float32Array(N), EZ = new Float32Array(N)
     EA[i] = 1 - 0.55 * e;
   }
 })();
-/* Drag the dome with a mouse or a finger: horizontal turns it, vertical tilts it, and it coasts a little after release.
-   Touch keeps vertical swipes for page scrolling (touch-action: pan-y), so on phones a drag only turns it. */
-var drag = { yaw: 0, pitch: 0, vy: 0, vp: 0, down: false, x: 0, y: 0 };
+/* Drag with a mouse or a finger: horizontal turns the scene, vertical tilts it, and it coasts a little after release.
+   Shift-drag or right-drag moves it across the screen instead. Touch keeps vertical swipes for page scrolling
+   (touch-action: pan-y), so on phones a drag only turns it. */
+var drag = { yaw: 0, pitch: 0, vy: 0, vp: 0, down: false, pan: false, x: 0, y: 0, mx: 0, my: 0 };
 if (heroCv) {
   heroCv.style.cursor = 'grab'; heroCv.style.touchAction = 'pan-y';
+  heroCv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
   heroCv.addEventListener('pointerdown', function (e) {
-    drag.down = true; drag.x = e.clientX; drag.y = e.clientY; drag.vy = drag.vp = 0;
-    heroCv.setPointerCapture(e.pointerId); heroCv.style.cursor = 'grabbing';
+    drag.down = true; drag.pan = e.shiftKey || e.button === 2; drag.x = e.clientX; drag.y = e.clientY; drag.vy = drag.vp = 0;
+    heroCv.setPointerCapture(e.pointerId); heroCv.style.cursor = drag.pan ? 'move' : 'grabbing';
   });
   heroCv.addEventListener('pointermove', function (e) {
     if (!drag.down) return;
-    drag.vy = -(e.clientX - drag.x) * 0.006; drag.vp = e.pointerType === 'touch' ? 0 : (e.clientY - drag.y) * 0.004;
-    drag.yaw += drag.vy; drag.pitch = clamp(drag.pitch + drag.vp, -CFG.hero.pitch - 0.25, 1.25 - CFG.hero.pitch);
-    drag.x = e.clientX; drag.y = e.clientY;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+    if (drag.pan) { drag.mx += dx; drag.my += dy; }
+    else {
+      drag.vy = -dx * 0.006; drag.vp = e.pointerType === 'touch' ? 0 : dy * 0.004;
+      drag.yaw += drag.vy; drag.pitch = clamp(drag.pitch + drag.vp, -CFG.hero.pitch - 0.25, 1.25 - CFG.hero.pitch);
+    }
     if (REDUCED) drawHero(performance.now());
   });
   ['pointerup', 'pointercancel'].forEach(function (n) { heroCv.addEventListener(n, function () { drag.down = false; heroCv.style.cursor = 'grab'; }); });
@@ -204,37 +190,13 @@ function drawHero(now) {
   if (!heroCv) return;
   var dpr = fit(heroCv), W = heroCv.width, H = heroCv.height, ctx = heroCv.getContext('2d'), h = CFG.hero, hs = SMALL ? CFG.heroSmall : h;
   ctx.clearRect(0, 0, W, H);
-  var t = REDUCED ? 0 : (now - heroT0), spin = t / 90000 * TAU, R = Math.max(RW, RD) * 0.78, cz = 0.9, far = R * h.dist;
+  var t = REDUCED ? 0 : (now - heroT0), spin = t / 90000 * TAU, R = Math.max(RW, RD) * 0.78, cz = 0.9;
   if (!drag.down) { drag.yaw += drag.vy; drag.pitch = clamp(drag.pitch + drag.vp, -h.pitch - 0.25, 1.25 - h.pitch); drag.vy *= 0.94; drag.vp *= 0.94; }
-  var v = view(W, H, { tx: 0, ty: 0, tz: cz, yaw: -0.9 + spin + drag.yaw, pitch: h.pitch + drag.pitch, dist: R * h.dist, fov: h.fov, ox: hs.ox, oy: hs.oy });
-  ctx.lineWidth = dpr;
-  dome.E.forEach(function (e) {      // struts, fading with depth
-    var a = dome.V[e[0]], b = dome.V[e[1]];
-    if (!proj(v, a[0] * R, a[1] * R, a[2] * R + cz)) return; var ax = P[0], ay = P[1], az = P[2];
-    if (!proj(v, b[0] * R, b[1] * R, b[2] * R + cz)) return;
-    var depth = clamp(1.25 - ((az + P[2]) / 2 - far + R) / (2 * R), 0.12, 1);
-    ctx.strokeStyle = rgba(C.ink, h.strut * depth); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(P[0], P[1]); ctx.stroke();
-  });
+  var v = view(W, H, { tx: 0, ty: 0, tz: cz, yaw: -0.9 + spin + drag.yaw, pitch: h.pitch + drag.pitch, dist: R * (SMALL ? 2.2 : h.dist), fov: h.fov,
+    ox: hs.ox + drag.mx * dpr / W, oy: hs.oy + drag.my * dpr / H });
   ctx.lineWidth = dpr;
   var fp = REDUCED ? 1 : clamp((t - 300) / 2600, 0, 1), shown = GROUND * smooth(0, 0.35, fp) + (N - GROUND) * smooth(0.35, 1, fp);
-  // one scanner at the top of the dome sweeps a slow line back and forth across the floor; dots under it light up
-  var scanOn = !REDUCED && t > 3200, sweep = scanOn ? 0.5 - 0.5 * Math.cos(((t - 3200) / 9000) * TAU) : 0, sx = (sweep - 0.5) * RW;
-  drawPoints(ctx, v, function (i) {
-    if (i >= shown) return 0;
-    if (scanOn && Math.abs(EX[i] - sx) < 0.14) return 16 + lvl(0.95);   // accent colour bucket
-    return lvl((0.35 + 0.07 * SH[i]) * EA[i]);
-  }, 0.022, 0, 0, SMALL ? 3 : 2, EX, EY, EZ);   // every other point: the 6.5 cm cloud reads as a carpet otherwise
-  if (proj(v, 0, 0, cz + R)) {
-    var hx = P[0], hy = P[1];
-    if (scanOn && proj(v, sx, -RD / 2, 0)) {
-      var ax = P[0], ay = P[1];
-      if (proj(v, sx, RD / 2, 0)) {   // a faint fan from the scanner to the line it is reading
-        ctx.fillStyle = rgba(C.acc, 0.07); ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(ax, ay); ctx.lineTo(P[0], P[1]); ctx.closePath(); ctx.fill();
-        ctx.strokeStyle = rgba(C.acc, 0.8); ctx.lineWidth = 1.4 * dpr; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(P[0], P[1]); ctx.stroke();
-      }
-    }
-    ctx.fillStyle = rgba(C.acc, 0.95); ctx.fillRect(hx - 3 * dpr, hy - 3 * dpr, 6 * dpr, 6 * dpr);   // the scanner
-  }
+  drawPoints(ctx, v, function (i) { return i < shown ? lvl((0.35 + 0.07 * SH[i]) * EA[i]) : 0; }, 0.022, 0, 0, SMALL ? 3 : 2, EX, EY, EZ);   // every other point: the 6.5 cm cloud reads as a carpet otherwise
   if (BOTS && BOTS.h1) {   // two Unitree H1s facing each other in the rebuilt room
     var ha = REDUCED ? 1 : smooth(2900, 4100, t), fr = Math.floor(t / 1000 * BOTS.h1.fps) % BOTS.h1.n;
     if (ha > 0) {
@@ -268,6 +230,7 @@ var KEYS = [  // camera at the start of each stage (input, capture, rebuild, tea
   { yaw: -0.9, pitch: 0.85, dist: 8.2 }, { yaw: -0.3, pitch: 0.38, dist: 6.5 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
 KEYS.forEach(function (k, j) { if (j !== 4) k.dist *= Math.max(RW, RD) / 4.83; });   // tuned for a 4.83 m room; stage 04 frames the robots, not the room
 var panels = { lead: document.getElementById('lead-panel'), pip: document.getElementById('pip'), team: document.getElementById('team-panel') };
+var panes = Array.prototype.slice.call(document.querySelectorAll('#team-panel .dots-panes > div')), scanT0 = 0;
 function show(el, o) { if (el) { el.style.opacity = o.toFixed(3); el.style.visibility = o > 0.01 ? 'visible' : 'hidden'; } }
 function storyT() { var span = story.offsetHeight - innerHeight; return clamp(-story.getBoundingClientRect().top / span, 0, 1) * 6; }
 railBtns.forEach(function (b) { b.addEventListener('click', function () {
@@ -337,6 +300,15 @@ function teamBox(T) {   // where the robots work over the whole run: frames the 
   });
   return b;
 }
+function sideCam(Sd, sec, w, h) {   // a side's own camera from dots_data, with the slow drift the old dots player had
+  var fi = clamp(sec * 15, 0, Sd.F - 1), k = Math.floor(fi), u = fi - k, k2 = Math.min(k + 1, Sd.F - 1), a = Sd.frames;
+  var o0 = k * Sd.stride + Sd.parts.length * 7, o1 = k2 * Sd.stride + Sd.parts.length * 7, m = function (j) { return (a[o0 + j] * (1 - u) + a[o1 + j] * u) / 1000; };
+  var dx = m(0) - m(3), dy = m(1) - m(4), dz = m(2) - m(5), d = Math.hypot(dx, dy, dz);
+  var v = view(w, h, { tx: m(3) - OX, ty: m(4) - OY, tz: m(5), yaw: Math.atan2(dy, dx) + (REDUCED ? 0 : 0.035 * Math.sin(sec * TAU / 23)), pitch: Math.asin(dz / d),
+    dist: d, fov: Sd.fov, ox: 0.5, oy: 0.5 });
+  v.f = 0.5 * w / Math.tan(Sd.fov / 2);   // dots_data gives a horizontal field of view
+  return v;
+}
 function drawStory(now) {
   var dpr = fit(simCv), W = simCv.width, H = simCv.height, ctx = simCv.getContext('2d'), so = SMALL ? CFG.storySmall : CFG.story;
   tShown += (storyT() - tShown) * (REDUCED ? 1 : 0.14); var t = tShown;
@@ -347,18 +319,19 @@ function drawStory(now) {
     pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch, dist: K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
   ctx.clearRect(0, 0, W, H);
 
-  var cap = clamp(t - 1, 0, 1), robots = smooth(4, 4.25, t), fac = smooth(5.15, 5.7, t), g;
-  var team = smooth(3, 3.2, t) * (1 - smooth(3.8, 4, t)), dots = smooth(0.85, 1.05, t) * (1 - 0.75 * team);
+  var robots = smooth(4, 4.25, t), fac = smooth(5.15, 5.7, t);
+  var team = smooth(3, 3.2, t) * (1 - smooth(3.8, 4, t)), dots = smooth(0.85, 1.05, t);
+  // step 01: one quick pass of the phone along the room, started when the step shows and replayed after scrolling back above it
+  if (t < 0.85) scanT0 = 0; else if (!scanT0) scanT0 = now;
+  var sw = REDUCED || t >= 2 ? 1 : scanT0 ? smooth(0, 1, (now - scanT0) / 1800) : 0, sx = -RW / 2 - 0.3 + sw * (RW + 0.6);
+  ctx.globalAlpha = 1 - team;   // step 03 hands the canvas to the side-by-side views below
   show(panels.lead, 1 - smooth(0.75, 1, t)); show(panels.pip, smooth(2, 2.2, t) * (1 - smooth(2.8, 3, t))); show(panels.team, team);
 
   ctx.lineWidth = dpr; ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath();     // floor grid
   // the grid covers the scan and, when the robot team works past the scanned edge, the simulated floor under it too
   var x0 = -RW / 2 - 0.6, x1 = RW / 2 + 0.6, y0 = -RD / 2 - 0.6, y1 = RD / 2 + 0.6;
   if (teamB) { x0 = Math.min(x0, teamB[0] - 1); x1 = Math.max(x1, teamB[1] + 1); y0 = Math.min(y0, teamB[2] - 1); y1 = Math.max(y1, teamB[3] + 1); }
-  x0 = Math.floor(x0 * 2) / 2; y0 = Math.floor(y0 * 2) / 2;
-  for (g = x0; g <= x1 + 1e-6; g += 0.5) seg(ctx, v, [g, y0, 0], [g, y1, 0]);
-  for (g = y0; g <= y1 + 1e-6; g += 0.5) seg(ctx, v, [x0, g, 0], [x1, g, 0]);
-  ctx.stroke();
+  grid(ctx, v, x0, x1, y0, y1); ctx.stroke();
 
   if (fac > 0) {   // facility: copies of the room around it (the zoom-out)
     var sx = RW + 1.6, sy = RD + 1.6;
@@ -370,21 +343,27 @@ function drawStory(now) {
       drawPoints(ctx, v, function () { return lvl(0.32 * on); }, 0.03, gxi * sx, gyi * sy, ring === 1 ? 4 : 9);
     }
   }
-  drawPoints(ctx, v, function (i) {   // the scan: revealed along the camera path, then the rebuilt room
-    if (t < 2 && reveal[i] > cap * 1.04) return 0;
+  drawPoints(ctx, v, function (i) {   // the scan: revealed behind the sweep, then the rebuilt room
+    if (X[i] > sx) return 0;
+    if (sw < 1 && X[i] > sx - 0.14) return 16 + lvl(0.95 * dots);   // the strip being read, in accent
     return lvl(dots * (1 - robots * (1 - fac)) * (0.38 + 0.065 * SH[i]));   // step 04 shows only what moves on the grid floor; the scan returns for the zoom-out
   }, 0.03, 0, 0, SMALL ? 2 : 1);
 
-  var path = smooth(0.9, 1.05, t) * (1 - smooth(1.7, 2.3, t));   // camera path and the moving camera (capture)
+  var path = smooth(0.9, 1.05, t) * (1 - smooth(1.7, 2.3, t)) * (1 - smooth(0.85, 1, sw));   // the phone and the strip it reads, gone once the pass ends
   if (path > 0) {
-    var upto = Math.max(1, Math.round(cap * (cams.length - 1)));
-    ctx.strokeStyle = rgba(C.acc, 0.9 * path); ctx.lineWidth = 1.6 * dpr; ctx.beginPath();
-    for (k = 1; k <= upto; k++) seg(ctx, v, [cams[k - 1].x, cams[k - 1].y, cams[k - 1].z], [cams[k].x, cams[k].y, cams[k].z]);
-    ctx.stroke();
-    var cm = cams[upto], f = [cm.fx, cm.fy, cm.fz], r = [cm.fy, -cm.fx, 0], rl = Math.hypot(r[0], r[1]) || 1; r = [r[0] / rl, r[1] / rl, 0];
-    var up = [r[1] * f[2], -r[0] * f[2], r[0] * f[1] - r[1] * f[0]], o = [cm.x, cm.y, cm.z], q = [];
+    var o = [sx, -RD / 2 - 0.9, 1.4], f = [0, 0.96, -0.28], r = [1, 0, 0], up = [0, 0.28, 0.96], q = [];   // phone at the room's edge, looking across
+    ctx.lineWidth = 1.6 * dpr;
+    if (proj(v, sx, -RD / 2, 0)) {
+      var ax = P[0], ay = P[1];
+      if (proj(v, sx, RD / 2, 0)) {
+        var bx = P[0], by = P[1];
+        if (proj(v, o[0], o[1], o[2])) { ctx.fillStyle = rgba(C.acc, 0.07 * path); ctx.beginPath(); ctx.moveTo(P[0], P[1]); ctx.lineTo(ax, ay); ctx.lineTo(bx, by); ctx.closePath(); ctx.fill(); }
+        ctx.strokeStyle = rgba(C.acc, 0.8 * path); ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+      }
+    }
     for (var cx = -1; cx <= 1; cx += 2) for (var cy = -1; cy <= 1; cy += 2)
       q.push([o[0] + f[0] * 0.3 + r[0] * cx * 0.2 + up[0] * cy * 0.12, o[1] + f[1] * 0.3 + r[1] * cx * 0.2 + up[1] * cy * 0.12, o[2] + f[2] * 0.3 + up[2] * cy * 0.12]);
+    ctx.strokeStyle = rgba(C.acc, 0.9 * path);
     ctx.beginPath(); q.forEach(function (c) { seg(ctx, v, o, c); }); seg(ctx, v, q[0], q[1]); seg(ctx, v, q[1], q[3]); seg(ctx, v, q[3], q[2]); seg(ctx, v, q[2], q[0]); ctx.stroke();
   }
 
@@ -392,6 +371,22 @@ function drawStory(now) {
     if (!teamT0) teamT0 = now;
     drawTeam(ctx, v, T, REDUCED ? T.F / 15 : ((now - teamT0) / 1000) % (T.F / 15 + 2), 0.95 * robots * (1 - 0.5 * fac));
   } else teamT0 = 0;
+  ctx.globalAlpha = 1;
+
+  var Td = T && window.DOTS.sides.today, fl = T && window.DOTS.manifest.floor;
+  if (team > 0 && Td) {   // step 03: today and with a robot team side by side in the canvas, each with its own camera, on the dots.js clock
+    var cr = simCv.getBoundingClientRect(), sec = window.DOTS.clock || 0;
+    ctx.globalAlpha = team; ctx.lineWidth = dpr;
+    panes.forEach(function (el, j) {
+      var r = el.getBoundingClientRect(), px = (r.left - cr.left) * dpr, py = (r.top - cr.top) * dpr, pw = r.width * dpr, ph = r.height * dpr;
+      var Sd = j ? T : Td, pv = sideCam(Sd, sec, pw, ph); pv.cx += px; pv.cy += py;
+      ctx.save(); ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip();
+      ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath(); grid(ctx, pv, fl.x[0] - OX, fl.x[1] - OX, fl.y[0] - OY, fl.y[1] - OY); ctx.stroke();
+      drawTeam(ctx, pv, Sd, sec, 0.95);
+      ctx.restore();
+    });
+    ctx.globalAlpha = 1;
+  }
 
   var cur = Math.min(5, Math.floor(clamp(t, 0, 5.999)));
   capsEl.forEach(function (el, j) { el.classList.toggle('on', j === cur); });
