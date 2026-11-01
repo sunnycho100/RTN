@@ -78,8 +78,6 @@ for (i = 0; i < N; i++) {
   if (d < 0.05) near5++; if (d < 0.15) near15++;
 }
 function setText(id, s) { var el = document.getElementById(id); if (el) el.innerHTML = s; }
-function fmt(n) { return n.toLocaleString('en-US'); }
-setText('readout', 'CarDA WS30 · CC BY 4.0<br>' + fmt(N) + ' points · voxel ' + S.voxel_cm + ' cm<br>' + cams.length + ' cameras<br>' + RW.toFixed(1) + ' × ' + RD.toFixed(1) + ' m<br>drag to rotate');
 setText('stat-build', S.walls.length + ' wall boxes · ' + S.hulls.length + ' clutter pieces');
 setText('stat-check', Math.round(100 * near5 / N) + '% of scan points within 5 cm of a shape · ' + Math.round(100 * near15 / N) + '% within 15 cm');
 
