@@ -40,7 +40,12 @@
   });
   dlg.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', closeQuote); });
   dlg.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', function () { go(b.dataset.go); }); });
-  dlg.addEventListener('click', function (e) { if (e.target === dlg) closeQuote(); });   // a click on the backdrop closes it
+  // The dialog element itself is the target for clicks on its padding as well as on the backdrop, so close only when the press
+  // and the release both land outside its box (a text selection dragged out of a field does not count).
+  function outside(e) { var r = dlg.getBoundingClientRect(); return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom; }
+  var downOut = false;
+  dlg.addEventListener('pointerdown', function (e) { downOut = e.target === dlg && outside(e); });
+  dlg.addEventListener('click', function (e) { if (downOut && e.target === dlg && outside(e)) closeQuote(); downOut = false; });
   dlg.addEventListener('cancel', function (e) { e.preventDefault(); closeQuote(); });   // Esc
 
   // null means no backend: the confirmation still shows, nothing is stored
