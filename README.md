@@ -32,6 +32,7 @@ All clips are our own runs. None come from other companies' sites.
 
 | Clip | Source |
 |---|---|
+| `shots/{panel,spot,qc,cnc}.jpg` | Stills from the 20-robot metal shop run (g1coop_port shots), title and credit bars cropped off |
 | `ws30_site.mp4` | 12 s of the CarDA WS30 IN camera, cycle 003 (CarDA, CC BY 4.0). Kept, not on the page |
 | `ws30_site_out.mp4` | The same 12 s from the WS30 OUT camera. Kept, not on the page |
 | `door_team.mp4` | WS30 rebuild in Isaac Sim: two UR20 rail arms and two G1s do the door job, kinematic replay, real time. Kept for the demo video, not on the page |

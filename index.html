@@ -162,6 +162,9 @@ details.film[open] > summary { margin-bottom: 16px; }
 #industry .next { margin-top: 56px; }
 .close3 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
 @media (max-width: 720px) { .close3 { grid-template-columns: 1fr; } }
+.shots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.shots img { display: block; width: 100%; height: auto; }
+@media (max-width: 720px) { .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .cap-h { margin: 16px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
 .cap-p { margin: 0; color: var(--dim); font-size: 16px; max-width: 70ch; }
 
@@ -178,6 +181,8 @@ details.film[open] > summary { margin-bottom: 16px; }
 .cta h2 { margin: 0; font: 650 clamp(32px, 5vw, 72px)/0.95 var(--display); font-stretch: 112%; letter-spacing: -0.02em; white-space: nowrap; }
 .cta .addr { user-select: all; }
 footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 12px 32px; justify-content: space-between; }
+footer a { text-decoration: none; }
+footer a:hover { color: var(--ink); }
 
 
 /* request-a-quote modal */
@@ -446,7 +451,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
       <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video></figure>
     </details>
     <figure class="clip wide" style="margin-top: 24px"><div class="pair"><img src="media/ws30_pair.jpg" loading="lazy" width="1600" height="392" style="display: block; width: 100%; height: auto" alt="Left: a real CarDA camera frame of the WS30 station. Right: our Isaac Sim rebuild seen from the same calibrated camera."><span class="l">Camera</span><span class="r">3D reconstruction</span></div></figure>
-    <figure class="clip wide" style="margin-top: 24px"><div class="pair"><img src="media/photo_pair.jpg" loading="lazy" width="1600" height="532" style="display: block; width: 100%; height: auto" alt="Left: a warehouse photo with a forklift. Right: the same view rebuilt in Isaac Sim from that one photo."><span class="l">Photo</span><span class="r">3D reconstruction</span></div><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim. Photo: Lance Cheung, USDA, public domain</figcaption></figure>
+    <figure class="clip wide" style="margin-top: 24px"><div class="pair"><img src="media/photo_pair.jpg" loading="lazy" width="1600" height="532" style="display: block; width: 100%; height: auto" alt="Left: a warehouse photo with a forklift. Right: the same view rebuilt in Isaac Sim from that one photo."><span class="l">Photo</span><span class="r">3D reconstruction</span></div><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim</figcaption></figure>
   </section>
 
 
@@ -454,6 +459,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <h2 class="sec">A whole floor, not one cell.</h2>
     <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Seohee's MuJoCo run in Isaac Sim</figcaption></figure>
     <h3 class="cap-h">20 robots in one metal shop</h3><div class="close3"><div><figure class="clip"><video data-src="media/close_3g1_tframe.mp4" poster="media/posters/close_3g1_tframe.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Welded T-frame, 3 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_2g1_sheets.mp4" poster="media/posters/close_2g1_sheets.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Steel sheet bundle, 2 G1s</figcaption></figure></div></div>
+    <div class="shots"><figure class="clip"><img src="media/shots/panel.jpg" alt="Two UR10e arms carry one panel at a packing bench" width="960" height="480" loading="lazy"><figcaption>Two UR10e arms, one panel</figcaption></figure><figure class="clip"><img src="media/shots/spot.jpg" alt="Spot walks its inspection route down the main aisle" width="960" height="480" loading="lazy"><figcaption>Spot on inspection</figcaption></figure><figure class="clip"><img src="media/shots/qc.jpg" alt="A Franka Panda at the quality-control table" width="960" height="480" loading="lazy"><figcaption>Panda at QC</figcaption></figure><figure class="clip"><img src="media/shots/cnc.jpg" alt="A UR5e loads and unloads the CNC machine" width="960" height="480" loading="lazy"><figcaption>UR5e at the CNC</figcaption></figure></div>
     <div class="next">
       <figure class="clip wide"><video data-src="media/door_team_v3c.mp4" poster="media/posters/door_team_v3c.jpg" muted loop playsinline preload="none" aria-label="Two rail arms and two humanoid robots fit the glass and drive the screws on a car door at the rebuilt station"></video></figure>
       <h3 class="cap-h">Car-door station</h3>
@@ -486,8 +492,8 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 </main>
 
 <footer class="wrap mono">
-  <span>RTOS · Real to Simulation · draft</span>
-  <span>Simulation clips are our own MuJoCo and Isaac Sim runs. CarDA footage, motion data and point cloud, and the Depot world by Open Robotics, are CC BY 4.0.</span>
+  <span>© 2026 RTOS</span>
+  <a href="credits.html">Credits</a>
 </footer>
 
 

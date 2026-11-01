@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Credits · RTOS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-14 -14 28 28'><rect x='-14' y='-14' width='28' height='28' rx='6' fill='%230a0c0c'/><path d='M-7.3 -5.8L-1.4 -9.2M1.4 -9.2L7.3 -5.8M8.7 -3.4L8.7 -1.6M-8.7 -3.4L-8.7 -1.6M-8.7 1.6L-8.7 3.4M-7.1 0L-1.6 0M1.6 0L7.1 0M1.4 0.8L7.3 4.2M0 -8.4L0 -1.6M0 1.6L0 8.4M8.7 1.6L8.7 3.4M7.3 5.8L1.4 9.2M-1.4 9.2L-7.3 5.8' stroke='%236cb4f7' stroke-width='2.4' stroke-linecap='round'/></svg>">
+<style>
+:root { --bg: #0a0c0c; --line: #222a29; --ink: #e4eae7; --dim: #8a9592; --accent: #6fe0cf; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+main { max-width: 680px; margin: 0 auto; padding: 64px 16px max(64px, env(safe-area-inset-bottom, 0px)); }
+h1 { margin: 0 0 32px; font: 650 36px/1 "Archivo", "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.02em; }
+ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+li { padding: 16px 0; border-bottom: 1px solid var(--line); }
+li span { display: block; color: var(--dim); font-size: 14px; }
+a { color: inherit; }
+a:hover { color: var(--accent); }
+p { color: var(--dim); font-size: 14px; }
+.back { display: inline-block; margin-bottom: 40px; color: var(--dim); text-decoration: none; font: 500 13px/1 ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="./">← RTOS</a>
+  <h1>Credits</h1>
+  <ul>
+    <li>Car-door station footage, worker motion and point cloud<span><a href="https://zenodo.org/records/14644367">CarDA dataset</a>, Stellantis Melfi experimental line, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span></li>
+    <li>Factory world<span><a href="https://fuel.gazebosim.org/1.0/OpenRobotics/models/Depot">Depot</a> by Open Robotics, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span></li>
+    <li>Warehouse photo<span>Lance Cheung, USDA, public domain</span></li>
+    <li>Robot models<span><a href="https://github.com/google-deepmind/mujoco_menagerie">MuJoCo Menagerie</a>, BSD-3-Clause or Apache-2.0 per model</span></li>
+  </ul>
+  <p>We rebuilt, relabeled and rendered these in MuJoCo and Isaac Sim. All simulation clips are our own runs.</p>
+</main>
+</body>
+</html>
