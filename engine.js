@@ -77,14 +77,11 @@ for (i = 0; i < N; i++) {
   }
   err[i] = d; if (d < 0.05) near5++; if (d < 0.15) near15++;
 }
-function fmt(n) { return n.toLocaleString('en-US'); }
 function setText(id, s) { var el = document.getElementById(id); if (el) el.innerHTML = s; }
-setText('readout', 'SCAN · floor4_static3<br>' + fmt(N) + ' points · voxel ' + S.voxel_cm + ' cm<br>' + cams.length + ' camera poses<br>' + RW.toFixed(1) + ' × ' + RD.toFixed(1) + ' m<br>drag to rotate');
-setText('num-pts', fmt(N));
-setText('stat-cap', cams.length + ' camera poses · ' + fmt(N) + ' points');
+function fmt(n) { return n.toLocaleString('en-US'); }
+setText('readout', 'CarDA WS30 · CC BY 4.0<br>' + fmt(N) + ' points · voxel ' + S.voxel_cm + ' cm<br>' + cams.length + ' cameras<br>' + RW.toFixed(1) + ' × ' + RD.toFixed(1) + ' m<br>drag to rotate');
 setText('stat-build', S.walls.length + ' wall boxes · ' + S.hulls.length + ' clutter pieces');
 setText('stat-check', Math.round(100 * near5 / N) + '% of scan points within 5 cm of a shape · ' + Math.round(100 * near15 / N) + '% within 15 cm');
-setText('dims', RW.toFixed(2) + ' × ' + RD.toFixed(2) + ' m');
 
 /* ---- tiny 3D: orbit camera + perspective projection onto a 2D canvas ---- */
 function view(W, H, cam) {
@@ -222,6 +219,12 @@ function drawHero(now) {
       drawBot(ctx, v, BOTS.h1, fr, -RW * 0.27, -0.2, (1 - ha) * 0.8, 0, 0.95 * ha, true);
       drawBot(ctx, v, BOTS.h1, (fr + 20) % BOTS.h1.n, RW * 0.27, 0.2, (1 - ha) * 0.8, Math.PI, 0.95 * ha, true);
     }
+    var ra = REDUCED ? 1 : smooth(3600, 4800, t), sec = t / 1000;   // then an arm at the back wall and a Go2 trotting across
+    if (ra > 0) {
+      drawBot(ctx, v, BOTS.arm, Math.floor(sec * BOTS.arm.fps) % BOTS.arm.n, 0, RD * 0.3, (1 - ra) * 0.8, -Math.PI / 2, 0.95 * ra, true);
+      var u = (Math.sin(sec / 3) + 1) / 2;
+      drawBot(ctx, v, BOTS.quad, Math.floor(sec * BOTS.quad.fps) % BOTS.quad.n, RW * (u - 0.5) * 0.6, -RD * 0.3, (1 - ra) * 0.8, Math.cos(sec / 3) < 0 ? Math.PI : 0, 0.95 * ra, true);
+    }
   }
 }
 if (heroCv) {
@@ -267,6 +270,7 @@ var verdictEl = document.getElementById('verdict'), storyOn = false, tShown = 0;
 var KEYS = [  // camera at the start of each stage (input, capture, rebuild, team, run, decide) and the final pull-back
   { yaw: -2.6, pitch: 0.75, dist: 9.0 }, { yaw: -2.3, pitch: 0.62, dist: 8.2 }, { yaw: -1.4, pitch: 0.7, dist: 7.8 },
   { yaw: -0.9, pitch: 0.85, dist: 8.2 }, { yaw: -0.3, pitch: 0.38, dist: 3.7 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
+KEYS.forEach(function (k, j) { if (j !== 4) k.dist *= Math.max(RW, RD) / 4.83; });   // tuned for a 4.83 m room; stage 04 frames the robots, not the room
 var panels = { lead: document.getElementById('lead-panel'), pip: document.getElementById('pip'), team: document.getElementById('team-panel') };
 function show(el, o) { if (el) { el.style.opacity = o.toFixed(3); el.style.visibility = o > 0.01 ? 'visible' : 'hidden'; } }
 function storyT() { var span = story.offsetHeight - innerHeight; return clamp(-story.getBoundingClientRect().top / span, 0, 1) * 6; }
@@ -289,19 +293,24 @@ if (window.ROBOTS) {
   boxes.forEach(function (b) { var top = b.cz + b.hz; if (!b.wall && top > 0.55 && top < 1.05 && b.hx > 0.15 && b.hy > 0.15 && (!table || b.hx * b.hy > table.hx * table.hy)) table = b; });
   BOTS.arm.at = table ? [table.cx, table.cy, table.cz + table.hz] : [spawn[0] - 1.2, spawn[1] - 1.0, 0];
 }
-function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a, tint) {
-  var fr = R.f[frame], cy = Math.cos(yaw), sy = Math.sin(yaw), cols = [rgba(C.ink, a), rgba(C.acc, a)];
+function eachBotPoint(R, frame, fn) {   // fn(x, y, z, accent) for every body point, in the robot's frame
+  var fr = R.f[frame];
   R.bodies.forEach(function (b, bi) {
     var o = bi * 7, px = fr[o] / 1000, py = fr[o + 1] / 1000, pz = fr[o + 2] / 1000;
     var qw = fr[o + 3] / 1000, qx = fr[o + 4] / 1000, qy = fr[o + 5] / 1000, qz = fr[o + 6] / 1000, p = b.p;
-    ctx.fillStyle = tint ? cols[1] : cols[b.c];
     for (var j = 0; j < p.length; j += 3) {
       var lx = p[j], ly = p[j + 1], lz = p[j + 2];
       var tx = 2 * (qy * lz - qz * ly), ty = 2 * (qz * lx - qx * lz), tz = 2 * (qx * ly - qy * lx);   // rotate by the body quaternion
-      var wx = lx + qw * tx + (qy * tz - qz * ty) + px, wy = ly + qw * ty + (qz * tx - qx * tz) + py, wz = lz + qw * tz + (qx * ty - qy * tx) + pz;
-      if (!proj(v, ox + cy * wx - sy * wy, oy + sy * wx + cy * wy, oz + wz)) continue;
-      var s = clamp(0.022 * v.f / P[2], 1, 3.4); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
+      fn(lx + qw * tx + (qy * tz - qz * ty) + px, ly + qw * ty + (qz * tx - qx * tz) + py, lz + qw * tz + (qx * ty - qy * tx) + pz, b.c);
     }
+  });
+}
+function drawBot(ctx, v, R, frame, ox, oy, oz, yaw, a, tint) {
+  var cy = Math.cos(yaw), sy = Math.sin(yaw), cols = [rgba(C.ink, a), rgba(C.acc, a)];
+  eachBotPoint(R, frame, function (wx, wy, wz, c) {
+    if (!proj(v, ox + cy * wx - sy * wy, oy + sy * wx + cy * wy, oz + wz)) return;
+    ctx.fillStyle = tint ? cols[1] : cols[c];
+    var s = clamp(0.022 * v.f / P[2], 1, 3.4); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
   });
 }
 function pingpong(R, sec) { var k = Math.floor(sec * R.fps) % (2 * R.n - 2); return k < R.n ? k : 2 * R.n - 2 - k; }
@@ -364,6 +373,31 @@ function drawStory(now) {
   capsEl.forEach(function (el, j) { el.classList.toggle('on', j === cur); });
   railBtns.forEach(function (b) { b.classList.toggle('on', +b.dataset.stage === cur); });
   if (verdictEl) verdictEl.classList.toggle('on', t > 5.45);
+}
+/* ---- hero runner: a Go2 trots in along the headline, drops the period into place, and trots off ---- */
+var runCv = document.getElementById('runner'), hdot = document.querySelector('.hdot');
+if (runCv && hdot && BOTS && BOTS.quad && !REDUCED) {
+  hdot.classList.add('wait');
+  var zMin = 1e9, zTop = -1e9;
+  eachBotPoint(BOTS.quad, 0, function (x, y, z) { if (z < zMin) zMin = z; if (z > zTop) zTop = z; });
+  var RUN0 = 1200, RUN = 1400, DROP = 350, OFF = 900;   // ms after load: start, reach the period, drop it, leave
+  (function runLoop(now) {
+    var dpr = fit(runCv), ctx = runCv.getContext('2d'), t = now - heroT0 - RUN0;
+    ctx.clearRect(0, 0, runCv.width, runCv.height);
+    if (t > RUN + DROP + OFF) { hdot.classList.remove('wait'); return; }
+    requestAnimationFrame(runLoop);
+    if (t < 0) return;
+    var cr = runCv.getBoundingClientRect(), dr = hdot.getBoundingClientRect(), fs = parseFloat(getComputedStyle(hdot).fontSize);
+    var s = 0.9 * fs / (zTop - zMin) * dpr, base = (dr.bottom - cr.top - 0.2 * fs) * dpr, xd = (dr.left + dr.width / 2 - cr.left) * dpr;
+    var x, a = 1, d = 0.17 * fs * dpr, back = base - (zTop - zMin) * s - d / 2, dy = back;
+    if (t < RUN) { var e = 1 - Math.pow(1 - t / RUN, 3); x = -0.5 * s + (xd + 0.5 * s) * e; }   // ease out into place
+    else if (t < RUN + DROP) { x = xd; var q = (t - RUN) / DROP; dy = back + (base - d / 2 - back) * q * q; }
+    else { hdot.classList.remove('wait'); var w = (t - RUN - DROP) / OFF; x = xd + w * 6 * fs * dpr; a = 1 - w; dy = -1; }
+    var fr = Math.floor(t / 1000 * BOTS.quad.fps * 2) % BOTS.quad.n, ps = 2.8 * dpr;   // trot at double speed: a run
+    ctx.fillStyle = rgba(C.acc, a);
+    eachBotPoint(BOTS.quad, fr, function (wx, wy, wz) { ctx.fillRect(x + wx * s - ps / 2, base - (wz - zMin) * s - ps / 2, ps, ps); });
+    if (dy >= 0) { ctx.fillStyle = rgba(C.ink, 1); ctx.fillRect(x - d / 2, dy - d / 2, d, d); }
+  })(performance.now());
 }
 onScreen(story, function (on) { storyOn = on; });
 drawStory(performance.now());

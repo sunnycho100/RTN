@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>robosim Landing</title>
+<title>RtoS · Real to Simulation</title>
 <!-- Draft for the team. Copy and name are placeholders. Every clip is ours (site/media, rendered by site/tools). -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,6 +53,9 @@ a { color: inherit; }
 .hero { position: relative; min-height: min(100svh, 980px); display: grid; align-items: end; overflow: hidden; }
 .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero-copy { position: relative; padding-block: 0 clamp(48px, 9vh, 96px); max-width: 980px; }
+.hero #runner { pointer-events: none; }
+.hero h1 .hdot { transition: opacity 0.15s; }
+.hero h1 .hdot.wait { opacity: 0; }
 .hero h1 { margin: 0 0 18px; font: 650 clamp(42px, 7.2vw, 104px)/0.93 var(--display); font-stretch: 112%; letter-spacing: -0.025em; text-wrap: balance; }
 .typed { font-family: var(--mono); font-size: clamp(14px, 1.5vw, 17px); color: var(--dim); min-height: 1.6em; }
 .typed b { display: inline-block; width: 0.6em; height: 1.05em; margin-left: 2px; vertical-align: -0.15em; background: var(--accent); animation: blink 1s steps(1) infinite; }
@@ -66,7 +69,7 @@ a { color: inherit; }
 .stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .caps { position: absolute; left: 0; right: 0; bottom: clamp(32px, 8vh, 80px); pointer-events: none; }
-.cap { position: absolute; left: max(var(--gutter), env(safe-area-inset-left, 0px)); bottom: 0; max-width: 560px; opacity: 0; transition: opacity 0.35s, transform 0.35s; transform: translateY(8px); }
+.cap { position: absolute; left: max(var(--gutter), env(safe-area-inset-left, 0px)); bottom: 0; max-width: min(560px, 40vw); opacity: 0; transition: opacity 0.35s, transform 0.35s; transform: translateY(8px); }
 .cap.on { opacity: 1; transform: none; }
 .cap h2 .no { color: var(--accent); margin-right: 0.35em; font-variant-numeric: tabular-nums; }
 .cap h2 { margin: 0 0 8px; font: 650 clamp(28px, 3.6vw, 48px)/1 var(--display); font-stretch: 112%; letter-spacing: -0.02em; }
@@ -80,7 +83,7 @@ a { color: inherit; }
 .rail button.on { color: var(--ink); }
 .rail button.on::after { width: 34px; background: var(--accent); }
 .rail button:focus-visible { outline: 1px solid var(--accent); }
-@media (max-width: 720px) { .rail { display: none; } .cap p { font-size: 15px; } }
+@media (max-width: 720px) { .rail { display: none; } .cap { max-width: calc(100vw - 2 * var(--gutter)); } .cap p { font-size: 15px; } }
 .lead-panel { position: absolute; right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); top: 50%; transform: translateY(-50%); width: min(520px, 44vw); display: grid; gap: 12px; opacity: 0; visibility: hidden; }
 .chips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .chips li { background: var(--panel); border: 1px solid var(--line); padding: 10px 12px; font-size: 15px; }
@@ -329,13 +332,12 @@ dialog.quote .btn { justify-self: start; }
 <body>
 
 <header class="nav wrap">
-  <a class="brand" href="#top"><i></i>robosim</a>
+  <a class="brand" href="#top"><i></i>RtoS</a>
   <nav>
-    <a href="#options">Options</a>
-    <a href="#film">Film</a>
+    <a href="#options">Example</a>
     <a href="#how">How it works</a>
-    <a href="#industry">Industry</a>
-    <a href="#trust">Many owners</a>
+    <a href="#industry">Whole floor</a>
+    <a href="#spec">What you get</a>
     <a class="btn" href="#contact" data-quote>Request a quote</a>
   </nav>
 </header>
@@ -345,13 +347,14 @@ dialog.quote .btn { justify-self: start; }
     <canvas id="hero" aria-hidden="true"></canvas>
     <div class="readout mono" id="readout"></div>
     <div class="hero-copy">
-      <h1>Bring your robots into your workplace.</h1>
+      <h1>Bring your robots into your workplace<span class="hdot">.</span></h1>
       <div class="typed" id="typed" data-text="Test any robot in a copy of your own site before you buy it."></div>
       <div class="ctas">
         <a class="btn" href="#contact" data-quote>Request a quote</a>
         <a class="btn ghost" href="#story">See it on a real scan</a>
       </div>
     </div>
+    <canvas id="runner" aria-hidden="true"></canvas>
   </section>
 
   <section class="story" id="story" aria-label="From site video to verdict">
@@ -359,7 +362,7 @@ dialog.quote .btn { justify-self: start; }
       <canvas id="sim" aria-hidden="true"></canvas>
       <div class="caps wrap">
         <div class="cap"><h2>All we need is a video of your site and a little information.</h2></div>
-        <div class="cap"><h2><span class="no">01</span>Walk the site once.</h2><p>Use a phone to record the place.</p><div class="stat" id="stat-cap"></div></div>
+        <div class="cap"><h2><span class="no">01</span>Walk the site once.</h2><p>Use a phone to record the place.</p></div>
         <div class="cap"><h2><span class="no">02</span>We rebuild it in 3D, as a scene a simulator can run.</h2></div>
         <div class="cap"><h2><span class="no">03</span>See your floor today, then with a robot team.</h2></div>
         <div class="cap"><h2><span class="no">04</span>Your robots do the job here.</h2><div class="stat">G1s from a MuJoCo policy run · arm and Go2 motion scripted</div></div>
@@ -367,15 +370,15 @@ dialog.quote .btn { justify-self: start; }
       </div>
       <div class="lead-panel" id="lead-panel" aria-label="Example input">
         <div class="mono">EXAMPLE INPUT</div>
-        <figure class="clip"><video data-src="media/capture.mp4" poster="media/posters/capture.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Site video, 12 s</figcaption></figure>
+        <figure class="clip"><video data-src="media/ws30_site.mp4" poster="media/posters/ws30_site.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag">CarDA</span>Site video, 12 s. CC BY 4.0</figcaption></figure>
         <ul class="chips">
-          <li><b>SITE</b>One room, <span id="dims">4.8 × 3.8 m</span></li>
-          <li><b>TASK</b>Carry a box across the room</li>
-          <li><b>ROBOTS</b>2 × Unitree G1</li>
+          <li><b>SITE</b>Car-door line, WS30</li>
+          <li><b>TASK</b>Fit the speaker, drive 4 screws</li>
+          <li><b>ROBOTS</b>2 UR20 rail arms + 2 Unitree G1</li>
           <li><b>SHIFT</b>8 hours</li>
         </ul>
       </div>
-      <div class="pip" id="pip"><video data-src="media/capture.mp4" poster="media/posters/capture.jpg" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
+      <div class="pip" id="pip"><video data-src="media/ws30_site.mp4" poster="media/posters/ws30_site.jpg" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
       <div class="team-panel" id="team-panel">
         <figure class="clip"><video data-src="media/door_split.mp4" poster="media/posters/door_split.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Left: a real worker's motion, CarDA CC BY 4.0. Right: rail arms and G1s, kinematic replay</figcaption></figure>
       </div>
@@ -452,14 +455,14 @@ dialog.quote .btn { justify-self: start; }
         <summary><span class="n">01</span><span class="t">Capture</span><span class="l">Phone video, RGB-D or LiDAR of the site.</span><span class="pm"></span></summary>
         <div class="body">
           <div><p class="mono">INPUT · video or photos · depth and LiDAR optional</p></div>
-          <figure class="clip"><video data-src="media/capture.mp4" poster="media/posters/capture.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>floor4 capture, 12 s</figcaption></figure>
+          <figure class="clip"><video data-src="media/ws30_site.mp4" poster="media/posters/ws30_site.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag">CarDA</span>WS30 camera, 12 s. CC BY 4.0</figcaption></figure>
         </div>
       </details>
       <details class="step">
         <summary><span class="n">02</span><span class="t">Reconstruct</span><span class="l">Camera poses and a dense 3D map.</span><span class="pm"></span></summary>
         <div class="body">
           <div><p class="mono">OUTPUT · poses · point cloud · mesh</p></div>
-          <figure class="clip"><canvas class="mini" data-mode="orbit" aria-label="floor4 point cloud, live"></canvas><figcaption><span class="tag ours">Ours</span>floor4 point cloud, live</figcaption></figure>
+          <figure class="clip"><img src="media/ws30_height.jpg" loading="lazy" width="1280" height="810" style="display: block; width: 100%; height: auto" alt="Top-down height map of the WS30 station from the two cameras' depth, with a one-metre grid."><figcaption><span class="tag ours">Ours</span>WS30 height map from the cameras' depth. CarDA, CC BY 4.0</figcaption></figure>
         </div>
       </details>
       <details class="step">
@@ -473,21 +476,21 @@ dialog.quote .btn { justify-self: start; }
         <summary><span class="n">04</span><span class="t">Check</span><span class="l">Can we trust the geometry?</span><span class="pm"></span></summary>
         <div class="body">
           <div><p class="mono">SCORED ON · ETH3D · Hilti 2022</p></div>
-          <figure class="clip"><canvas class="mini" data-mode="heat" aria-label="scan vs collision shapes, live"></canvas><figcaption><span class="tag ours">Ours</span>scan vs collision shapes, live</figcaption></figure>
+          <figure class="clip"><img src="media/ws30_real_vs_rebuild_in.jpg" loading="lazy" width="1600" height="450" style="display: block; width: 100%; height: auto" alt="Left: a real CarDA camera frame of WS30. Right: our Isaac Sim rebuild from the same calibrated camera."><figcaption><span class="tag ours">Ours</span>Same camera, real and rebuilt. CarDA, CC BY 4.0</figcaption></figure>
         </div>
       </details>
       <details class="step">
         <summary><span class="n">05</span><span class="t">Run the task</span><span class="l">The robot does the job in the copy of your site.</span><span class="pm"></span></summary>
         <div class="body">
-          <div><p class="mono">ROBOTS · Unitree G1 · Go1 · Panda arm</p></div>
-          <figure class="clip"><video data-src="media/walk.mp4" poster="media/posters/walk.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>G1 walking in a reconstructed scene</figcaption></figure>
+          <div><p class="mono">ROBOTS · UR20 rail arms · Unitree G1</p></div>
+          <figure class="clip"><video data-src="media/door_team.mp4" poster="media/posters/door_team.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>WS30 rebuild, 2 rail arms and 2 G1s, kinematic replay</figcaption></figure>
         </div>
       </details>
       <details class="step">
         <summary><span class="n">06</span><span class="t">Decide</span><span class="l">Feasibility and cost, before anyone buys.</span><span class="pm"></span></summary>
         <div class="body">
           <div><p class="mono">DELIVERED · report · scene files · videos</p></div>
-          <figure class="clip"><canvas class="mini" data-mode="facility" aria-label="one site, then the next, live"></canvas><figcaption><span class="tag ours">Ours</span>one site, then the next, live</figcaption></figure>
+          
         </div>
       </details>
     </div>
@@ -523,7 +526,7 @@ dialog.quote .btn { justify-self: start; }
     <div class="nums">
       <div><strong>79%</strong><span>of a scanned loading area within 5 cm of a laser scan</span></div>
       <div><strong>1,219</strong><span>car-door line designs scored</span></div>
-      <div><strong id="num-pts">…</strong><span>Points in the scan on this page</span></div>
+      <div><strong>990</strong><span>simulated runs on the car-door line</span></div>
     </div>
   </section>
 
@@ -546,7 +549,7 @@ dialog.quote .btn { justify-self: start; }
 </main>
 
 <footer class="wrap mono">
-  <span>robosim · working name · draft</span>
+  <span>RtoS · Real to Simulation · draft</span>
   <span>All clips are our own MuJoCo and Isaac Sim runs. CarDA motion data and the Depot warehouse (roqsim) are CC BY 4.0.</span>
 </footer>
 
@@ -606,14 +609,14 @@ dialog.quote .btn { justify-self: start; }
 
   <div data-view="done" hidden>
     <h2>Request received.</h2>
-    <p class="sub">Thanks for sharing your site with RoboSim. Our team will review your workflow and decide whether it's suitable for an initial robotics simulation. We may contact you for additional measurements or task details.</p>
+    <p class="sub">Thanks for sharing your site with RtoS. Our team will review your workflow and decide whether it's suitable for an initial robotics simulation. We may contact you for additional measurements or task details.</p>
     <button class="btn" type="button" data-close>Close</button>
   </div>
 </dialog>
 <script src="quote.js"></script>
 <script src="options.js?v=2"></script>
-<script src="scan.js"></script>
+<script src="scan.js?v=2"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=6"></script>
+<script src="engine.js?v=8"></script>
 </body>
 </html>
