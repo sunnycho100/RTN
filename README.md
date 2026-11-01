@@ -36,12 +36,12 @@ All clips are our own runs. None come from other companies' sites.
 | `ws30_site.mp4` | 12 s of the CarDA WS30 IN camera, cycle 003 (CarDA, CC BY 4.0). Kept, not on the page |
 | `ws30_site_out.mp4` | The same 12 s from the WS30 OUT camera. Kept, not on the page |
 | `door_team.mp4` | WS30 rebuild in Isaac Sim: two UR20 rail arms and two G1s do the door job, kinematic replay, real time. Kept for the demo video, not on the page |
-| `door_team_v3c.mp4` | Whole floor, car-door station: the WS30 team job, v3c (G1 A drives the screw, G1 B sets a full-size pane with a suction lifter), no overlays, real time |
+| `door_team_hq.mp4` | Whole floor, car-door station: the WS30 team job, v3c (G1 A drives the screw, G1 B sets a full-size pane with a suction lifter), path traced, no overlays, real time, 1280 wide |
 | `process_film.mp4` | Process film on the CarDA WS30 station: record, label, rebuild in Isaac Sim, automate |
 | `photo_src.jpg`, `photo_sim.jpg` | One public-domain warehouse photo (Lance Cheung, USDA, via Wikimedia Commons) and our Isaac Sim rebuild from the same camera; the page stacks them in a drag-to-compare slider |
 | `ws30_cam.jpg`, `ws30_sim.jpg` | A CarDA WS30 OUT camera frame and our Isaac Sim rebuild from the same calibrated camera, cropped to match; the page stacks them in a drag-to-compare slider |
 | `g1coop_factory.mp4` | Seohee's 20-robot factory, v3 overview (first 10 s) with realistic loads (welded T-frame, steel sheet bundle, KLT tote): her MuJoCo run rendered in Isaac Sim (visual port, MuJoCo decides all motion) |
-| `close_3g1_tframe.mp4`, `close_2g1_sheets.mp4`, `close_1g1_tote.mp4` | Close-ups from Seohee's factory, v3 (the tote clip is off the page for now: the tote is carried tilted): G1s carrying a welded T-frame, a steel sheet bundle and a KLT tote |
+| `close_3g1_tframe_hq.mp4`, `close_2g1_sheets_hq.mp4` (clean high-quality renders, 1280 wide), `close_1g1_tote.mp4` | Close-ups from Seohee's factory, v3 (the tote clip is off the page for now: the tote is carried tilted): G1s carrying a welded T-frame, a steel sheet bundle and a KLT tote |
 | `ws10_human_vs_cell.mp4` | Station 1 (WS10) on one clock in MuJoCo, clean render without internal labels: the worker alone (as-is motion) beside the worker and a Doosan M0617 (option C, worker leaves after their part). Not on the page for now, kept for later |
 | `robots/*.png` | One uniform tile per robot for "What you get": same camera, light and palette tint, transparent background. Rendered by `tools/render_robots.py` from MuJoCo Menagerie (Unitree G1, H1, Go2, Boston Dynamics Spot, ANYbotics ANYmal C, Universal Robots UR10e under BSD-3-Clause; Franka Panda under Apache-2.0) and our M0617 kinematic model (capsules on the Doosan vendor kinematics, BSD-3-Clause) |
 
