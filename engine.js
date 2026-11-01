@@ -368,7 +368,7 @@ function drawStory(now) {
   }
   drawPoints(ctx, v, function (i) {   // the scan: revealed along the camera path, then the rebuilt room
     if (t < 2 && reveal[i] > cap * 1.04) return 0;
-    return lvl(dots * (1 - 0.4 * robots) * (0.38 + 0.065 * SH[i]));
+    return lvl(dots * (1 - robots * (1 - fac)) * (0.38 + 0.065 * SH[i]));   // step 04 shows only what moves on the grid floor; the scan returns for the zoom-out
   }, 0.03, 0, 0, SMALL ? 2 : 1);
 
   var path = smooth(0.9, 1.05, t) * (1 - smooth(1.7, 2.3, t));   // camera path and the moving camera (capture)
