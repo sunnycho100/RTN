@@ -152,6 +152,8 @@ details.step summary:hover .t { color: var(--accent); }
 .tiles p { margin: 0; color: var(--dim); font-size: 16px; }
 .clip.wide video { aspect-ratio: 16 / 9; }
 #industry .next { margin-top: 56px; }
+.close3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+@media (max-width: 720px) { .close3 { grid-template-columns: 1fr; } }
 .cap-h { margin: 16px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
 .cap-p { margin: 0; color: var(--dim); font-size: 16px; max-width: 70ch; }
 
@@ -350,16 +352,16 @@ dialog.quote .btn { justify-self: start; }
     <div class="stage">
       <canvas id="sim" aria-hidden="true"></canvas>
       <div class="caps wrap">
-        <div class="cap"><h2>All we need is a video of your site and a little information.</h2><p>A phone walkthrough, the task, and the robots you are considering.</p></div>
+        <div class="cap"><h2>All we need is a video of your site and a little information.</h2></div>
         <div class="cap"><h2><span class="no">01</span>Walk the site once.</h2><p>Use a phone to record the place.</p><div class="stat" id="stat-cap"></div></div>
-        <div class="cap"><h2><span class="no">02</span>We rebuild it in 3D, as a scene a simulator can run.</h2><p>Your video becomes the space, with its machines in place.</p></div>
-        <div class="cap"><h2><span class="no">03</span>See your floor today, then with a robot team.</h2><p>Two arms on rails carry a door from station 1 to station 2. One G1 brings a screw, another fits the window glass.</p></div>
-        <div class="cap"><h2><span class="no">04</span>Your robots do the job here.</h2><p>Two G1s carry a box, an arm works a scanned table, a Go2 patrols.</p><div class="stat">G1s from a MuJoCo policy run · arm and Go2 motion scripted</div></div>
-        <div class="cap"><h2><span class="no">05</span>Know before you buy.</h2><p>Whether it works, how fast, and what it costs. Then one site at a time.</p></div>
+        <div class="cap"><h2><span class="no">02</span>We rebuild it in 3D, as a scene a simulator can run.</h2></div>
+        <div class="cap"><h2><span class="no">03</span>See your floor today, then with a robot team.</h2></div>
+        <div class="cap"><h2><span class="no">04</span>Your robots do the job here.</h2><div class="stat">G1s from a MuJoCo policy run · arm and Go2 motion scripted</div></div>
+        <div class="cap"><h2><span class="no">05</span>Know before you buy.</h2></div>
       </div>
       <div class="lead-panel" id="lead-panel" aria-label="Example input">
         <div class="mono">EXAMPLE INPUT</div>
-        <figure class="clip"><video data-src="media/capture.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Site video, 12 s</figcaption></figure>
+        <figure class="clip"><video data-src="media/capture.mp4" poster="media/posters/capture.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Site video, 12 s</figcaption></figure>
         <ul class="chips">
           <li><b>SITE</b>One room, <span id="dims">4.8 × 3.8 m</span></li>
           <li><b>TASK</b>Carry a box across the room</li>
@@ -367,9 +369,9 @@ dialog.quote .btn { justify-self: start; }
           <li><b>SHIFT</b>8 hours</li>
         </ul>
       </div>
-      <div class="pip" id="pip"><video data-src="media/capture.mp4" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
+      <div class="pip" id="pip"><video data-src="media/capture.mp4" poster="media/posters/capture.jpg" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
       <div class="team-panel" id="team-panel">
-        <figure class="clip"><video data-src="media/door_team.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Kinematic replay in Isaac Sim. G1 walking from a MuJoCo policy; each robot signs its events</figcaption></figure>
+        <figure class="clip"><video data-src="media/door_split.mp4" poster="media/posters/door_split.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Left: one worker, a G1 standing in. Right: rail arms and G1s. Kinematic replay</figcaption></figure>
       </div>
       <div class="rail" id="rail" aria-label="Story steps">
         <button type="button" data-stage="0">INPUT</button><button type="button" data-stage="1">CAPTURE</button><button type="button" data-stage="2">REBUILD</button>
@@ -390,7 +392,7 @@ dialog.quote .btn { justify-self: start; }
 
   <section class="block wrap abc" id="options" aria-labelledby="abc-h">
   <h2 class="sec" id="abc-h">Three ways to fix this line.</h2>
-  <p class="lede">We built every robot setup the line allows, scored each one, and kept three. You pick by what matters most to you.</p>
+  <p class="lede">Every setup the line allows, scored. Three kept.</p>
 
   <!-- 1. many to few -->
   <div class="abc-funnel">
@@ -410,7 +412,7 @@ dialog.quote .btn { justify-self: start; }
   <!-- 2. priorities -->
   <div class="abc-part" id="abc-ask">
     <h3 class="abc-h3">What matters most to you?</h3>
-    <p class="abc-sub">We tried 20,000 ways to weigh cost, return, cycle time, worker strain and robot count, and counted which option comes out on top. Gray is a two-robot setup that wins too rarely to make the three.</p>
+    <p class="abc-sub">How often each option wins across 20,000 weightings. Gray: a two-robot setup.</p>
     <div class="abc-seg" role="group" aria-label="Priority" id="abc-seg"></div>
     <p class="abc-why" id="abc-why" aria-live="polite"></p>
     <div class="abc-share" id="abc-share" aria-hidden="true"></div>
@@ -421,64 +423,62 @@ dialog.quote .btn { justify-self: start; }
   <!-- 3. station cycles -->
   <div class="abc-part">
     <h3 class="abc-h3">Does each station make the cut?</h3>
-    <p class="abc-sub">Seconds per door at each station. The plan holds 5% of takt in reserve, so the cap is 228 s.</p>
+    <p class="abc-sub">Seconds per door. Cap: 228 s, takt minus 5%.</p>
     <div class="abc-tabs" role="group" aria-label="Show stations for" id="abc-tabs"></div>
     <div class="abc-st" id="abc-st"><div class="abc-lines" id="abc-lines"></div></div>
     <p class="abc-stnote" id="abc-stnote" aria-live="polite"></p>
   </div>
 
-  <p class="abc-note"><span class="abc-tag">IE estimate</span><span>Time study, line balancing and line simulation from video and motion capture. Robot cell simulations of all three options are running now, so these numbers can move. Data: CarDA, Stellantis Melfi line, CC BY 4.0.</span></p>
+  <p class="abc-note"><span class="abc-tag">IE estimate</span><span>Time study and line simulation from video and motion capture. Robot cell runs can still move these numbers. Data: CarDA, Stellantis Melfi line, CC BY 4.0.</span></p>
 </section>
 
   <section class="block wrap" id="film">
     <h2 class="sec">From a scan to a working robot.</h2>
-    <p class="lede">The same room as one film: video frames, camera poses, point cloud, surface mesh, collider, then a G1 walking in it.</p>
-    <figure class="clip wide"><video data-src="media/process_film.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>38 s film of the pipeline; clean walls and camera moves are styling</figcaption></figure>
+    <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Clean walls and camera moves are styling</figcaption></figure>
   </section>
 
   <section class="block wrap" id="how">
     <h2 class="sec">How it works</h2>
-    <p class="lede">Six steps from one site video to a buying decision. Open any step for the details.</p>
     <div>
       <details class="step">
         <summary><span class="n">01</span><span class="t">Capture</span><span class="l">Phone video, RGB-D or LiDAR of the site.</span><span class="pm"></span></summary>
         <div class="body">
-          <div><p>One walkthrough is enough. The scan in this page came from a robot-mounted RGB-D camera, 353 frames.</p><p class="mono">INPUT · video or photos · depth and LiDAR optional</p></div>
-          <figure class="clip"><video data-src="media/capture.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>floor4 capture, 12 s</figcaption></figure>
+          <div><p class="mono">INPUT · video or photos · depth and LiDAR optional</p></div>
+          <figure class="clip"><video data-src="media/capture.mp4" poster="media/posters/capture.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>floor4 capture, 12 s</figcaption></figure>
         </div>
       </details>
       <details class="step">
         <summary><span class="n">02</span><span class="t">Reconstruct</span><span class="l">Camera poses and a dense 3D map.</span><span class="pm"></span></summary>
         <div class="body">
-          <div><p>Heavy reconstruction runs on a cloud GPU. Output is a mesh in real units, floor and walls included.</p><p class="mono">OUTPUT · poses · point cloud · mesh</p></div>
+          <div><p class="mono">OUTPUT · poses · point cloud · mesh</p></div>
           <figure class="clip"><canvas class="mini" data-mode="orbit" aria-label="floor4 point cloud, live"></canvas><figcaption><span class="tag ours">Ours</span>floor4 point cloud, live</figcaption></figure>
         </div>
       </details>
       <details class="step">
         <summary><span class="n">03</span><span class="t">Build the scene</span><span class="l">A MuJoCo scene with simple collision shapes.</span><span class="pm"></span></summary>
         <div class="body">
-          <div><p>The floor is leveled, walls become boxes and clutter becomes convex pieces, so a robot can walk and bump into them.</p><p class="mono">EXPORT · MuJoCo · Isaac Sim · URDF</p></div>
+          <div><p class="mono">EXPORT · MuJoCo · Isaac Sim · URDF</p></div>
           <figure class="clip"><canvas class="mini" data-mode="shapes" aria-label="12 wall boxes and 96 clutter pieces, live"></canvas><figcaption><span class="tag ours">Ours</span>12 wall boxes and 96 clutter pieces, live</figcaption></figure>
         </div>
       </details>
       <details class="step">
         <summary><span class="n">04</span><span class="t">Check</span><span class="l">Can we trust the geometry?</span><span class="pm"></span></summary>
         <div class="body">
-          <div><p>We score the reconstruction against laser scans and walk a G1 into every wall to make sure nothing passes through.</p><p class="mono">SCORED ON · ETH3D · Hilti 2022</p></div>
+          <div><p class="mono">SCORED ON · ETH3D · Hilti 2022</p></div>
           <figure class="clip"><canvas class="mini" data-mode="heat" aria-label="scan vs collision shapes, live"></canvas><figcaption><span class="tag ours">Ours</span>scan vs collision shapes, live</figcaption></figure>
         </div>
       </details>
       <details class="step">
         <summary><span class="n">05</span><span class="t">Run the task</span><span class="l">The robot does the job in the copy of your site.</span><span class="pm"></span></summary>
         <div class="body">
-          <div><p>Today a G1 walks in reconstructed scenes. Next: two G1s carrying a box, G1 manipulation and a VLA-driven arm.</p><p class="mono">ROBOTS · Unitree G1 · Go1 · Panda arm</p></div>
-          <figure class="clip"><video data-src="media/walk.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>G1 walking in a reconstructed scene</figcaption></figure>
+          <div><p class="mono">ROBOTS · Unitree G1 · Go1 · Panda arm</p></div>
+          <figure class="clip"><video data-src="media/walk.mp4" poster="media/posters/walk.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>G1 walking in a reconstructed scene</figcaption></figure>
         </div>
       </details>
       <details class="step">
         <summary><span class="n">06</span><span class="t">Decide</span><span class="l">Feasibility and cost, before anyone buys.</span><span class="pm"></span></summary>
         <div class="body">
-          <div><p>A short report: does it fit, how fast is it, what does it cost, and when does it pay back.</p><p class="mono">DELIVERED · report · scene files · videos</p></div>
+          <div><p class="mono">DELIVERED · report · scene files · videos</p></div>
           <figure class="clip"><canvas class="mini" data-mode="facility" aria-label="one site, then the next, live"></canvas><figcaption><span class="tag ours">Ours</span>one site, then the next, live</figcaption></figure>
         </div>
       </details>
@@ -487,12 +487,11 @@ dialog.quote .btn { justify-self: start; }
 
   <section class="block wrap" id="industry">
     <h2 class="sec">A whole floor, not one cell.</h2>
-    <p class="lede">Whole lines and factories, simulated before anything is installed.</p>
-    <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Seohee's MuJoCo run, rendered in Isaac Sim. Depot warehouse by roqsim, CC BY 4.0</figcaption></figure>
-    <h3 class="cap-h">20 robots in one metal shop</h3><p class="cap-p">G1 teams carry a welded steel T-frame, a strapped steel sheet bundle and a KLT tote of brackets, next to arm cells, couriers and two Spots, run by a production scheduler.</p>
+    <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Seohee's MuJoCo run, rendered in Isaac Sim. Depot warehouse by roqsim, CC BY 4.0</figcaption></figure>
+    <h3 class="cap-h">20 robots in one metal shop</h3><div class="close3"><div><figure class="clip"><video data-src="media/close_3g1_tframe.mp4" poster="media/posters/close_3g1_tframe.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Welded T-frame, 3 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_2g1_sheets.mp4" poster="media/posters/close_2g1_sheets.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Steel sheet bundle, 2 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_1g1_tote.mp4" poster="media/posters/close_1g1_tote.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>KLT tote, 1 G1</figcaption></figure></div></div>
     <div class="next">
-      <figure class="clip wide"><video data-src="media/carda_line.mp4" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Kinematic replay. Motion capture from CarDA, CC BY 4.0</figcaption></figure>
-      <h3 class="cap-h">Car-door line</h3><p class="cap-p">Three stations, cobots on tracks driving screws next to a worker, with the separation distance shown live. The UR10e stands in for the study's Doosan M0617.</p>
+      <figure class="clip wide"><video data-src="media/carda_line.mp4" poster="media/posters/carda_line.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Kinematic replay. UR10e stands in for the study's Doosan M0617. Motion capture: CarDA, CC BY 4.0</figcaption></figure>
+      <h3 class="cap-h">Car-door line</h3><p class="cap-p">Cobots on tracks drive screws beside a worker, with live separation distance.</p>
     </div>
   </section>
 
@@ -514,8 +513,8 @@ dialog.quote .btn { justify-self: start; }
 
   <section class="block wrap" aria-label="Numbers">
     <div class="nums">
-      <div><strong>XX cm</strong><span>Geometry error against a laser scan</span></div>
-      <div><strong>XX h</strong><span>From site video to verdict</span></div>
+      <div><strong>79%</strong><span>of a scanned loading area within 5 cm of a laser scan</span></div>
+      <div><strong>1,219</strong><span>car-door line designs scored</span></div>
       <div><strong id="num-pts">…</strong><span>Points in the scan on this page</span></div>
     </div>
   </section>
