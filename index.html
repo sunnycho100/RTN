@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RtoS · Real to Simulation</title>
+<title>RTOS · Real to Simulation</title>
 <!-- Draft for the team. Copy and name are placeholders. Every clip is ours (site/media, rendered by site/tools). -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,8 +54,9 @@ a { color: inherit; }
 .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero-copy { position: relative; padding-block: 0 clamp(48px, 9vh, 96px); max-width: 980px; }
 .hero #runner { pointer-events: none; }
-.hero h1 .hdot { transition: opacity 0.15s; }
-.hero h1 .hdot.wait { opacity: 0; }
+.hero h1 .tow { display: inline-block; white-space: nowrap; clip-path: inset(-0.5em -100vw -0.5em 0); }   /* the words slide out from right after "into" */
+.hero h1 .tow > span { display: inline-block; transform-origin: 0 100%; }
+.hero h1 .tow.wait > span { opacity: 0; }
 .hero h1 { margin: 0 0 18px; font: 650 clamp(42px, 7.2vw, 104px)/0.93 var(--display); font-stretch: 112%; letter-spacing: -0.025em; text-wrap: balance; }
 .typed { font-family: var(--mono); font-size: clamp(14px, 1.5vw, 17px); color: var(--dim); min-height: 1.6em; }
 .typed b { display: inline-block; width: 0.6em; height: 1.05em; margin-left: 2px; vertical-align: -0.15em; background: var(--accent); animation: blink 1s steps(1) infinite; }
@@ -160,7 +161,6 @@ details.step summary:hover .t { color: var(--accent); }
 .tiles h3 { margin: 14px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
 .tiles p { margin: 0; color: var(--dim); font-size: 16px; }
 .clip.wide video { aspect-ratio: 16 / 9; }
-#industry .next { margin-top: 56px; }
 .close3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
 @media (max-width: 720px) { .close3 { grid-template-columns: 1fr; } }
 .cap-h { margin: 16px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
@@ -332,7 +332,7 @@ dialog.quote .btn { justify-self: start; }
 <body>
 
 <header class="nav wrap">
-  <a class="brand" href="#top"><i></i>RtoS</a>
+  <a class="brand" href="#top"><i></i>RTOS</a>
   <nav>
     <a href="#options">Example</a>
     <a href="#how">How it works</a>
@@ -347,7 +347,7 @@ dialog.quote .btn { justify-self: start; }
     <canvas id="hero" aria-hidden="true"></canvas>
     <div class="readout mono" id="readout"></div>
     <div class="hero-copy">
-      <h1>Bring your robots into your workplace<span class="hdot">.</span></h1>
+      <h1>Bring your robots into <span class="tow"><span>your workplace.</span></span></h1>
       <div class="typed" id="typed" data-text="Test any robot in a copy of your own site before you buy it."></div>
       <div class="ctas">
         <a class="btn" href="#contact" data-quote>Request a quote</a>
@@ -378,7 +378,7 @@ dialog.quote .btn { justify-self: start; }
           <li><b>SHIFT</b>8 hours</li>
         </ul>
       </div>
-      <div class="pip" id="pip"><video data-src="media/ws30_site.mp4" poster="media/posters/ws30_site.jpg" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
+      <div class="pip" id="pip"><video data-src="media/ws30_site_out.mp4" poster="media/posters/ws30_site_out.jpg" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
       <div class="team-panel" id="team-panel">
         <figure class="clip"><video data-src="media/door_split.mp4" poster="media/posters/door_split.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Left: a real worker's motion, CarDA CC BY 4.0. Right: rail arms and G1s, kinematic replay</figcaption></figure>
       </div>
@@ -455,7 +455,6 @@ dialog.quote .btn { justify-self: start; }
         <summary><span class="n">01</span><span class="t">Capture</span><span class="l">Phone video, RGB-D or LiDAR of the site.</span><span class="pm"></span></summary>
         <div class="body">
           <div><p class="mono">INPUT · video or photos · depth and LiDAR optional</p></div>
-          <figure class="clip"><video data-src="media/ws30_site.mp4" poster="media/posters/ws30_site.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag">CarDA</span>WS30 camera, 12 s. CC BY 4.0</figcaption></figure>
         </div>
       </details>
       <details class="step">
@@ -500,10 +499,6 @@ dialog.quote .btn { justify-self: start; }
     <h2 class="sec">A whole floor, not one cell.</h2>
     <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Seohee's MuJoCo run in Isaac Sim. Depot by Open Robotics, CC BY 4.0</figcaption></figure>
     <h3 class="cap-h">20 robots in one metal shop</h3><div class="close3"><div><figure class="clip"><video data-src="media/close_3g1_tframe.mp4" poster="media/posters/close_3g1_tframe.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Welded T-frame, 3 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_2g1_sheets.mp4" poster="media/posters/close_2g1_sheets.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Steel sheet bundle, 2 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_1g1_tote.mp4" poster="media/posters/close_1g1_tote.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>KLT tote, 1 G1</figcaption></figure></div></div>
-    <div class="next">
-      <figure class="clip wide"><video data-src="media/carda_line.mp4" poster="media/posters/carda_line.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Kinematic replay, UR10e in place of a Doosan M0617. CarDA, CC BY 4.0</figcaption></figure>
-      <h3 class="cap-h">Car-door line</h3>
-    </div>
   </section>
 
   <section class="block wrap" id="trust">
@@ -549,7 +544,7 @@ dialog.quote .btn { justify-self: start; }
 </main>
 
 <footer class="wrap mono">
-  <span>RtoS · Real to Simulation · draft</span>
+  <span>RTOS · Real to Simulation · draft</span>
   <span>All clips are our own MuJoCo and Isaac Sim runs. CarDA motion data and the Depot warehouse (roqsim) are CC BY 4.0.</span>
 </footer>
 
@@ -609,7 +604,7 @@ dialog.quote .btn { justify-self: start; }
 
   <div data-view="done" hidden>
     <h2>Request received.</h2>
-    <p class="sub">Thanks for sharing your site with RtoS. Our team will review your workflow and decide whether it's suitable for an initial robotics simulation. We may contact you for additional measurements or task details.</p>
+    <p class="sub">Thanks for sharing your site with RTOS. Our team will review your workflow and decide whether it's suitable for an initial robotics simulation. We may contact you for additional measurements or task details.</p>
     <button class="btn" type="button" data-close>Close</button>
   </div>
 </dialog>
@@ -617,6 +612,6 @@ dialog.quote .btn { justify-self: start; }
 <script src="options.js?v=2"></script>
 <script src="scan.js?v=3"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=8"></script>
+<script src="engine.js?v=10"></script>
 </body>
 </html>

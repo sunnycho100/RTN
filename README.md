@@ -32,6 +32,7 @@ All clips are our own runs. None come from other companies' sites.
 | Clip | Source |
 |---|---|
 | `ws30_site.mp4` | 12 s of the CarDA WS30 IN camera, cycle 003 (CarDA, CC BY 4.0) |
+| `ws30_site_out.mp4` | The same 12 s from the WS30 OUT camera, for the story's source-video inset |
 | `door_team.mp4` | WS30 rebuild in Isaac Sim: two UR20 rail arms and two G1s do the door job, kinematic replay, real time |
 | `ws30_height.jpg` | WS30 height map from the two cameras' depth |
 | `ws30_real_vs_rebuild_in.jpg` | WS30 IN camera frame beside our rebuild from the same calibrated camera |
@@ -41,10 +42,9 @@ All clips are our own runs. None come from other companies' sites.
 | `g1coop_factory.mp4` | Seohee's 20-robot factory, v3 overview (first 10 s) with realistic loads (welded T-frame, steel sheet bundle, KLT tote): her MuJoCo run rendered in Isaac Sim (visual port, MuJoCo decides all motion) |
 | `door_split.mp4` | CarDA WS30 rebuild, same clock: a real worker's Xsens motion alone beside two UR20 rail arms and two G1s. Kinematic replay in Isaac Sim, v3 |
 | `close_3g1_tframe.mp4`, `close_2g1_sheets.mp4`, `close_1g1_tote.mp4` | Close-ups from Seohee's factory, v3: G1s carrying a welded T-frame, a steel sheet bundle and a KLT tote |
-| `carda_line.mp4` | Car-door line, option C: kinematic replay, UR10e as a visual stand-in for the Doosan M0617 |
 | `ws10_human_vs_cell.mp4` | WS10 on one clock in MuJoCo: the worker alone (as-is motion) beside the worker and a Doosan M0617 (option C, worker leaves after their part) |
 
-The Isaac Sim clips use NVIDIA's sample robot and environment assets. Credits: CarDA footage and motion capture (CC BY 4.0) in `carda_line.mp4`, `ws10_human_vs_cell.mp4`, `process_film.mp4`, `ws30_site.mp4`, `door_team.mp4` and the WS30 stills, and the Depot world by Rafi Abdullah and Louise Poubel, Open Robotics (CC BY 4.0), with robots from roqsim and MuJoCo Menagerie, in `g1coop_factory.mp4` and the close-ups. The `door_split.mp4` worker motion is CarDA (CC BY 4.0).
+The Isaac Sim clips use NVIDIA's sample robot and environment assets. Credits: CarDA footage and motion capture (CC BY 4.0) in `ws10_human_vs_cell.mp4`, `process_film.mp4`, `ws30_site.mp4`, `door_team.mp4` and the WS30 stills, and the Depot world by Rafi Abdullah and Louise Poubel, Open Robotics (CC BY 4.0), with robots from roqsim and MuJoCo Menagerie, in `g1coop_factory.mp4` and the close-ups. The `door_split.mp4` worker motion is CarDA (CC BY 4.0).
 
 CooHOI clips (NeurIPS 2024, no license file) are never committed. Keep any copies in the git-ignored `private/` folder.
 

@@ -374,29 +374,53 @@ function drawStory(now) {
   railBtns.forEach(function (b) { b.classList.toggle('on', +b.dataset.stage === cur); });
   if (verdictEl) verdictEl.classList.toggle('on', t > 5.45);
 }
-/* ---- hero runner: a Go2 trots in along the headline, drops the period into place, and trots off ---- */
-var runCv = document.getElementById('runner'), hdot = document.querySelector('.hdot');
-if (runCv && hdot && BOTS && BOTS.quad && !REDUCED) {
-  hdot.classList.add('wait');
-  var zMin = 1e9, zTop = -1e9;
-  eachBotPoint(BOTS.quad, 0, function (x, y, z) { if (z < zMin) zMin = z; if (z > zTop) zTop = z; });
-  var RUN0 = 1200, RUN = 1400, DROP = 350, OFF = 900;   // ms after load: start, reach the period, drop it, leave
+/* ---- hero runner: a Go2 trots in towing "your workplace." on a leash; the words slide out after "into" and settle,
+   the leash lets go and the dog runs off. Reduced motion shows the finished headline. ---- */
+var runCv = document.getElementById('runner'), tow = document.querySelector('.tow'), towIn = tow && tow.firstElementChild;
+if (runCv && towIn && BOTS && BOTS.quad && !REDUCED) {
+  tow.classList.add('wait');
+  var YAW = 0.5, PITCH = 0.32, cyw = Math.cos(YAW), syw = Math.sin(YAW), cp = Math.cos(PITCH), sp = Math.sin(PITCH);
+  var dog = function (fr, fn) {   // three-quarter view of the Go2: screen x, height above the feet, depth (bigger is farther)
+    eachBotPoint(BOTS.quad, fr, function (x, y, z) { var xr = x * cyw - y * syw, yr = x * syw + y * cyw; fn(xr, z * cp + yr * sp, yr * cp - z * sp); });
+  };
+  var vMin = 1e9, vTop = -1e9, xMin = 1e9, xMax = -1e9;
+  dog(0, function (x, v) { vMin = Math.min(vMin, v); vTop = Math.max(vTop, v); xMin = Math.min(xMin, x); xMax = Math.max(xMax, x); });
+  var RUN0 = 900, ARRIVE = 1700, LAG = 90, SETTLE = 450, LET_GO = 300, ACC = 300;   // ms
+  var bgc = rgba(rgb(css('--bg')), 1), rim = rgba(C.acc, 1), done = false, pts = [];
   (function runLoop(now) {
-    var dpr = fit(runCv), ctx = runCv.getContext('2d'), t = now - heroT0 - RUN0;
-    ctx.clearRect(0, 0, runCv.width, runCv.height);
-    if (t > RUN + DROP + OFF) { hdot.classList.remove('wait'); return; }
+    var dpr = fit(runCv), ctx = runCv.getContext('2d'), W = runCv.width, t = now - heroT0 - RUN0;
+    ctx.clearRect(0, 0, W, runCv.height);
+    if (done) return;
     requestAnimationFrame(runLoop);
     if (t < 0) return;
-    var cr = runCv.getBoundingClientRect(), dr = hdot.getBoundingClientRect(), fs = parseFloat(getComputedStyle(hdot).fontSize);
-    var s = 0.9 * fs / (zTop - zMin) * dpr, base = (dr.bottom - cr.top - 0.2 * fs) * dpr, xd = (dr.left + dr.width / 2 - cr.left) * dpr;
-    var x, a = 1, d = 0.17 * fs * dpr, back = base - (zTop - zMin) * s - d / 2, dy = back;
-    if (t < RUN) { var e = 1 - Math.pow(1 - t / RUN, 3); x = -0.5 * s + (xd + 0.5 * s) * e; }   // ease out into place
-    else if (t < RUN + DROP) { x = xd; var q = (t - RUN) / DROP; dy = back + (base - d / 2 - back) * q * q; }
-    else { hdot.classList.remove('wait'); var w = (t - RUN - DROP) / OFF; x = xd + w * 6 * fs * dpr; a = 1 - w; dy = -1; }
-    var fr = Math.floor(t / 1000 * BOTS.quad.fps * 2) % BOTS.quad.n, ps = 2.8 * dpr;   // trot at double speed: a run
-    ctx.fillStyle = rgba(C.acc, a);
-    eachBotPoint(BOTS.quad, fr, function (wx, wy, wz) { ctx.fillRect(x + wx * s - ps / 2, base - (wz - zMin) * s - ps / 2, ps, ps); });
-    if (dy >= 0) { ctx.fillStyle = rgba(C.ink, 1); ctx.fillRect(x - d / 2, dy - d / 2, d, d); }
+    tow.classList.remove('wait');
+    var cr = runCv.getBoundingClientRect(), tr = tow.getBoundingClientRect(), fs = parseFloat(getComputedStyle(tow).fontSize);
+    var h = Math.max(1.1 * fs, 56) * dpr, s = h / (vTop - vMin), len = (xMax - xMin) * s;   // dog height in canvas px, px per metre
+    var base = (tr.bottom - cr.top - 0.2 * fs) * dpr, endX = (tr.right - cr.left) * dpr, slot = (tr.left - cr.left) * dpr, midY = (tr.top - cr.top + 0.55 * tr.height) * dpr;
+    var L = 0.9 * len, hx0 = -0.2 * s, hz = (0.32 - vMin) * s;   // leash length; harness on the dog's back
+    var p = function (u) { return u < ACC ? u * u / (2 * ACC) : u - ACC / 2; };   // ease into a steady run
+    var x0 = -0.7 * len, v = (endX + L - hx0 - x0) / p(ARRIVE - LAG);
+    var D = x0 + v * p(t), text = Math.min(endX, x0 + v * p(Math.max(0, t - LAG)) + hx0 - L);   // the words trail the dog
+    var off = text - endX, skew, since = t - ARRIVE;
+    if (since < 0) skew = Math.min(9, v / dpr * 10);
+    else { off = 0; skew = 9 * Math.exp(-since / 110) * Math.cos(since / 55); }   // a small wobble as they land
+    towIn.style.transform = 'translateX(' + (off / dpr).toFixed(1) + 'px) skewX(' + skew.toFixed(2) + 'deg)';
+    if (since > SETTLE && D > W + len) { towIn.style.transform = ''; done = true; return; }   // hand the headline back to CSS
+    var la = since < 0 ? 1 : clamp(1 - since / LET_GO, 0, 1);   // leash: slight sag while it pulls, then slack and gone
+    if (la > 0) {
+      var ax = D + hx0, ay = base - hz, bx = Math.max(slot, text) + 2 * dpr, by = midY, d = Math.hypot(ax - bx, ay - by), rest = L * 1.06 + Math.max(0, since) * 0.3 * dpr;
+      var sag = d < rest ? Math.sqrt(rest * rest - d * d) * 0.6 : 0.02 * fs * dpr;
+      ctx.strokeStyle = rgba(C.acc, 0.9 * la); ctx.lineWidth = 1.6 * dpr; ctx.beginPath(); ctx.moveTo(ax, ay);
+      ctx.quadraticCurveTo((ax + bx) / 2, (ay + by) / 2 + 2 * sag, bx, by); ctx.stroke();
+    }
+    var fr = Math.floor(t / 1000 * BOTS.quad.fps * 2) % BOTS.quad.n, q = Math.max(3 * dpr, h / 16);   // trot at double speed: a run
+    pts.length = 0; dog(fr, function (x, vz, dz) { pts.push(D + x * s, base - (vz - vMin) * s, dz); });
+    [[bgc, q + 8 * dpr], [rim, q + 3 * dpr]].forEach(function (ly) {   // dark cutout, then the accent outline
+      ctx.fillStyle = ly[0]; for (var j = 0; j < pts.length; j += 3) ctx.fillRect(pts[j] - ly[1] / 2, pts[j + 1] - ly[1] / 2, ly[1], ly[1]);
+    });
+    for (var j = 0; j < pts.length; j += 3) {   // light body, the far side a little darker
+      ctx.fillStyle = rgba(C.ink, clamp(0.95 - pts[j + 2] * 1.4, 0.55, 1)); ctx.fillRect(pts[j] - q / 2, pts[j + 1] - q / 2, q, q);
+    }
   })(performance.now());
 }
 onScreen(story, function (on) { storyOn = on; });
