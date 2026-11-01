@@ -34,7 +34,8 @@ All clips are our own runs. None come from other companies' sites.
 |---|---|
 | `ws30_site.mp4` | 12 s of the CarDA WS30 IN camera, cycle 003 (CarDA, CC BY 4.0) |
 | `ws30_site_out.mp4` | The same 12 s from the WS30 OUT camera, for the story's source-video inset |
-| `door_team.mp4` | WS30 rebuild in Isaac Sim: two UR20 rail arms and two G1s do the door job, kinematic replay, real time |
+| `door_team.mp4` | WS30 rebuild in Isaac Sim: two UR20 rail arms and two G1s do the door job, kinematic replay, real time. Kept for the demo video, not on the page |
+| `door_team_still.jpg` | How it works, step 05: a frame of the same WS30 team job from the dots view, no overlays |
 | `ws30_height.jpg` | WS30 height map from the two cameras' depth |
 | `ws30_real_vs_rebuild_in.jpg` | WS30 IN camera frame beside our rebuild from the same calibrated camera |
 | `process_film.mp4` | Process film on the CarDA WS30 station: record, label, rebuild in Isaac Sim, automate |
@@ -43,6 +44,7 @@ All clips are our own runs. None come from other companies' sites.
 | `g1coop_factory.mp4` | Seohee's 20-robot factory, v3 overview (first 10 s) with realistic loads (welded T-frame, steel sheet bundle, KLT tote): her MuJoCo run rendered in Isaac Sim (visual port, MuJoCo decides all motion) |
 | `close_3g1_tframe.mp4`, `close_2g1_sheets.mp4`, `close_1g1_tote.mp4` | Close-ups from Seohee's factory, v3 (the tote clip is off the page for now: the tote is carried tilted): G1s carrying a welded T-frame, a steel sheet bundle and a KLT tote |
 | `ws10_human_vs_cell.mp4` | Station 1 (WS10) on one clock in MuJoCo, clean render without internal labels: the worker alone (as-is motion) beside the worker and a Doosan M0617 (option C, worker leaves after their part). Not on the page for now, kept for later |
+| `robots/*.png` | One uniform tile per robot for "What you get": same camera, light and palette tint, transparent background. Rendered by `tools/render_robots.py` from MuJoCo Menagerie (Unitree G1, H1, Go2, Boston Dynamics Spot, ANYbotics ANYmal C, Universal Robots UR10e under BSD-3-Clause; Franka Panda under Apache-2.0) and our M0617 kinematic model (capsules on the Doosan vendor kinematics, BSD-3-Clause) |
 
 The Isaac Sim clips use NVIDIA's sample robot and environment assets. Credits: CarDA footage and motion capture (CC BY 4.0) in `ws10_human_vs_cell.mp4`, `process_film.mp4`, `ws30_site.mp4`, `door_team.mp4` and the WS30 stills, and the Depot world by Rafi Abdullah and Louise Poubel, Open Robotics (CC BY 4.0), with robots from roqsim and MuJoCo Menagerie, in `g1coop_factory.mp4` and the close-ups. The worker motion in `dots_data.js` is CarDA (CC BY 4.0).
 

@@ -136,11 +136,16 @@ details.step summary::-webkit-details-marker { display: none; }
 summary .n { font: 500 12px/1 var(--mono); color: var(--accent); }
 summary .t { font: 600 22px/1.1 var(--display); font-stretch: 112%; }
 summary .l { color: var(--dim); min-width: 0; }
-.spec { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; border-top: 1px solid var(--line); }
+.spec { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 0 40px; border-top: 1px solid var(--line); }
 .spec > div { padding-top: 24px; }
-.spec b { font: 500 12px/1.6 var(--mono); color: var(--accent); letter-spacing: 0.08em; }
+.spec b { font: 500 13px/1.6 var(--mono); color: var(--accent); letter-spacing: 0.08em; }
 .spec ul { list-style: none; margin: 12px 0 0; padding: 0; }
-.spec li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
+.spec li { padding: 14px 0; border-bottom: 1px solid var(--line); font-size: clamp(19px, 1.8vw, 24px); }
+.spec .bots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 14px; margin-top: 16px; }
+.spec .bots li { padding: 0; border: 0; font-size: 14px; line-height: 1.3; color: var(--dim); text-align: center; }
+.spec .bots img { display: block; width: 100%; height: auto; aspect-ratio: 1; margin-bottom: 4px; }
+.spec .bots small { display: block; font-size: 11px; color: var(--mid); }
+@media (max-width: 480px) { .spec .bots { gap: 8px; } .spec .bots li { font-size: 12px; } }
 @media (max-width: 760px) { .spec { grid-template-columns: 1fr; } }
 summary .pm { justify-self: end; width: 14px; height: 14px; position: relative; }
 summary .pm::before, summary .pm::after { content: ""; position: absolute; inset: 6px 0 auto; height: 1.5px; background: var(--ink); transition: transform 0.25s; }
@@ -466,7 +471,7 @@ dialog.quote .btn { justify-self: start; }
         <summary><span class="n">05</span><span class="t">Run the task</span><span class="l">The robot does the job in the copy of your site.</span><span class="pm"></span></summary>
         <div class="body">
           <div><p class="mono">ROBOTS · UR20 rail arms · Unitree G1</p></div>
-          <figure class="clip"><video data-src="media/door_team.mp4" poster="media/posters/door_team.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>WS30 rebuild, 2 rail arms and 2 G1s, kinematic replay</figcaption></figure>
+          <figure class="clip"><img src="media/door_team_still.jpg" loading="lazy" width="1280" height="720" style="display: block; width: 100%; height: auto" alt="Two rail arms hold a car door while two humanoid robots fit the glass and drive a screw, drawn as points."></figure>
         </div>
       </details>
       <details class="step">
@@ -513,7 +518,7 @@ dialog.quote .btn { justify-self: start; }
     <h2 class="sec">What you get.</h2>
     <div class="spec">
       <div><b>YOU GET</b><ul><li>Your floor, rebuilt in 3D</li><li>Each option run against your target</li><li>A film and a written verdict</li></ul></div>
-      <div><b>ROBOTS RUN SO FAR</b><ul><li>Unitree G1, H1, Go2</li><li>Franka Panda, UR10e, Doosan M0617</li><li>ANYmal, Spot</li></ul></div>
+      <div><b>ROBOTS RUN SO FAR</b><ul class="bots"><li><img src="media/robots/g1.png" alt="" width="256" height="256" loading="lazy">Unitree G1</li><li><img src="media/robots/h1.png" alt="" width="256" height="256" loading="lazy">Unitree H1</li><li><img src="media/robots/go2.png" alt="" width="256" height="256" loading="lazy">Unitree Go2</li><li><img src="media/robots/spot.png" alt="" width="256" height="256" loading="lazy">Boston Dynamics Spot</li><li><img src="media/robots/anymal.png" alt="" width="256" height="256" loading="lazy">ANYbotics ANYmal C</li><li><img src="media/robots/panda.png" alt="" width="256" height="256" loading="lazy">Franka Panda</li><li><img src="media/robots/ur10e.png" alt="" width="256" height="256" loading="lazy">Universal Robots UR10e</li><li><img src="media/robots/m0617.png" alt="" width="256" height="256" loading="lazy">Doosan M0617<small>kinematic model</small></li></ul></div>
     </div>
   </section>
 
@@ -537,19 +542,17 @@ dialog.quote .btn { justify-self: start; }
 
   <form id="quote-step1" data-view="step1">
     <h2 id="quote-title">Send us one station.</h2>
-    <p class="mono note">A phone video · your target cycle time · the robots you are weighing</p>
-    <p class="sub">Leave your email and we will reach out.</p>
     <label class="f"><span>Work email</span><input type="email" name="email" required autocomplete="email" placeholder="you@company.com"></label>
     <label class="f"><span>Phone number (optional)</span>
       <span class="tel"><span class="cc"><input name="cc" id="cc" value="+1" role="combobox" aria-label="Country code" aria-autocomplete="list" aria-expanded="false" aria-controls="cc-list" autocomplete="off" inputmode="tel" placeholder="+1"><ul id="cc-list" role="listbox" aria-label="Country codes" hidden></ul></span><input type="tel" name="phone" autocomplete="tel-national" placeholder="555 123 4567"></span></label>
-    <label class="f"><span>Company name (optional)</span><input name="company" autocomplete="organization" placeholder="Acme Metalworks"></label>
+    <label class="f"><span>Company name (optional)</span><input name="company" autocomplete="organization" placeholder=""></label>
     <button class="btn" type="submit">Request a quote</button>
-    <p class="mono note">You get back your station rebuilt in 3D, ranked setups and simulated station times. We keep your contact details only to reply.</p>
+    <p class="mono note">We only use your details to reply.</p>
   </form>
 
   <div data-view="received" hidden>
     <h2>Request received.</h2>
-    <p class="sub">We have your email and will be in touch.</p>
+    <p class="sub">We will reach out to you shortly.</p>
     <div class="choices">
       <button class="choice" type="button" data-go="step2"><b>Want feedback right away?</b><span>Add a few details now.</span></button>
       <button class="choice" type="button" data-close><b>No time now?</b><span>We'll email you a short form to fill in later.</span></button>
