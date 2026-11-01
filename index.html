@@ -13,6 +13,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-14 -14 28 28'><rect x='-14' y='-14' width='28' height='28' rx='6' fill='%230a0c0c'/><path d='M-7.3 -5.8L-1.4 -9.2M1.4 -9.2L7.3 -5.8M8.7 -3.4L8.7 -1.6M-8.7 -3.4L-8.7 -1.6M-8.7 1.6L-8.7 3.4M-7.1 0L-1.6 0M1.6 0L7.1 0M1.4 0.8L7.3 4.2M0 -8.4L0 -1.6M0 1.6L0 8.4M8.7 1.6L8.7 3.4M7.3 5.8L1.4 9.2M-1.4 9.2L-7.3 5.8' stroke='%236cb4f7' stroke-width='2.4' stroke-linecap='round'/></svg>">
 <!-- Draft for the team. Copy and name are placeholders. Every clip is ours (site/media, rendered by site/tools). -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +48,14 @@ a { color: inherit; }
   padding-top: max(14px, env(safe-area-inset-top, 0px)); padding-bottom: 14px;
   background: linear-gradient(var(--bg), color-mix(in srgb, var(--bg) 0%, transparent)); }
 .brand { font: 700 17px/1 var(--display); font-stretch: 118%; letter-spacing: 0.01em; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-.brand i { width: 9px; height: 9px; border: 1.5px solid var(--accent); transform: rotate(45deg); }
+/* logo: R, T, O and S drawn on one hexagon, then stacked into the mark; strokes shared by more letters stack brighter */
+.brand svg { overflow: visible; flex: none; }
+.brand g { opacity: 0.7; animation: lg-merge 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.65s both; }
+.brand line { stroke: #6cb4f7; stroke-width: 1.7; stroke-linecap: round; stroke-dasharray: 1 1; animation: lg-draw 0.26s ease-out var(--d) both; }
+.brand span { animation: lg-fade 0.4s ease-out 2.1s both; }
+@keyframes lg-draw { from { stroke-dashoffset: 1; opacity: 0; } 15% { opacity: 1; } }
+@keyframes lg-merge { from { transform: translateX(var(--x)); opacity: 1; } }
+@keyframes lg-fade { from { opacity: 0; } }
 .nav nav { display: flex; align-items: center; gap: 22px; }
 .nav nav a { text-decoration: none; color: var(--dim); font-size: 14px; }
 .nav nav a:hover { color: var(--ink); }
@@ -347,13 +355,32 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
   .abc-bar i,   .abc-steps.play li.now { animation: none; }
 }
 
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .typed b { animation: none; } .cap, .verdict { transition: none; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .brand g, .brand line, .brand span { animation: none; } .typed b { animation: none; } .cap, .verdict { transition: none; } }
 </style>
 </head>
 <body>
 
 <header class="nav wrap">
-  <a class="brand" href="#top"><i></i>RTOS</a>
+  <a class="brand" href="#top"><svg id="logo" width="20" height="23" viewBox="-10 -11.5 20 23" aria-hidden="true"></svg><span>RTOS</span></a>
+  <script>
+  (function () {   // each letter is polylines over named hexagon points; every segment is its own stroke, trimmed so joints show gaps
+    var P = { T: [0, -10], UR: [8.66, -5], MR: [8.66, 0], LR: [8.66, 5], B: [0, 10], LL: [-8.66, 5], ML: [-8.66, 0], UL: [-8.66, -5], C: [0, 0] };
+    var W = ['UL ML LL|UL T UR MR C ML|C LR', 'UL T UR|T C B', 'UL T UR MR LR B LL ML UL', 'UR T UL ML C MR LR B LL'], k = 0, h = '';
+    W.forEach(function (w, i) {
+      h += '<g style="--x:' + 24 * i + 'px">';
+      w.split('|').forEach(function (s) {
+        s = s.split(' ');
+        for (var j = 1; j < s.length; j++) {
+          var a = P[s[j - 1]], b = P[s[j]], dx = b[0] - a[0], dy = b[1] - a[1], u = 1.5 / Math.hypot(dx, dy);
+          h += '<line pathLength="1" style="--d:' + (0.15 + 0.031 * k++).toFixed(3) + 's" x1="' + (a[0] + dx * u).toFixed(2) + '" y1="' + (a[1] + dy * u).toFixed(2)
+            + '" x2="' + (b[0] - dx * u).toFixed(2) + '" y2="' + (b[1] - dy * u).toFixed(2) + '"/>';
+        }
+      });
+      h += '</g>';
+    });
+    document.getElementById('logo').innerHTML = h;
+  })();
+  </script>
   <nav>
     <a href="#options">Example</a>
     <a href="#story">How it works</a>
@@ -383,14 +410,14 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
       <div class="caps wrap">
         <div class="cap"><h2>All we need is a video of your site and a little information.</h2></div>
         <div class="cap"><h2><span class="no">01</span>Walk the site once.</h2><p>Use a phone to record the place.</p></div>
-        <div class="cap"><h2><span class="no">02</span>We rebuild it in 3D, as a scene a simulator can run.</h2></div>
+        <div class="cap"><h2><span class="no">02</span>We rebuild it in 3D.</h2></div>
         <div class="cap"><h2><span class="no">03</span>See your floor today, then with a robot team.</h2></div>
         <div class="cap"><h2><span class="no">04</span>Your robots do the job here.</h2><div class="stat">Two rail arms and two G1s, kinematic replay</div></div>
         <div class="cap"><h2><span class="no">05</span>Know before you buy.</h2></div>
       </div>
       <div class="lead-panel" id="lead-panel" aria-label="Example input">
         <div class="mono">EXAMPLE INPUT</div>
-        <figure class="clip"><video data-src="media/ws30_site.mp4" poster="media/posters/ws30_site.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag">CarDA</span>Site video, 12 s. CC BY 4.0</figcaption></figure>
+        <figure class="clip"><video data-src="media/ws30_site.mp4" poster="media/posters/ws30_site.jpg" muted loop playsinline preload="none"></video></figure>
         <ul class="chips">
           <li><b>SITE</b>Car-door line, WS30</li>
           <li><b>TASK</b>Fit the speaker, drive 4 screws</li>
@@ -403,7 +430,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
         <figure class="clip dots">
           <div class="dots-panes"><div><canvas id="dots-today"></canvas><span class="mono">Today</span></div><div class="team"><canvas id="dots-team"></canvas><span class="mono">With a robot team</span></div></div>
           <div class="dots-events mono" id="dots-events"></div><div class="dots-bar"><i id="dots-bar"></i></div>
-          <figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Worker motion: CarDA, CC BY 4.0. Robots: kinematic replay</figcaption>
+          <figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Kinematic replay</figcaption>
         </figure>
       </div>
       <div class="rail" id="rail" aria-label="Story steps">
@@ -414,7 +441,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
         <div class="mono">EXAMPLE VERDICT · CAR-DOOR LINE</div>
         <dl>
           <dt>Setup</dt><dd>Robot at every station</dd>
-          <dt>Hits target</dt><dd>Yes</dd>
+          <dt>Hits target</dt><dd>Yes, worker steps away</dd>
           <dt>Cycle time</dt><dd>224 s</dd>
           <dt>Install cost</dt><dd>$437k</dd>
           <dt>Payback</dt><dd>3.3 years</dd>
@@ -454,23 +481,23 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <div class="abc-cards" id="abc-cards"></div>
   </div>
 
-  <p class="abc-note"><span class="abc-tag">Estimate</span><span>Funnel and cards come from a time study and a line simulation. Shares come from 20,000 random mixes of priorities; gray is a two-robot setup. Data: CarDA, CC BY 4.0.</span></p>
+  <p class="abc-note"><span class="abc-tag">Estimate</span><span>Time study and line simulation. Gray: a two-robot setup.</span></p>
 </section>
 
   <section class="block wrap" id="film">
     <h2 class="sec">From a scan to a working robot.</h2>
     <details class="film">
       <summary class="btn ghost"><span aria-hidden="true">▶</span>Watch the process<span class="len">29 s</span></summary>
-      <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>CarDA footage, CC BY 4.0. Rebuild and robots are ours</figcaption></figure>
+      <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video></figure>
     </details>
-    <figure class="clip wide" style="margin-top: 24px"><div class="pair"><img src="media/ws30_pair.jpg" loading="lazy" width="1600" height="392" style="display: block; width: 100%; height: auto" alt="Left: a real CarDA camera frame of the WS30 station. Right: our Isaac Sim rebuild seen from the same calibrated camera."><span class="l">Camera</span><span class="r">3D reconstruction</span></div><figcaption><span class="tag ours">Ours</span>Same camera, real and rebuilt. CarDA, CC BY 4.0</figcaption></figure>
+    <figure class="clip wide" style="margin-top: 24px"><div class="pair"><img src="media/ws30_pair.jpg" loading="lazy" width="1600" height="392" style="display: block; width: 100%; height: auto" alt="Left: a real CarDA camera frame of the WS30 station. Right: our Isaac Sim rebuild seen from the same calibrated camera."><span class="l">Camera</span><span class="r">3D reconstruction</span></div></figure>
     <figure class="clip wide" style="margin-top: 24px"><div class="pair"><img src="media/photo_pair.jpg" loading="lazy" width="1600" height="532" style="display: block; width: 100%; height: auto" alt="Left: a warehouse photo with a forklift. Right: the same view rebuilt in Isaac Sim from that one photo."><span class="l">Photo</span><span class="r">3D reconstruction</span></div><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim. Photo: Lance Cheung, USDA, public domain</figcaption></figure>
   </section>
 
 
   <section class="block wrap" id="industry">
     <h2 class="sec">A whole floor, not one cell.</h2>
-    <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Seohee's MuJoCo run in Isaac Sim. Depot by Open Robotics, CC BY 4.0</figcaption></figure>
+    <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Seohee's MuJoCo run in Isaac Sim</figcaption></figure>
     <h3 class="cap-h">20 robots in one metal shop</h3><div class="close3"><div><figure class="clip"><video data-src="media/close_3g1_tframe.mp4" poster="media/posters/close_3g1_tframe.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Welded T-frame, 3 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_2g1_sheets.mp4" poster="media/posters/close_2g1_sheets.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Steel sheet bundle, 2 G1s</figcaption></figure></div></div>
     <div class="next">
       <figure class="clip wide"><video data-src="media/door_team_v3c.mp4" poster="media/posters/door_team_v3c.jpg" muted loop playsinline preload="none" aria-label="Two rail arms and two humanoid robots fit the glass and drive the screws on a car door at the rebuilt station"></video></figure>
@@ -514,7 +541,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <h2>Start with one site.</h2>
     <div>
       <button class="btn" type="button" data-quote>Request a quote</button>
-      <p class="mono">Your email only. We use it to reply about your site, nothing else.</p>
+      <p class="mono">We only use your email to reply.</p>
     </div>
   </section>
 </main>
