@@ -239,19 +239,16 @@ dialog.quote .btn { justify-self: start; }
 .abc-steps li { display: grid; grid-template-columns: 76px 1fr; gap: 2px 14px; padding: 8px 0; color: var(--ink); }
 .abc-steps b { grid-row: span 2; font: 600 26px/1 var(--display); font-stretch: 112%; font-variant-numeric: tabular-nums; text-align: right; }
 .abc-steps span { font-weight: 500; }
-.abc-steps small { font-size: 13px; color: var(--dim); }
 /* one step at a time: earlier steps shrink into a dim trail above the current one */
 .abc-steps.play li { display: none; }
 .abc-steps.play li.past { display: grid; grid-template-columns: 6ch 1fr; padding: 3px 0 3px 12px; border-left: 1px solid var(--line); color: var(--dim); font-size: 13px; }
 .abc-steps.play li.past b { grid-row: auto; font: 500 13px/1.5 var(--mono); }
 .abc-steps.play li.past span { font-weight: 400; }
-.abc-steps.play li.past small { display: none; }
 .abc-steps.play li.now { display: block; padding: 18px 0 0; animation: abc-in 0.5s ease both; }
 .abc-steps.play li.now b { display: block; text-align: left; font: 650 clamp(64px, 8vw, 112px)/0.95 var(--display); font-stretch: 112%; letter-spacing: -0.02em; color: var(--accent); }
 .abc-steps.play li.now span { display: block; margin-top: 10px; font: 600 clamp(20px, 2vw, 26px)/1.15 var(--display); font-stretch: 110%; }
-.abc-steps.play li.now small { display: block; margin-top: 6px; font-size: 15px; }
 @keyframes abc-in { from { opacity: 0; transform: translateY(14px); } }
-.abc-replay { all: unset; cursor: pointer; margin-top: 14px; font: 500 12px/1 var(--mono); letter-spacing: 0.06em; color: var(--dim); }
+.abc-replay { all: unset; cursor: pointer; margin-top: 14px; padding: 6px; display: inline-flex; color: var(--dim); }
 .abc-replay[hidden] { display: none; }
 .abc-replay:hover { color: var(--ink); }
 .abc-replay:focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; }
@@ -296,27 +293,7 @@ dialog.quote .btn { justify-self: start; }
 .abc-foot { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
 
 /* 4. station cycles */
-.abc-tabs { display: flex; gap: 0; border: 1px solid var(--line); width: max-content; margin-bottom: 20px; }
-.abc-tabs button { cursor: pointer; padding: 8px 16px; background: transparent; border: 0; border-right: 1px solid var(--line); font: 500 13px/1 var(--mono); color: var(--dim); }
-.abc-tabs button:last-child { border-right: 0; }
-.abc-tabs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
-.abc-st { position: relative; display: grid; gap: 14px; }
-.abc-row { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: center; }
-.abc-row span { font-size: 14px; color: var(--dim); }
-.abc-row span b { display: block; font: 500 13px/1.2 var(--mono); color: var(--ink); }
-.abc-track { position: relative; height: 30px; }
-.abc-track > i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); transition: width 0.8s cubic-bezier(.2,.7,.2,1), background 0.4s; }
-.abc-track > i.over { background: var(--mid); }
-.abc-track > em { position: absolute; top: 50%; transform: translateY(-50%); font: 500 13px/1 var(--mono); font-style: normal; color: var(--bg); padding-left: 8px; transition: left 0.8s cubic-bezier(.2,.7,.2,1); white-space: nowrap; }
-.abc-track > em { left: 0; }
-.abc-lines { position: absolute; top: -8px; bottom: -8px; left: 126px; right: 0; pointer-events: none; }
-.abc-lines i { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--ink); }
-.abc-lines i.takt { border-left-style: solid; border-color: var(--hot); }
-.abc-lines i::after { content: attr(data-l); position: absolute; top: -18px; right: 4px; font: 500 11px/1 var(--mono); color: var(--dim); white-space: nowrap; }
-.abc-lines i.takt::after { top: auto; bottom: -18px; color: var(--hot); }
-.abc-vid { margin-top: 24px; }
 .abc-eg { margin: 0 0 10px; color: var(--dim); font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
-.abc-stnote { margin: 34px 0 0; min-height: 1.6em; color: var(--dim); font-size: 15px; max-width: 70ch; }
 
 .abc-note { margin-top: clamp(48px, 8vh, 80px); padding-top: 18px; border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; color: var(--dim); font-size: 14px; }
 .abc-tag { font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 6px; border: 1px solid var(--mid); color: var(--mid); white-space: nowrap; }
@@ -324,18 +301,13 @@ dialog.quote .btn { justify-self: start; }
 @media (max-width: 860px) {
   .abc-funnel { grid-template-columns: 1fr; gap: 20px; }
   .abc-cards { grid-template-columns: 1fr; }
-  .abc-steps small { display: none; }
   .abc-steps button { padding: 9px 0; }
 }
 @media (max-width: 520px) {
-  .abc-row { grid-template-columns: 76px 1fr; }
-  .abc-lines { left: 90px; }
-  .abc-row span { font-size: 12px; }
-  .abc-note { flex-direction: column; }
+        .abc-note { flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .abc-bar i, .abc-track > i, .abc-track > em, .abc-share i, #abc-ask { transition: none; }
-  .abc-steps.play li.now { animation: none; }
+  .abc-bar i,   .abc-steps.play li.now { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .typed b { animation: none; } .cap, .verdict { transition: none; } }
@@ -425,13 +397,13 @@ dialog.quote .btn { justify-self: start; }
     <canvas id="abc-dots" role="img" aria-label="1,219 squares, one per design, narrowing to 3 options"></canvas>
     <div>
       <ol class="abc-steps" id="abc-steps" aria-live="polite">
-        <li><b>1,219</b><span>designs built</span><small>Robot or none at each station, layout changes, task splits</small></li>
-        <li><b>40</b><span>worth a closer look</span><small>Cost, return, cycle time, worker strain, robots to install</small></li>
-        <li><b>31</b><span>still ahead in a simulated shift</span><small>30 simulated shifts each, same random events for all</small></li>
-        <li><b>10</b><span>practical</span><small>No extra hire, money back within 5 years</small></li>
-        <li><b>3</b><span>options for you</span><small>Together the best pick for 88% of priorities</small></li>
+        <li><b>1,219</b><span>configurations enumerated from IK-feasible robots, layouts and task splits</span></li>
+        <li><b>40</b><span>Pareto-optimal on cost, return, cycle time, ergonomics and robot count</span></li>
+        <li><b>31</b><span>still Pareto-optimal under discrete-event simulation, 30 replications</span></li>
+        <li><b>10</b><span>feasible: positive 5-year NPV, no added headcount</span></li>
+        <li><b>3</b><span>recommended options, top choice in 88% of priority weightings (SMAA-2)</span></li>
       </ol>
-      <button type="button" class="abc-replay" id="abc-replay" hidden>REPLAY</button>
+      <button type="button" class="abc-replay" id="abc-replay" aria-label="Replay the funnel" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg></button>
     </div>
   </div>
 
@@ -444,16 +416,6 @@ dialog.quote .btn { justify-self: start; }
     <div class="abc-share" id="abc-share" aria-hidden="true"></div>
 
     <div class="abc-cards" id="abc-cards"></div>
-  </div>
-
-  <!-- 3. station cycles -->
-  <div class="abc-part">
-    <h3 class="abc-h3">Does each station make the cut?</h3>
-    <p class="abc-sub"><span class="abc-tag">Simulated, 990 runs</span> Slowest 5% of cycles, seconds per door. Target: 228 s.</p>
-    <div class="abc-tabs" role="group" aria-label="Show stations for" id="abc-tabs"></div>
-    <div class="abc-st" id="abc-st"><div class="abc-lines" id="abc-lines"></div></div>
-    <p class="abc-stnote" id="abc-stnote" aria-live="polite"></p>
-    <figure class="clip abc-vid"><video data-src="media/ws10_human_vs_cell.mp4" poster="media/posters/ws10_human_vs_cell.jpg" muted loop playsinline preload="none" style="aspect-ratio: 32 / 9"></video><figcaption><span class="tag ours">Ours</span><span class="tag">5× speed</span>Station 1 on one clock: worker alone, worker with a robot arm</figcaption></figure>
   </div>
 
   <p class="abc-note"><span class="abc-tag">Estimate</span><span>Funnel and cards come from a time study and a line simulation. Shares come from 20,000 random mixes of priorities; gray is a two-robot setup. Data: CarDA, CC BY 4.0.</span></p>
@@ -626,7 +588,7 @@ dialog.quote .btn { justify-self: start; }
   </div>
 </dialog>
 <script src="quote.js"></script>
-<script src="options.js?v=3"></script>
+<script src="options.js?v=4"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
 <script src="engine.js?v=15"></script>

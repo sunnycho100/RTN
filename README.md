@@ -42,7 +42,7 @@ All clips are our own runs. None come from other companies' sites.
 | `ws30_real_vs_rebuild.jpg` | A CarDA WS30 camera frame beside our Isaac Sim rebuild from the same calibrated camera |
 | `g1coop_factory.mp4` | Seohee's 20-robot factory, v3 overview (first 10 s) with realistic loads (welded T-frame, steel sheet bundle, KLT tote): her MuJoCo run rendered in Isaac Sim (visual port, MuJoCo decides all motion) |
 | `close_3g1_tframe.mp4`, `close_2g1_sheets.mp4`, `close_1g1_tote.mp4` | Close-ups from Seohee's factory, v3 (the tote clip is off the page for now: the tote is carried tilted): G1s carrying a welded T-frame, a steel sheet bundle and a KLT tote |
-| `ws10_human_vs_cell.mp4` | Station 1 (WS10) on one clock in MuJoCo, clean render without internal labels: the worker alone (as-is motion) beside the worker and a Doosan M0617 (option C, worker leaves after their part) |
+| `ws10_human_vs_cell.mp4` | Station 1 (WS10) on one clock in MuJoCo, clean render without internal labels: the worker alone (as-is motion) beside the worker and a Doosan M0617 (option C, worker leaves after their part). Not on the page for now, kept for later |
 
 The Isaac Sim clips use NVIDIA's sample robot and environment assets. Credits: CarDA footage and motion capture (CC BY 4.0) in `ws10_human_vs_cell.mp4`, `process_film.mp4`, `ws30_site.mp4`, `door_team.mp4` and the WS30 stills, and the Depot world by Rafi Abdullah and Louise Poubel, Open Robotics (CC BY 4.0), with robots from roqsim and MuJoCo Menagerie, in `g1coop_factory.mp4` and the close-ups. The worker motion in `dots_data.js` is CarDA (CC BY 4.0).
 

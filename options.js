@@ -1,4 +1,4 @@
-/* Options A, B, C section: the design funnel, the priority toggle with option cards, and the station cycles.
+/* Options A, B, C section: the design funnel and the priority toggle with option cards.
    Merged from docs/evidence/web/options_abc/options_abc.html in the robot repo. Numbers are industrial engineering
    estimates from the robot_consult_demo s5x run (config/demo_regress.yaml); priority shares from priority_shares.py. */
 (() => {
@@ -11,11 +11,6 @@
     C: { title: "One robot at every station", desc: "B, plus the same arm at the other two stations.", adds: "BUILDS ON B",
          capex: 436876, npv: 97006, overrun: 5.3, strain: 13.1, payback: 3.3, doors: 14.9, share: 26 },
   };
-  // station cycle p95 in s from the MuJoCo runs on 30 shared draws (carda/options_abc/summary.json): Today is the worker
-  // alone, A at walk x0.5, C with the worker leaving the door after their part
-  const SIM = { Today: [294.7, 328.7, 254.4], A: [262.8, 296.3, 247.0], B: [262.8, 197.2, 247.0], C: [223.7, 197.2, 220.5] };
-  const STATIONS = [["Station 1", "glass"], ["Station 2", "mirror"], ["Station 3", "speaker"]];
-  const CAP = 228, TAKT = 240, AXIS = 340;
   const KPI = [   // [key, label, format, lower is better]
     ["capex", "Install cost", v => "$" + Math.round(v / 1000) + "k", true],
     ["npv", "5-year return", v => "$" + Math.round(v / 1000) + "k", false],
@@ -169,40 +164,9 @@
   };
   segs.forEach(b => b.addEventListener("click", () => setPriority(b.dataset.p)));
 
-  // ---- 3. station cycles ----
-  const VIEWS = SIM;
-  $("abc-tabs").innerHTML = Object.keys(VIEWS).map(k => `<button type="button" data-v="${k}" aria-pressed="false">${k}</button>`).join("");
-  const tabs = [...$("abc-tabs").querySelectorAll("button")];
-  $("abc-st").insertAdjacentHTML("beforeend", STATIONS.map(([s, what]) => `
-    <div class="abc-row"><span><b>${s}</b>${what}</span><div class="abc-track"><i></i><em></em></div></div>`).join(""));
-  $("abc-lines").innerHTML = `<i style="left:${CAP / AXIS * 100}%" data-l="228 s target"></i><i class="takt" style="left:${TAKT / AXIS * 100}%" data-l="240 s line pace"></i>`;
-  const tracks = [...document.querySelectorAll(".abc-track")];
-  const NOTE = {
-    Today: "Worker alone, no robot. Every station runs slower than the line.",
-    A: "Parts come to the worker, but every station stays over the target.",
-    B: "The robot brings station 2 under the target. Stations 1 and 3 stay over.",
-    C: "Every station hits the target if the worker steps away after their part.",
-  };
-  let shown = false, view = "B";
-  const showView = v => {
-    view = v;
-    tabs.forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
-    $("abc-stnote").textContent = NOTE[v];
-    if (!shown) return;
-    VIEWS[v].forEach((sec, i) => {
-      const bar = tracks[i].querySelector("i"), lab = tracks[i].querySelector("em");
-      bar.style.width = sec / AXIS * 100 + "%";
-      bar.classList.toggle("over", sec > CAP);
-      lab.textContent = sec.toFixed(1) + " s";
-    });
-  };
-  tabs.forEach(b => b.addEventListener("click", () => showView(b.dataset.v)));
-  onView($("abc-st"), () => { shown = true; showView(view); }, 0.4);
-
   function pick(id) {
     cards.forEach(c => { c.classList.toggle("on", c.dataset.o === id); c.setAttribute("aria-pressed", c.dataset.o === id); });
     $("abc-cards").classList.add("picked");
-    showView(id);
   }
   cards.forEach(c => c.addEventListener("click", () => pick(c.dataset.o)));
   setPriority("all");
