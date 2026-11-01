@@ -94,7 +94,18 @@ a { color: inherit; }
 .pip span { display: block; padding: 6px 8px; }
 .team-panel { position: absolute; top: 88px; bottom: calc(clamp(32px, 8vh, 80px) + 190px); left: max(var(--gutter), env(safe-area-inset-left, 0px)); right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); display: grid; place-items: center; opacity: 0; visibility: hidden; }
 .team-panel .clip { width: 100%; height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
-.team-panel .clip video { width: 100%; height: 100%; aspect-ratio: auto; object-fit: contain; }
+.team-panel .clip.dots { height: auto; display: block; }
+.dots-panes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 12px 0; }
+.dots-panes > div { position: relative; aspect-ratio: 16 / 9; }
+.dots-panes canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.dots-panes span { position: absolute; left: 10px; top: 8px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+.dots-panes .team span { color: var(--accent); }
+.dots-events { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 10px 12px 0; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
+.dots-events span { color: var(--line); transition: color 0.4s; }
+.dots-events span.on { color: var(--accent); }
+.dots-bar { position: relative; height: 1px; margin: 8px 12px 0; background: var(--line); }
+.dots-bar i { position: absolute; left: 0; top: 0; height: 1px; width: 0; background: var(--accent); }
+@media (max-width: 720px) { .dots-panes { grid-template-columns: 1fr; gap: 8px; } }
 @media (max-width: 1100px) {
   .lead-panel { top: 80px; transform: none; width: min(460px, 48vw); }
   .lead-panel .chips { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -381,7 +392,11 @@ dialog.quote .btn { justify-self: start; }
       </div>
       <div class="pip" id="pip"><video data-src="media/ws30_site_out.mp4" poster="media/posters/ws30_site_out.jpg" muted loop playsinline preload="none"></video><span class="mono">SOURCE VIDEO</span></div>
       <div class="team-panel" id="team-panel">
-        <figure class="clip"><video data-src="media/door_split.mp4" poster="media/posters/door_split.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Left: a real worker's motion, CarDA CC BY 4.0. Right: rail arms and G1s, kinematic replay</figcaption></figure>
+        <figure class="clip dots">
+          <div class="dots-panes"><div><canvas id="dots-today"></canvas><span class="mono">Today</span></div><div class="team"><canvas id="dots-team"></canvas><span class="mono">With a robot team</span></div></div>
+          <div class="dots-events mono" id="dots-events"></div><div class="dots-bar"><i id="dots-bar"></i></div>
+          <figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span>Worker motion: CarDA, CC BY 4.0. Robots: kinematic replay</figcaption>
+        </figure>
       </div>
       <div class="rail" id="rail" aria-label="Story steps">
         <button type="button" data-stage="0">INPUT</button><button type="button" data-stage="1">CAPTURE</button><button type="button" data-stage="2">REBUILD</button>
@@ -614,6 +629,8 @@ dialog.quote .btn { justify-self: start; }
 <script src="options.js?v=3"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=11"></script>
+<script src="engine.js?v=12"></script>
+<script src="dots_data.js"></script>
+<script src="dots.js"></script>
 </body>
 </html>

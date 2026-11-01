@@ -201,7 +201,7 @@ function drawHero(now) {
   });
   ctx.lineWidth = dpr;
   var fp = REDUCED ? 1 : clamp((t - 300) / 2600, 0, 1), shown = GROUND * smooth(0, 0.35, fp) + (N - GROUND) * smooth(0.35, 1, fp);
-  drawPoints(ctx, v, function (i) { return i < shown ? lvl(0.35 + 0.07 * SH[i]) : 0; }, 0.022, 0, 0, SMALL ? 2 : 1);
+  drawPoints(ctx, v, function (i) { return i < shown ? lvl(0.35 + 0.07 * SH[i]) : 0; }, 0.022, 0, 0, SMALL ? 3 : 2);   // every other point: the 6.5 cm cloud reads as a carpet otherwise
   if (BOTS && BOTS.h1) {   // two Unitree H1s facing each other in the rebuilt room
     var ha = REDUCED ? 1 : smooth(2900, 4100, t), fr = Math.floor(t / 1000 * BOTS.h1.fps) % BOTS.h1.n;
     if (ha > 0) {
@@ -369,13 +369,13 @@ var runCv = document.getElementById('runner'), tow = document.querySelector('.to
 if (runCv && towIn && BOTS && BOTS.quad && !REDUCED) {
   tow.classList.add('wait');
   var YAW = 0.5, PITCH = 0.32, cyw = Math.cos(YAW), syw = Math.sin(YAW), cp = Math.cos(PITCH), sp = Math.sin(PITCH);
-  var dog = function (fr, fn) {   // three-quarter view of the Go2: screen x, height above the feet, depth (bigger is farther)
-    eachBotPoint(BOTS.quad, fr, function (x, y, z) { var xr = x * cyw - y * syw, yr = x * syw + y * cyw; fn(xr, z * cp + yr * sp, yr * cp - z * sp); });
+  var dog = function (fr, fn) {   // three-quarter view of the Go2: screen x, height above the feet
+    eachBotPoint(BOTS.quad, fr, function (x, y, z) { var xr = x * cyw - y * syw, yr = x * syw + y * cyw; fn(xr, z * cp + yr * sp); });
   };
   var vMin = 1e9, vTop = -1e9, xMin = 1e9, xMax = -1e9;
   dog(0, function (x, v) { vMin = Math.min(vMin, v); vTop = Math.max(vTop, v); xMin = Math.min(xMin, x); xMax = Math.max(xMax, x); });
   var RUN0 = 900, ARRIVE = 1700, LAG = 90, SETTLE = 450, LET_GO = 300, ACC = 300;   // ms
-  var bgc = rgba(rgb(css('--bg')), 1), rim = rgba(C.acc, 1), done = false, pts = [];
+  var bgc = rgba(rgb(css('--bg')), 1), dotc = rgba(C.acc, 1), done = false, pts = [];
   (function runLoop(now) {
     var dpr = fit(runCv), ctx = runCv.getContext('2d'), W = runCv.width, t = now - heroT0 - RUN0;
     ctx.clearRect(0, 0, W, runCv.height);
@@ -402,14 +402,11 @@ if (runCv && towIn && BOTS && BOTS.quad && !REDUCED) {
       ctx.strokeStyle = rgba(C.acc, 0.9 * la); ctx.lineWidth = 1.6 * dpr; ctx.beginPath(); ctx.moveTo(ax, ay);
       ctx.quadraticCurveTo((ax + bx) / 2, (ay + by) / 2 + 2 * sag, bx, by); ctx.stroke();
     }
-    var fr = Math.floor(t / 1000 * BOTS.quad.fps * 2) % BOTS.quad.n, q = Math.max(3 * dpr, h / 16);   // trot at double speed: a run
-    pts.length = 0; dog(fr, function (x, vz, dz) { pts.push(D + x * s, base - (vz - vMin) * s, dz); });
-    [[bgc, q + 8 * dpr], [rim, q + 3 * dpr]].forEach(function (ly) {   // dark cutout, then the accent outline
-      ctx.fillStyle = ly[0]; for (var j = 0; j < pts.length; j += 3) ctx.fillRect(pts[j] - ly[1] / 2, pts[j + 1] - ly[1] / 2, ly[1], ly[1]);
+    var fr = Math.floor(t / 1000 * BOTS.quad.fps * 2) % BOTS.quad.n, q = Math.max(2.4 * dpr, h / 34);   // trot at double speed: a run
+    pts.length = 0; dog(fr, function (x, vz) { pts.push(D + x * s, base - (vz - vMin) * s); });
+    [[bgc, q + 5 * dpr], [dotc, q]].forEach(function (ly) {   // dark cutout so it reads over the text, then the dots in one colour
+      ctx.fillStyle = ly[0]; for (var j = 0; j < pts.length; j += 2) ctx.fillRect(pts[j] - ly[1] / 2, pts[j + 1] - ly[1] / 2, ly[1], ly[1]);
     });
-    for (var j = 0; j < pts.length; j += 3) {   // light body, the far side a little darker
-      ctx.fillStyle = rgba(C.ink, clamp(0.95 - pts[j + 2] * 1.4, 0.55, 1)); ctx.fillRect(pts[j] - q / 2, pts[j + 1] - q / 2, q, q);
-    }
   })(performance.now());
 }
 onScreen(story, function (on) { storyOn = on; });
