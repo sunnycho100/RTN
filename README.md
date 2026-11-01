@@ -32,15 +32,16 @@ All clips are our own runs. None come from other companies' sites.
 | Clip | Source |
 |---|---|
 | `capture.mp4` | The floor4 scan's camera frames |
-| `process_film.mp4` | Process film of the same scan, video frames to a walking G1 (Mac render; clean walls and camera moves are styling) |
+| `process_film.mp4` | Process film on the CarDA WS30 station: record, label, rebuild in Isaac Sim, automate. CarDA footage from fixed ZED 2 cameras |
+| `ws30_real_vs_rebuild.jpg` | A CarDA WS30 camera frame beside our Isaac Sim rebuild from the same calibrated camera |
 | `walk.mp4` | MuJoCo: G1 walking in a reconstructed scene |
 | `g1coop_factory.mp4` | Seohee's 20-robot factory, v2 with realistic loads (welded T-frame, steel sheet bundle, KLT tote): her MuJoCo run rendered in Isaac Sim (visual port, MuJoCo decides all motion) |
-| `door_split.mp4` | Same car-door job, same clock: one worker alone (a G1 stands in) beside two UR20 rail arms and two G1s. Kinematic replay in Isaac Sim, first 35 s |
+| `door_split.mp4` | Same car-door job, same clock: one worker alone (a G1 stands in) beside two UR20 rail arms and two G1s. Kinematic replay in Isaac Sim, v2, first 40 s |
 | `close_3g1_tframe.mp4`, `close_2g1_sheets.mp4`, `close_1g1_tote.mp4` | Close-ups from Seohee's factory: G1s carrying a welded T-frame, a steel sheet bundle and a KLT tote |
 | `carda_line.mp4` | Car-door line, option C: kinematic replay, UR10e as a visual stand-in for the Doosan M0617 |
 | `ws10_human_vs_cell.mp4` | WS10 on one clock in MuJoCo: the worker alone (as-is motion) beside the worker and a Doosan M0617 (option C, worker leaves after their part) |
 
-The Isaac Sim clips use NVIDIA's sample robot and environment assets. Credits: CarDA motion capture (CC BY 4.0) in `carda_line.mp4` and `ws10_human_vs_cell.mp4`, and roqsim's Depot warehouse (CC BY 4.0) in `g1coop_factory.mp4`.
+The Isaac Sim clips use NVIDIA's sample robot and environment assets. Credits: CarDA footage and motion capture (CC BY 4.0) in `carda_line.mp4`, `ws10_human_vs_cell.mp4`, `process_film.mp4` and `ws30_real_vs_rebuild.jpg`, and roqsim's Depot warehouse (CC BY 4.0) in `g1coop_factory.mp4`.
 
 CooHOI clips (NeurIPS 2024, no license file) are never committed. Keep any copies in the git-ignored `private/` folder.
 
