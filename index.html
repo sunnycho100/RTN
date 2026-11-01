@@ -121,7 +121,12 @@ details.step summary::-webkit-details-marker { display: none; }
 summary .n { font: 500 12px/1 var(--mono); color: var(--accent); }
 summary .t { font: 600 22px/1.1 var(--display); font-stretch: 112%; }
 summary .l { color: var(--dim); min-width: 0; }
-.faq-a { margin: 0; color: var(--dim); max-width: 64ch; font-size: 17px; }
+.spec { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 32px; border-top: 1px solid var(--line); }
+.spec > div { padding-top: 24px; }
+.spec b { font: 500 12px/1.6 var(--mono); color: var(--accent); letter-spacing: 0.08em; }
+.spec ul { list-style: none; margin: 12px 0 0; padding: 0; }
+.spec li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
+@media (max-width: 760px) { .spec { grid-template-columns: 1fr; } }
 summary .pm { justify-self: end; width: 14px; height: 14px; position: relative; }
 summary .pm::before, summary .pm::after { content: ""; position: absolute; inset: 6px 0 auto; height: 1.5px; background: var(--ink); transition: transform 0.25s; }
 summary .pm::after { transform: rotate(90deg); }
@@ -296,6 +301,7 @@ dialog.quote .btn { justify-self: start; }
 .abc-lines i.takt { border-left-style: solid; border-color: var(--hot); }
 .abc-lines i::after { content: attr(data-l); position: absolute; top: -18px; right: 4px; font: 500 11px/1 var(--mono); color: var(--dim); white-space: nowrap; }
 .abc-lines i.takt::after { top: auto; bottom: -18px; color: var(--hot); }
+.abc-vid { margin-top: 24px; }
 .abc-stnote { margin: 34px 0 0; min-height: 1.6em; color: var(--dim); font-size: 15px; max-width: 70ch; }
 
 .abc-note { margin-top: clamp(48px, 8vh, 80px); padding-top: 18px; border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; color: var(--dim); font-size: 14px; }
@@ -428,6 +434,7 @@ dialog.quote .btn { justify-self: start; }
     <div class="abc-tabs" role="group" aria-label="Show stations for" id="abc-tabs"></div>
     <div class="abc-st" id="abc-st"><div class="abc-lines" id="abc-lines"></div></div>
     <p class="abc-stnote" id="abc-stnote" aria-live="polite"></p>
+    <figure class="clip abc-vid"><video data-src="media/ws10_human_vs_cell.mp4" poster="media/posters/ws10_human_vs_cell.jpg" muted loop playsinline preload="none" style="aspect-ratio: 32 / 9"></video><figcaption><span class="tag ours">Ours</span>WS10 on one clock: worker alone, worker with cobot</figcaption></figure>
   </div>
 
   <p class="abc-note"><span class="abc-tag">IE estimate</span><span>Funnel and cards: time study and line simulation from video and motion capture. Data: CarDA, Stellantis Melfi line, CC BY 4.0.</span></p>
@@ -488,11 +495,11 @@ dialog.quote .btn { justify-self: start; }
 
   <section class="block wrap" id="industry">
     <h2 class="sec">A whole floor, not one cell.</h2>
-    <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Seohee's MuJoCo run, rendered in Isaac Sim. Depot warehouse by roqsim, CC BY 4.0</figcaption></figure>
+    <figure class="clip wide"><video data-src="media/g1coop_factory.mp4" poster="media/posters/g1coop_factory.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Seohee's MuJoCo run in Isaac Sim. Depot by roqsim, CC BY 4.0</figcaption></figure>
     <h3 class="cap-h">20 robots in one metal shop</h3><div class="close3"><div><figure class="clip"><video data-src="media/close_3g1_tframe.mp4" poster="media/posters/close_3g1_tframe.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Welded T-frame, 3 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_2g1_sheets.mp4" poster="media/posters/close_2g1_sheets.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Steel sheet bundle, 2 G1s</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_1g1_tote.mp4" poster="media/posters/close_1g1_tote.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>KLT tote, 1 G1</figcaption></figure></div></div>
     <div class="next">
-      <figure class="clip wide"><video data-src="media/carda_line.mp4" poster="media/posters/carda_line.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Kinematic replay. UR10e stands in for the study's Doosan M0617. Motion capture: CarDA, CC BY 4.0</figcaption></figure>
-      <h3 class="cap-h">Car-door line</h3><p class="cap-p">Cobots on tracks drive screws beside a worker, with live separation distance.</p>
+      <figure class="clip wide"><video data-src="media/carda_line.mp4" poster="media/posters/carda_line.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>Kinematic replay, UR10e in place of a Doosan M0617. CarDA, CC BY 4.0</figcaption></figure>
+      <h3 class="cap-h">Car-door line</h3>
     </div>
   </section>
 
@@ -500,14 +507,14 @@ dialog.quote .btn { justify-self: start; }
     <div class="split">
       <div>
         <h2 class="sec">Robots from different owners, working together.</h2>
-        <p class="lede">A neighbor's robot can ask yours for help. Yours checks who is asking and decides how far to follow.</p>
+        <p class="lede">A neighbor's robot can ask yours for help.</p>
 
       </div>
       <ol class="flow">
-        <li><b>VERIFY</b><span>Is it really that robot? Signed messages, no replays, no strangers.</span></li>
-        <li><b>DECIDE</b><span>How far do we follow it? Allow, partial or deny, per action.</span></li>
-        <li><b>ACT</b><span>Only allowed actions reach the robot. Some are never allowed.</span></li>
-        <li><b>LOG</b><span>The owner sees one plain line per request.</span></li>
+        <li><b>VERIFY</b><span>Signed messages, no replays, no strangers.</span></li>
+        <li><b>DECIDE</b><span>Allow, partial or deny, per action.</span></li>
+        <li><b>ACT</b><span>Only allowed actions reach the robot.</span></li>
+        <li><b>LOG</b><span>One plain line per request for the owner.</span></li>
       </ol>
     </div>
   </section>
@@ -520,21 +527,12 @@ dialog.quote .btn { justify-self: start; }
     </div>
   </section>
 
-  <section class="block wrap" id="faq">
-    <h2 class="sec">Questions plant managers ask</h2>
-    <div>
-      <details class="step">
-        <summary><span class="n">?</span><span class="t">What do you need from my plant?</span><span class="l"></span><span class="pm"></span></summary>
-        <div class="body" style="grid-template-columns: 1fr"><p class="faq-a">One phone walkthrough of the area and the task. Depth or LiDAR helps but is optional.</p></div>
-      </details>
-      <details class="step">
-        <summary><span class="n">?</span><span class="t">Which robots can you test?</span><span class="l"></span><span class="pm"></span></summary>
-        <div class="body" style="grid-template-columns: 1fr"><p class="faq-a">Any robot with a simulation model. Today we run Unitree G1 and H1, Go2, Universal Robots arms and Franka arms in MuJoCo and Isaac Sim.</p></div>
-      </details>
-      <details class="step">
-        <summary><span class="n">?</span><span class="t">How close is the simulation to my floor?</span><span class="l"></span><span class="pm"></span></summary>
-        <div class="body" style="grid-template-columns: 1fr"><p class="faq-a">We check rebuilt geometry against laser scans (79% within 5 cm on a public loading area) and show seconds per station against your takt.</p></div>
-      </details>
+  <section class="block wrap" id="spec">
+    <h2 class="sec">What we need, what you get.</h2>
+    <div class="spec">
+      <div><b>WE NEED</b><ul><li>One phone video of the area</li><li>Your stations and takt target</li><li>The robots you are weighing</li></ul></div>
+      <div><b>YOU GET</b><ul><li>Your floor, rebuilt in 3D</li><li>Each option run against your takt</li><li>A film and a written verdict</li></ul></div>
+      <div><b>ROBOTS RUN SO FAR</b><ul><li>Unitree G1, H1, Go2</li><li>Franka Panda, UR10e, Doosan M0617</li><li>ANYmal, Spot</li></ul></div>
     </div>
   </section>
 
