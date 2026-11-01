@@ -4,11 +4,11 @@
 (() => {
   // ---- data (s5x headline, config/demo_regress.yaml) ----
   const OPT = {
-    A: { title: "Better layout, no robot arms", desc: "A mobile robot brings parts to every station.", adds: "START HERE",
+    A: { title: "Better layout, no robot arms", desc: "Lowest install cost.", adds: "START HERE",
          capex: 54000, npv: 41221, overrun: 41.1, strain: 80.0, payback: 2.3, doors: 13.6, share: 24 },
-    B: { title: "One robot at the slowest station", desc: "A, plus a collaborative robot arm on a track.", adds: "BUILDS ON A",
+    B: { title: "One robot at the slowest station", desc: "Best 5-year return.", adds: "BUILDS ON A",
          capex: 190625, npv: 238291, overrun: 28.0, strain: 36.8, payback: 1.8, doors: 14.1, share: 38 },
-    C: { title: "One robot at every station", desc: "B, plus the same arm at the other two stations.", adds: "BUILDS ON B",
+    C: { title: "One robot at every station", desc: "Most robots, hits the target most often.", adds: "BUILDS ON B",
          capex: 436876, npv: 97006, overrun: 5.3, strain: 13.1, payback: 3.3, doors: 14.9, share: 26 },
   };
   const KPI = [   // [key, label, format, lower is better]

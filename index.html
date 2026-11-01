@@ -165,13 +165,6 @@ details.film[open] > summary { margin-bottom: 16px; }
 .cap-h { margin: 16px 0 4px; font: 600 clamp(22px, 2.2vw, 28px)/1.1 var(--display); font-stretch: 110%; }
 .cap-p { margin: 0; color: var(--dim); font-size: 16px; max-width: 70ch; }
 
-.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 32px; align-items: start; }
-@media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
-.flow { margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
-.flow li { background: var(--bg); padding: 14px 16px; display: grid; grid-template-columns: 90px 1fr; gap: 12px; }
-.flow b { font: 500 12px/1.6 var(--mono); color: var(--accent); font-weight: 500; }
-.flow span { color: var(--dim); }
-
 .nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
 .nums div { padding: 28px 24px 0 0; }
 .nums strong { display: block; font: 600 clamp(36px, 5vw, 64px)/1 var(--display); font-stretch: 112%; font-variant-numeric: tabular-nums; }
@@ -321,19 +314,10 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 .abc-bar i.best { background: var(--accent); }
 .abc-foot { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
 
-/* 4. station cycles */
-.abc-eg { margin: 0 0 10px; color: var(--dim); font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
-
-.abc-note { margin-top: clamp(48px, 8vh, 80px); padding-top: 18px; border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; color: var(--dim); font-size: 14px; }
-.abc-tag { font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 6px; border: 1px solid var(--mid); color: var(--mid); white-space: nowrap; }
-
 @media (max-width: 860px) {
   .abc-funnel { grid-template-columns: 1fr; gap: 20px; }
   .abc-cards { grid-template-columns: 1fr; }
   .abc-steps button { padding: 9px 0; }
-}
-@media (max-width: 520px) {
-        .abc-note { flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {
   .abc-bar i,   .abc-steps.play li.now { animation: none; }
@@ -393,7 +377,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
       <canvas id="sim" aria-hidden="true"></canvas>
       <div class="caps wrap">
         <div class="cap"><h2>All we need is a video.</h2></div>
-        <div class="cap"><h2><span class="no">01</span>Walk the site once.</h2><p>Use a phone to record the place.</p></div>
+        <div class="cap"><h2><span class="no">01</span>Walk the site once.</h2></div>
         <div class="cap"><h2><span class="no">02</span>We rebuild it in 3D.</h2></div>
         <div class="cap"><h2><span class="no">03</span>See your floor today, then with a robot team.</h2></div>
         <div class="cap"><h2><span class="no">04</span>Your robots do the job here.</h2></div>
@@ -424,7 +408,6 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
   </section>
 
   <section class="block wrap abc" id="options" aria-labelledby="abc-h">
-  <p class="abc-eg">Example: a car-door assembly line</p>
   <h2 class="sec" id="abc-h">Three ways to fix this line.</h2>
   <p class="lede">Your options, ranked by what you care about most.</p>
 
@@ -454,7 +437,6 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <div class="abc-cards" id="abc-cards"></div>
   </div>
 
-  <p class="abc-note"><span class="abc-tag">Estimate</span><span>Time study and line simulation. Gray: a two-robot setup.</span></p>
 </section>
 
   <section class="block wrap" id="film">
@@ -478,22 +460,6 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     </div>
   </section>
 
-  <section class="block wrap" id="trust">
-    <div class="split">
-      <div>
-        <h2 class="sec">Robots from different owners, working together.</h2>
-        <p class="lede">A neighbor's robot can ask yours for help.</p>
-
-      </div>
-      <ol class="flow">
-        <li><b>VERIFY</b><span>Signed messages, no replays, no strangers.</span></li>
-        <li><b>DECIDE</b><span>Allow, partial or deny, per action.</span></li>
-        <li><b>ACT</b><span>Only allowed actions reach the robot.</span></li>
-        <li><b>LOG</b><span>One plain line per request for the owner.</span></li>
-      </ol>
-    </div>
-  </section>
-
   <section class="block wrap" aria-label="Numbers">
     <div class="nums">
       <div><strong>79%</strong><span>of a scanned loading area within 5 cm of a laser scan</span></div>
@@ -511,7 +477,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
   </section>
 
   <section class="cta wrap" id="contact">
-    <h2>Start with one site.</h2>
+    <h2>Start with one video.</h2>
     <div>
       <button class="btn" type="button" data-quote>Request a quote</button>
       <p class="mono">We only use your email to reply.</p>
@@ -579,7 +545,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
   </div>
 </dialog>
 <script src="quote.js?v=4"></script>
-<script src="options.js?v=4"></script>
+<script src="options.js?v=5"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
 <script src="engine.js?v=27"></script>
