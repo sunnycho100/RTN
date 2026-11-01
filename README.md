@@ -35,9 +35,6 @@ All clips are our own runs. None come from other companies' sites.
 | `ws30_site.mp4` | 12 s of the CarDA WS30 IN camera, cycle 003 (CarDA, CC BY 4.0) |
 | `ws30_site_out.mp4` | The same 12 s from the WS30 OUT camera, for the story's source-video inset |
 | `door_team.mp4` | WS30 rebuild in Isaac Sim: two UR20 rail arms and two G1s do the door job, kinematic replay, real time. Kept for the demo video, not on the page |
-| `door_team_still.jpg` | How it works, step 05: a frame of the same WS30 team job from the dots view, no overlays |
-| `ws30_height.jpg` | WS30 height map from the two cameras' depth |
-| `ws30_real_vs_rebuild_in.jpg` | WS30 IN camera frame beside our rebuild from the same calibrated camera |
 | `process_film.mp4` | Process film on the CarDA WS30 station: record, label, rebuild in Isaac Sim, automate |
 | `photo_vs_rebuild.jpg` | One public-domain warehouse photo (Lance Cheung, USDA, via Wikimedia Commons) beside our Isaac Sim rebuild from the same camera |
 | `ws30_real_vs_rebuild.jpg` | A CarDA WS30 camera frame beside our Isaac Sim rebuild from the same calibrated camera |

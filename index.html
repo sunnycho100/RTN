@@ -129,13 +129,6 @@ section.block { padding-block: clamp(72px, 12vh, 140px) 0; }
 .block h2.sec { margin: 0 0 8px; font: 650 clamp(30px, 4vw, 54px)/1 var(--display); font-stretch: 112%; letter-spacing: -0.02em; text-wrap: balance; }
 .block .lede { margin: 0 0 32px; color: var(--dim); max-width: 60ch; font-size: 17px; }
 
-details.step { border-top: 1px solid var(--line); }
-details.step:last-child { border-bottom: 1px solid var(--line); }
-details.step summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 48px minmax(120px, 220px) 1fr 24px; gap: 16px; align-items: baseline; padding-block: 22px; }
-details.step summary::-webkit-details-marker { display: none; }
-summary .n { font: 500 12px/1 var(--mono); color: var(--accent); }
-summary .t { font: 600 22px/1.1 var(--display); font-stretch: 112%; }
-summary .l { color: var(--dim); min-width: 0; }
 .spec { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 0 40px; border-top: 1px solid var(--line); }
 .spec > div { padding-top: 24px; }
 .spec b { font: 500 13px/1.6 var(--mono); color: var(--accent); letter-spacing: 0.08em; }
@@ -147,26 +140,13 @@ summary .l { color: var(--dim); min-width: 0; }
 .spec .bots small { display: block; font-size: 11px; color: var(--mid); }
 @media (max-width: 480px) { .spec .bots { gap: 8px; } .spec .bots li { font-size: 12px; } }
 @media (max-width: 760px) { .spec { grid-template-columns: 1fr; } }
-summary .pm { justify-self: end; width: 14px; height: 14px; position: relative; }
-summary .pm::before, summary .pm::after { content: ""; position: absolute; inset: 6px 0 auto; height: 1.5px; background: var(--ink); transition: transform 0.25s; }
-summary .pm::after { transform: rotate(90deg); }
-details[open] summary .pm::after { transform: rotate(0deg); }
-details.step summary:hover .t { color: var(--accent); }
-.step .body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; padding: 4px 0 28px 64px; }
-.step .body p { margin: 0 0 10px; color: var(--dim); max-width: 52ch; }
-@media (max-width: 720px) {
-  details.step summary { grid-template-columns: 32px 1fr 20px; }
-  summary .l { grid-column: 2; grid-row: 2; }
-  .step .body { grid-template-columns: 1fr; padding-left: 0; }
-}
-@supports (interpolate-size: allow-keywords) {
-  :root { interpolate-size: allow-keywords; }
-  details.step::details-content { height: 0; overflow: clip; transition: height 0.35s ease, content-visibility 0.35s allow-discrete; }
-  details.step[open]::details-content { height: auto; }
-}
 
 .clip { margin: 0; background: var(--panel); border: 1px solid var(--line); }
-.clip video, .clip .empty, .clip canvas.mini { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #050606; }
+details.film > summary { list-style: none; cursor: pointer; margin-bottom: 4px; }
+details.film > summary::-webkit-details-marker { display: none; }
+details.film > summary .len { color: var(--dim); font: 500 12px/1 var(--mono); margin-left: 4px; }
+details.film[open] > summary { margin-bottom: 16px; }
+.clip video, .clip .empty { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #050606; }
 .clip .empty { display: grid; place-items: center; color: var(--dim); font: 500 12px/1.5 var(--mono); text-align: center; padding: 16px; }
 .clip figcaption { display: flex; gap: 10px; align-items: baseline; padding: 10px 12px; font-size: 13px; color: var(--dim); }
 .tag { font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 6px; border: 1px solid var(--line); color: var(--dim); white-space: nowrap; }
@@ -332,7 +312,7 @@ dialog.quote .btn { justify-self: start; }
   <a class="brand" href="#top"><i></i>RTOS</a>
   <nav>
     <a href="#options">Example</a>
-    <a href="#how">How it works</a>
+    <a href="#story">How it works</a>
     <a href="#industry">Whole floor</a>
     <a href="#spec">What you get</a>
     <a class="btn" href="#contact" data-quote>Request a quote</a>
@@ -410,11 +390,11 @@ dialog.quote .btn { justify-self: start; }
     <canvas id="abc-dots" role="img" aria-label="1,219 squares, one per design, narrowing to 3 options"></canvas>
     <div>
       <ol class="abc-steps" id="abc-steps" aria-live="polite">
-        <li><b>1,219</b><span>configurations enumerated from IK-feasible robots, layouts and task splits</span></li>
-        <li><b>40</b><span>Pareto-optimal on cost, return, cycle time, ergonomics and robot count</span></li>
-        <li><b>31</b><span>still Pareto-optimal under discrete-event simulation, 30 replications</span></li>
-        <li><b>10</b><span>feasible: positive 5-year NPV, no added headcount</span></li>
-        <li><b>3</b><span>recommended options, top choice in 88% of priority weightings (SMAA-2)</span></li>
+        <li><b>1,219</b><span>configurations run</span></li>
+        <li><b>40</b><span>Pareto-optimal</span></li>
+        <li><b>31</b><span>still ahead in line simulation</span></li>
+        <li><b>10</b><span>positive return in 5 years, no new hires</span></li>
+        <li><b>3</b><span>options, best for 88% of priorities</span></li>
       </ol>
       <button type="button" class="abc-replay" id="abc-replay" aria-label="Replay the funnel" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg></button>
     </div>
@@ -423,7 +403,7 @@ dialog.quote .btn { justify-self: start; }
   <!-- 2. priorities -->
   <div class="abc-part" id="abc-ask">
     <h3 class="abc-h3">What matters most to you?</h3>
-    <p class="abc-sub">How often each option comes out on top.</p>
+    <p class="abc-sub">We tailor to your needs.</p>
     <div class="abc-seg" role="group" aria-label="Priority" id="abc-seg"></div>
     <p class="abc-why" id="abc-why" aria-live="polite"></p>
     <div class="abc-share" id="abc-share" aria-hidden="true"></div>
@@ -436,56 +416,14 @@ dialog.quote .btn { justify-self: start; }
 
   <section class="block wrap" id="film">
     <h2 class="sec">From a scan to a working robot.</h2>
-    <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>CarDA footage, CC BY 4.0. Rebuild and robots are ours</figcaption></figure>
+    <details class="film">
+      <summary class="btn ghost"><span aria-hidden="true">▶</span>Watch the process<span class="len">29 s</span></summary>
+      <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video><figcaption><span class="tag ours">Ours</span>CarDA footage, CC BY 4.0. Rebuild and robots are ours</figcaption></figure>
+    </details>
     <figure class="clip wide" style="margin-top: 24px"><img src="media/ws30_real_vs_rebuild.jpg" loading="lazy" width="1600" height="450" style="display: block; width: 100%; height: auto" alt="Left: a real CarDA camera frame of the WS30 station. Right: our Isaac Sim rebuild seen from the same calibrated camera."><figcaption><span class="tag ours">Ours</span>Same camera, real and rebuilt. CarDA, CC BY 4.0</figcaption></figure>
+    <figure class="clip wide" style="margin-top: 24px"><img src="media/photo_vs_rebuild.jpg" loading="lazy" width="1600" height="532" style="display: block; width: 100%; height: auto" alt="Left: a warehouse photo with a forklift. Right: the same view rebuilt in Isaac Sim from that one photo."><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim. Photo: Lance Cheung, USDA, public domain</figcaption></figure>
   </section>
 
-  <section class="block wrap" id="how">
-    <h2 class="sec">How it works</h2>
-    <div>
-      <details class="step">
-        <summary><span class="n">01</span><span class="t">Capture</span><span class="l">Phone video, RGB-D or LiDAR of the site.</span><span class="pm"></span></summary>
-        <div class="body">
-          <div><p class="mono">INPUT · video or photos · depth and LiDAR optional</p></div>
-        </div>
-      </details>
-      <details class="step">
-        <summary><span class="n">02</span><span class="t">Reconstruct</span><span class="l">Camera poses and a dense 3D map.</span><span class="pm"></span></summary>
-        <div class="body">
-          <div><p class="mono">OUTPUT · poses · point cloud · mesh</p></div>
-          <figure class="clip"><img src="media/ws30_height.jpg" loading="lazy" width="1280" height="810" style="display: block; width: 100%; height: auto" alt="Top-down height map of the WS30 station from the two cameras' depth, with a one-metre grid."><figcaption><span class="tag ours">Ours</span>WS30 height map from the cameras' depth. CarDA, CC BY 4.0</figcaption></figure>
-        </div>
-      </details>
-      <details class="step">
-        <summary><span class="n">03</span><span class="t">Build the scene</span><span class="l">Machines placed in a simulator scene.</span><span class="pm"></span></summary>
-        <div class="body">
-          <div><p class="mono">EXPORT · MuJoCo · Isaac Sim</p></div>
-          <figure class="clip"><img src="media/photo_vs_rebuild.jpg" loading="lazy" width="1600" height="532" style="display: block; width: 100%; height: auto" alt="Left: a warehouse photo with a forklift. Right: the same view rebuilt in Isaac Sim from that one photo."><figcaption><span class="tag ours">Ours</span>One photo, rebuilt in Isaac Sim. Photo: Lance Cheung, USDA, public domain</figcaption></figure>
-        </div>
-      </details>
-      <details class="step">
-        <summary><span class="n">04</span><span class="t">Check</span><span class="l">Can we trust the geometry?</span><span class="pm"></span></summary>
-        <div class="body">
-          <div><p class="mono">SCORED ON · ETH3D · Hilti 2022</p></div>
-          <figure class="clip"><img src="media/ws30_real_vs_rebuild_in.jpg" loading="lazy" width="1600" height="450" style="display: block; width: 100%; height: auto" alt="Left: a real CarDA camera frame of WS30. Right: our Isaac Sim rebuild from the same calibrated camera."><figcaption><span class="tag ours">Ours</span>Same camera, real and rebuilt. CarDA, CC BY 4.0</figcaption></figure>
-        </div>
-      </details>
-      <details class="step">
-        <summary><span class="n">05</span><span class="t">Run the task</span><span class="l">The robot does the job in the copy of your site.</span><span class="pm"></span></summary>
-        <div class="body">
-          <div><p class="mono">ROBOTS · UR20 rail arms · Unitree G1</p></div>
-          <figure class="clip"><img src="media/door_team_still.jpg" loading="lazy" width="1280" height="720" style="display: block; width: 100%; height: auto" alt="Two rail arms hold a car door while two humanoid robots fit the glass and drive a screw, drawn as points."></figure>
-        </div>
-      </details>
-      <details class="step">
-        <summary><span class="n">06</span><span class="t">Decide</span><span class="l">Feasibility and cost, before anyone buys.</span><span class="pm"></span></summary>
-        <div class="body">
-          <div><p class="mono">DELIVERED · report · scene files · videos</p></div>
-          
-        </div>
-      </details>
-    </div>
-  </section>
 
   <section class="block wrap" id="industry">
     <h2 class="sec">A whole floor, not one cell.</h2>
@@ -597,7 +535,7 @@ dialog.quote .btn { justify-self: start; }
 <script src="options.js?v=4"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=15"></script>
+<script src="engine.js?v=16"></script>
 <script src="dots_data.js"></script>
 <script src="dots.js?v=2"></script>
 </body>

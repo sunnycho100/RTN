@@ -63,7 +63,7 @@ function box(b, wall) { return { cx: b[0] / 100 - OX, cy: b[1] / 100 - OY, cz: b
 var boxes = S.walls.map(function (b) { return box(b, true); }).concat(S.hulls.map(function (b) { return box(b, false); }));
 
 /* Per point: which camera saw it first (capture reveal), and distance to the nearest simple shape (check stage). */
-var reveal = new Float32Array(N), err = new Float32Array(N), near5 = 0, near15 = 0;
+var reveal = new Float32Array(N), near5 = 0, near15 = 0;
 for (i = 0; i < N; i++) {
   var best = 1e9, bi = 0;
   for (k = 0; k < cams.length; k++) { var dx = X[i] - cams[k].x, dy = Y[i] - cams[k].y, dd = dx * dx + dy * dy; if (dd < best) { best = dd; bi = k; } }
@@ -75,7 +75,7 @@ for (i = 0; i < N; i++) {
     var out = Math.hypot(Math.max(lx, 0), Math.max(ly, 0), Math.max(lz, 0)), ins = Math.min(Math.max(lx, ly, lz), 0);
     var bd = Math.abs(out + ins); if (bd < d) d = bd;
   }
-  err[i] = d; if (d < 0.05) near5++; if (d < 0.15) near15++;
+  if (d < 0.05) near5++; if (d < 0.15) near15++;
 }
 function setText(id, s) { var el = document.getElementById(id); if (el) el.innerHTML = s; }
 function fmt(n) { return n.toLocaleString('en-US'); }
@@ -220,36 +220,6 @@ if (heroCv) {
   onScreen(heroCv, function (on) { heroOn = on; });
   (function heroLoop(now) { if (heroOn) drawHero(now); if (!REDUCED) requestAnimationFrame(heroLoop); })(performance.now());
 }
-
-/* ---- MINI views: small live canvases (<canvas class="mini" data-mode="orbit|shapes|heat|facility">) in the detail rows ---- */
-document.querySelectorAll('canvas.mini').forEach(function (cv) {
-  var on = false, mode = cv.dataset.mode;
-  onScreen(cv, function (v) { on = v; });
-  (function loop(now) {
-    if (on && cv.clientWidth) {
-      var dpr = fit(cv), W = cv.width, H = cv.height, ctx = cv.getContext('2d');
-      var far = mode === 'facility';
-      var v = view(W, H, { tx: 0, ty: 0, tz: far ? 0.2 : 0.6, yaw: -1 + (REDUCED ? 0 : now / 16000 * TAU), pitch: far ? 0.95 : 0.7,
-        dist: far ? 26 : 8.4, fov: 0.7, ox: 0.5, oy: 0.5 });
-      ctx.clearRect(0, 0, W, H); ctx.lineWidth = dpr;
-      if (far) {
-        var sx = RW + 1.6, sy = RD + 1.6;
-        for (var a = -2; a <= 2; a++) for (var b = -2; b <= 2; b++) {
-          ctx.strokeStyle = rgba(a || b ? C.ink : C.acc, a || b ? 0.18 : 0.8); ctx.beginPath();
-          boxes.forEach(function (bx) { if (bx.wall) boxEdges(ctx, v, bx, a * sx, b * sy); }); ctx.stroke();
-          drawPoints(ctx, v, function () { return lvl(a || b ? 0.3 : 0.9); }, 0.03, a * sx, b * sy, a || b ? 7 : 2);
-        }
-      } else {
-        if (mode === 'shapes') { ctx.strokeStyle = rgba(C.acc, 0.75); ctx.beginPath(); boxes.forEach(function (bx) { boxEdges(ctx, v, bx, 0, 0); }); ctx.stroke(); }
-        drawPoints(ctx, v, function (i) {
-          if (mode === 'heat') return (err[i] < 0.05 ? 1 : err[i] < 0.15 ? 2 : 3) * 16 + lvl(0.85);
-          return lvl((mode === 'shapes' ? 0.35 : 1) * (0.38 + 0.065 * SH[i]));
-        }, 0.03, 0, 0, 1);
-      }
-    }
-    if (!REDUCED || !on) requestAnimationFrame(loop);
-  })(performance.now());
-});
 
 /* ---- STORY: one pinned canvas, scroll drives six stages ---- */
 var story = document.getElementById('story'), simCv = document.getElementById('sim');
