@@ -32,7 +32,7 @@ All clips are our own runs. None come from other companies' sites.
 | Clip | Source |
 |---|---|
 | `capture.mp4` | The floor4 scan's camera frames |
-| `process_film.mp4` | Process film on the CarDA WS30 station: record, label, rebuild in Isaac Sim, automate. CarDA footage from fixed ZED 2 cameras |
+| `process_film.mp4` | Process film on the CarDA WS30 station: record, label, rebuild in Isaac Sim, automate |
 | `ws30_real_vs_rebuild.jpg` | A CarDA WS30 camera frame beside our Isaac Sim rebuild from the same calibrated camera |
 | `walk.mp4` | MuJoCo: G1 walking in a reconstructed scene |
 | `g1coop_factory.mp4` | Seohee's 20-robot factory, v2 with realistic loads (welded T-frame, steel sheet bundle, KLT tote): her MuJoCo run rendered in Isaac Sim (visual port, MuJoCo decides all motion) |
