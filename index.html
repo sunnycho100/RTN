@@ -151,6 +151,14 @@ details.film > summary.btn { padding: 22px 36px; font-size: 22px; gap: 14px; bor
 details.film > summary.btn:hover { background: var(--ink); color: var(--bg); }
 details.film > summary .len { color: var(--dim); font: 500 16px/1 var(--mono); margin-left: 4px; }
 details.film[open] > summary { margin-bottom: 16px; }
+.seek { display: flex; align-items: center; gap: 14px; padding: 10px 14px; font: 500 13px/1 var(--mono); color: var(--dim); }
+.seek button { width: 28px; height: 28px; padding: 0; border: 0; background: none; color: var(--ink); font: 13px/1 var(--mono); cursor: pointer; }
+.seek .bar { flex: 1; position: relative; height: 20px; cursor: pointer; touch-action: none; }
+.seek .bar::before, .seek .bar b { content: ""; position: absolute; left: 0; top: 50%; height: 3px; margin-top: -1.5px; }
+.seek .bar::before { right: 0; background: var(--line); }
+.seek .bar b { width: var(--v, 0%); background: var(--ink); }
+.seek .bar b::after { content: ""; position: absolute; right: -6px; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%; background: var(--ink); }
+.seek .bar:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pairs + details.film { margin-top: 28px; }
 .clip video, .clip .empty { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #050606; }
 .clip .empty { display: grid; place-items: center; color: var(--dim); font: 500 12px/1.5 var(--mono); text-align: center; padding: 16px; }
@@ -466,8 +474,8 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <figure class="clip"><div class="ba"><img src="media/photo_sim.jpg" loading="lazy" width="1200" height="600" alt="The same warehouse view rebuilt in Isaac Sim from that one photo."><img class="top" src="media/photo_src.jpg" loading="lazy" width="1200" height="600" alt="A warehouse photo with a forklift."><span class="l">One photo</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the photo with the 3D reconstruction"></div></figure>
     </div>
     <details class="film">
-      <summary class="btn ghost"><span aria-hidden="true">▶</span>Watch the process<span class="len">29 s</span></summary>
-      <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video></figure>
+      <summary class="btn ghost"><span aria-hidden="true">▶</span>Watch the process<span class="len">23 s</span></summary>
+      <figure class="clip wide"><video data-src="media/process_film_v5.mp4" poster="media/posters/process_film_v5.jpg" muted loop playsinline preload="none" aria-label="A real car-door station recorded, rebuilt in 3D, then run by two rail arms and two humanoid robots"></video></figure>
     </details>
     <script>
     var baStill = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -505,6 +513,28 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
       </details>
     </div>
   </section>
+  <script>
+  document.querySelectorAll('details.film video').forEach(function (v) {   // a thin seek bar under each film: drag to the part worth watching
+    var s = document.createElement('div'), drag = false; s.className = 'seek';
+    s.innerHTML = '<button type="button" aria-label="Play">\u25B6</button><div class="bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0"><b></b></div><span>0:00</span>';
+    v.after(s);
+    var btn = s.children[0], bar = s.children[1], out = s.children[2];
+    function fmt(x) { x = Math.floor(x || 0); return Math.floor(x / 60) + ':' + ('0' + x % 60).slice(-2); }
+    function draw() { var d = v.duration || 0; bar.style.setProperty('--v', (d ? v.currentTime / d * 100 : 0) + '%'); out.textContent = fmt(v.currentTime) + ' / ' + fmt(d);
+      bar.setAttribute('aria-valuemax', Math.round(d)); bar.setAttribute('aria-valuenow', Math.round(v.currentTime)); }
+    function at(e) { var b = bar.getBoundingClientRect(); if (v.duration) v.currentTime = Math.max(0, Math.min(0.999, (e.clientX - b.left) / b.width)) * v.duration; draw(); }
+    function toggle() { if (v.paused) v.play().catch(function () {}); else v.pause(); }
+    bar.addEventListener('pointerdown', function (e) { drag = true; bar.setPointerCapture(e.pointerId); at(e); });
+    bar.addEventListener('pointermove', function (e) { if (drag) at(e); });
+    ['pointerup', 'pointercancel'].forEach(function (n) { bar.addEventListener(n, function () { drag = false; }); });
+    bar.addEventListener('keydown', function (e) { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); v.currentTime = Math.max(0, v.currentTime + (e.key === 'ArrowRight' ? 2 : -2)); draw(); });
+    btn.addEventListener('click', toggle); v.addEventListener('click', toggle);
+    v.addEventListener('loadedmetadata', draw); v.addEventListener('seeked', draw);
+    v.addEventListener('pause', function () { btn.textContent = '\u25B6'; btn.setAttribute('aria-label', 'Play'); });
+    v.addEventListener('play', function () { btn.textContent = '\u275A\u275A'; btn.setAttribute('aria-label', 'Pause');
+      (function loop() { draw(); if (!v.paused) requestAnimationFrame(loop); })(); });
+  });
+  </script>
 </dialog>
 <script>
 (function () {   // the photos, renders and films live in one full-screen gallery so the page itself stays dots and diagrams
