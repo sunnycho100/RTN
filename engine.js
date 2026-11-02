@@ -305,6 +305,56 @@ function teamBox(T) {   // where the robots work over the whole run: frames the 
   });
   return b;
 }
+/* The zoom-out: every station gets the scanned room plus the floor the robot team works on (the WS30 team reaches past the
+   scanned edge), filled with jittered floor dots. The other 24 stations each run one of five cells, laid out so the same cell
+   never touches itself, not even on a diagonal: 0 the real WS30 team, 1 the landing scene, 2 two G1s carrying together,
+   3 an arm bench, 4 a patrol. */
+var TILE = null;
+function tile() {
+  if (TILE || !teamB) return TILE;
+  var x0 = Math.min(-RW / 2, teamB[0] - 0.6), x1 = Math.max(RW / 2, teamB[1] + 0.6), y0 = Math.min(-RD / 2, teamB[2] - 0.6), y1 = Math.max(RD / 2, teamB[3] + 0.6), f = [];
+  var seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (var x = x0; x < x1; x += 0.13) for (var y = y0; y < y1; y += 0.13) {
+    var px = x + (rnd() - 0.5) * 0.1, py = y + (rnd() - 0.5) * 0.1;
+    if (Math.abs(px) < RW / 2 - 0.05 && Math.abs(py) < RD / 2 - 0.05) continue;   // the scan already has this floor
+    f.push(px, py);
+  }
+  TILE = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, sx: x1 - x0 + 1.2, sy: y1 - y0 + 1.2, fill: new Float32Array(f) };
+  KEYS[6].dist *= Math.max(TILE.sx, TILE.sy) / (Math.max(RW, RD) + 1.6);   // pull back far enough for the bigger stations
+  return TILE;
+}
+function drawFill(ctx, v, ox, oy, a, step) {
+  var f = TILE.fill; ctx.fillStyle = rgba(C.ink, a);
+  for (var j = 0; j < f.length; j += 2 * step) {
+    if (!proj(v, f[j] + ox, f[j + 1] + oy, 0)) continue;
+    var s = clamp(0.03 * v.f / P[2], 0.8, 3.2); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
+  }
+}
+var botMid = {};
+function mid(R, key) {   // where a recorded robot run sits on its own floor, so it can be centered in a station
+  if (!botMid[key]) { var sx = 0, sy = 0, n = 0; eachBotPoint(R, 0, function (x, y) { sx += x; sy += y; n++; }); botMid[key] = [sx / n, sy / n]; }
+  return botMid[key];
+}
+function cell(ctx, v, kind, ox, oy, sec, a) {   // cells 1 to 4, centered on (ox, oy), life size
+  var B = BOTS, f = function (R, off) { return Math.floor(sec * R.fps + (off || 0)) % R.n; };
+  if (kind === 1) {   // the landing scene: two H1s facing each other, two arms, a Go2 trotting across
+    var u = (Math.sin(sec / 3) + 1) / 2;
+    drawBot(ctx, v, B.h1, f(B.h1), ox - 1.2, oy - 0.3, 0, 0, a, true, 1);
+    drawBot(ctx, v, B.h1, f(B.h1, 20), ox + 1.2, oy + 0.3, 0, Math.PI, a, true, 1);
+    drawBot(ctx, v, B.arm, f(B.arm), ox - 0.6, oy + 1.3, 0, -Math.PI / 2, a, true, 1);
+    drawBot(ctx, v, B.arm, f(B.arm, 45), ox + 0.6, oy + 1.3, 0, -Math.PI / 2, a, true, 1);
+    drawBot(ctx, v, B.quad, f(B.quad), ox + (u - 0.5) * 3, oy - 1.5, 0, Math.cos(sec / 3) < 0 ? Math.PI : 0, a, true, 1);
+  } else if (kind === 2) {   // two G1s carrying one load
+    var m = mid(B.coop, 'coop'); drawBot(ctx, v, B.coop, f(B.coop), ox - m[0], oy - m[1], 0, 0, a, true, 1);
+  } else if (kind === 3) {   // an arm bench: three arms down one table, out of step
+    for (var j = -1; j <= 1; j++) drawBot(ctx, v, B.arm, f(B.arm, (j + 1) * 30), ox + j * 1.1, oy, 0, -Math.PI / 2, a, true, 1);
+  } else {   // a patrol: two Go2s crossing while an H1 works the middle
+    var w = (Math.sin(sec / 2.5) + 1) / 2, back = Math.cos(sec / 2.5) < 0;
+    drawBot(ctx, v, B.quad, f(B.quad), ox + (w - 0.5) * 3.5, oy - 0.9, 0, back ? Math.PI : 0, a, true, 1);
+    drawBot(ctx, v, B.quad, f(B.quad, 7), ox - (w - 0.5) * 3.5, oy + 0.9, 0, back ? 0 : Math.PI, a, true, 1);
+    drawBot(ctx, v, B.h1, f(B.h1, 10), ox, oy, 0, Math.PI / 2, a, true, 1);
+  }
+}
 function drawStory(now) {
   var dpr = fit(simCv), W = simCv.width, H = simCv.height, ctx = simCv.getContext('2d'), so = SMALL ? CFG.storySmall : CFG.story;
   tShown += (storyT() - tShown) * (REDUCED ? 1 : 0.14); var t = tShown;
@@ -332,14 +382,18 @@ function drawStory(now) {
   if (teamB) { x0 = Math.min(x0, teamB[0] - 1); x1 = Math.max(x1, teamB[1] + 1); y0 = Math.min(y0, teamB[2] - 1); y1 = Math.max(y1, teamB[3] + 1); }
   copies.forEach(function (c) { grid(ctx, v, x0, x1, y0, y1, c * ox, c * oy); }); ctx.stroke();
 
-  if (fac > 0) {   // facility: copies of the room around it (the zoom-out)
-    var sx = RW + 1.6, sy = RD + 1.6;
+  if (fac > 0 && tile()) {   // facility: 24 more stations around this one (the zoom-out), each running one of the five cells
+    var sx = TILE.sx, sy = TILE.sy, csec = now / 1000;
     for (var gxi = -2; gxi <= 2; gxi++) for (var gyi = -2; gyi <= 2; gyi++) {
       if (!gxi && !gyi) continue;
       var ring = Math.max(Math.abs(gxi), Math.abs(gyi)), on = clamp(fac * 2.2 - (Math.abs(gxi) + Math.abs(gyi)) * 0.35, 0, 1); if (on <= 0) continue;
       ctx.strokeStyle = rgba(C.ink, 0.16 * on); ctx.beginPath();
       boxes.forEach(function (b) { if (b.wall) boxEdges(ctx, v, b, gxi * sx, gyi * sy); }); ctx.stroke();
       drawPoints(ctx, v, function () { return lvl(0.32 * on); }, 0.03, gxi * sx, gyi * sy, ring === 1 ? 4 : 9);
+      drawFill(ctx, v, gxi * sx, gyi * sy, 0.32 * on, ring === 1 ? 2 : 4);
+      var kind = (gxi + 2 + 2 * (gyi + 2) + 4) % 5;   // a 5x5 Latin layout shifted by two per row: no cell meets its twin, even diagonally
+      if (kind === 0) { if (T) drawTeam(ctx, v, T, csec % (T.F / 15), 0.85 * on, gxi * sx, gyi * sy); }
+      else if (BOTS) cell(ctx, v, kind, TILE.cx + gxi * sx, TILE.cy + gyi * sy, csec, 0.85 * on);
     }
   }
   if (rise < 1) for (i = GROUND; i < N; i++) ZR[i] = Z[i] * rise;
@@ -350,6 +404,8 @@ function drawStory(now) {
       if (sw < 1 && X[i] > sx - 0.14) return i < GROUND ? 16 + lvl(0.95 * dots) : 0;   // the strip being read, in accent
       return lvl(dots * (i < GROUND ? 1 : env) * (0.38 + 0.065 * SH[i]));
     }, 0.03, c * ox, c * oy, SMALL ? 2 : 1, X, Y, rise < 1 ? ZR : Z);
+    var fillA = 0.42 * dots * Math.max(split, robots);   // from step 03 on, the floor reaches where the robot team works
+    if (fillA > 0.01 && tile()) drawFill(ctx, v, c * ox, c * oy, fillA, SMALL ? 2 : 1);
   });
 
   var path = smooth(0.9, 1.05, t) * (1 - smooth(1.7, 2.3, t)) * (1 - smooth(0.85, 1, sw));   // the phone and the strip it reads, gone once the pass ends
@@ -442,20 +498,23 @@ drawStory(performance.now());
 /* The story plays on its own, like a slow scroll, while it is pinned; scrolling down only speeds it up. Scrolling back up,
    touching the screen or pressing a key pauses it for a moment. Once the story's end has passed, the stage fades so it never
    sits over the next section. */
-var stage = story.querySelector('.stage'), AUTO_MS = 30000, autoPause = 0, autoAcc = 0, lastNow = 0;
+var stage = story.querySelector('.stage'), AUTO_MS = 30000, autoPause = 0, autoAcc = 0, lastNow = 0, autoY = null;
 function pause(ms) { autoPause = Math.max(autoPause, performance.now() + ms); }
 addEventListener('wheel', function (e) { if (e.deltaY < 0) pause(1500); }, { passive: true });
 addEventListener('touchstart', function () { autoPause = Infinity; }, { passive: true });
 addEventListener('touchend', function () { autoPause = 0; pause(1200); }, { passive: true });
 addEventListener('keydown', function () { pause(1500); });
+addEventListener('click', function () { pause(1500); });   // a nav link or rail button starts its own smooth scroll: let it land
 (function storyLoop(now) {
   var dt = Math.min(now - (lastNow || now), 100); lastNow = now;
   if (storyOn) {
+    if (autoY !== null && Math.abs(scrollY - autoY) > 1) pause(600);   // the page moved without us (scrollbar, a link): wait until it settles
     var r = story.getBoundingClientRect(), span = story.offsetHeight - innerHeight;
     if (!REDUCED && r.top <= 0 && r.bottom > innerHeight + 1 && now > autoPause && !document.querySelector('dialog[open]')) {
       autoAcc += span / AUTO_MS * dt; var n = Math.floor(autoAcc);
       if (n >= 1) { autoAcc -= n; scrollTo({ top: scrollY + n, behavior: 'instant' }); }
     } else autoAcc = 0;
+    autoY = scrollY;
     stage.style.opacity = r.bottom < innerHeight ? clamp((r.bottom - 0.6 * innerHeight) / (0.4 * innerHeight), 0, 1).toFixed(3) : '';
     drawStory(now);
   }
