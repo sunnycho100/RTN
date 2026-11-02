@@ -236,7 +236,7 @@ KEYS.forEach(function (k, j) { if (j !== 4) k.dist *= Math.max(RW, RD) / 4.83; }
 var teamPanel = document.getElementById('team-panel');
 var panes = Array.prototype.slice.call(document.querySelectorAll('#team-panel .dots-panes > div')), scanT0 = 0;
 function show(el, o) { if (el) { el.style.opacity = o.toFixed(3); el.style.visibility = o > 0.01 ? 'visible' : 'hidden'; } }
-function storyT() { var span = story.offsetHeight - innerHeight; return clamp(-story.getBoundingClientRect().top / span, 0, 1) * 6; }
+function storyT() { var span = story.offsetHeight - innerHeight; return clamp(-story.getBoundingClientRect().top / span * 1.1, 0, 1) * 6; }   // the last tenth of the scroll holds the final screen
 railBtns.forEach(function (b) { b.addEventListener('click', function () {
   var span = story.offsetHeight - innerHeight; scrollTo({ top: story.offsetTop + span * (+b.dataset.stage + 0.5) / 6, behavior: REDUCED ? 'auto' : 'smooth' }); }); });
 
@@ -304,15 +304,6 @@ function teamBox(T) {   // where the robots work over the whole run: frames the 
   });
   return b;
 }
-function sideCam(Sd, sec, w, h) {   // a side's own camera from dots_data, with the slow drift the old dots player had
-  var fi = clamp(sec * 15, 0, Sd.F - 1), k = Math.floor(fi), u = fi - k, k2 = Math.min(k + 1, Sd.F - 1), a = Sd.frames;
-  var o0 = k * Sd.stride + Sd.parts.length * 7, o1 = k2 * Sd.stride + Sd.parts.length * 7, m = function (j) { return (a[o0 + j] * (1 - u) + a[o1 + j] * u) / 1000; };
-  var dx = m(0) - m(3), dy = m(1) - m(4), dz = m(2) - m(5), d = Math.hypot(dx, dy, dz);
-  var v = view(w, h, { tx: m(3) - OX, ty: m(4) - OY, tz: m(5), yaw: Math.atan2(dy, dx) + (REDUCED ? 0 : 0.035 * Math.sin(sec * TAU / 23)), pitch: Math.asin(dz / d),
-    dist: d, fov: Sd.fov, ox: 0.5, oy: 0.5 });
-  v.f = 0.5 * w / Math.tan(Sd.fov / 2);   // dots_data gives a horizontal field of view
-  return v;
-}
 function drawStory(now) {
   var dpr = fit(simCv), W = simCv.width, H = simCv.height, ctx = simCv.getContext('2d'), so = SMALL ? CFG.storySmall : CFG.story;
   tShown += (storyT() - tShown) * (REDUCED ? 1 : 0.14); var t = tShown;
@@ -377,16 +368,17 @@ function drawStory(now) {
   } else teamT0 = 0;
   ctx.globalAlpha = 1;
 
-  var Td = T && window.DOTS.sides.today, fl = T && window.DOTS.manifest.floor;
-  if (team > 0 && Td) {   // step 03: today and with a robot team side by side in the canvas, each with its own camera, on the dots.js clock
+  var Td = T && window.DOTS.sides.today, K4 = KEYS[4];
+  if (team > 0 && Td) {   // step 03: today and with a robot team side by side, both inside the rebuilt field (same floor, grid and camera as step 04), on the dots.js clock
     var cr = simCv.getBoundingClientRect(), sec = window.DOTS.clock || 0;
     ctx.globalAlpha = team; ctx.lineWidth = dpr;
     panes.forEach(function (el, j) {
       var r = el.getBoundingClientRect(), px = (r.left - cr.left) * dpr, py = (r.top - cr.top) * dpr, pw = r.width * dpr, ph = r.height * dpr;
-      var Sd = j ? T : Td, pv = sideCam(Sd, sec, pw, ph); pv.cx += px; pv.cy += py;
+      var Sd = j ? T : Td, pv = view(pw, ph, { tx: fc[0], ty: fc[1], tz: 0.6, yaw: K4.yaw + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03), pitch: K4.pitch + 0.12,
+        dist: K4.dist * 0.95, fov: CFG.story.fov, ox: 0.5, oy: 0.55 }); pv.cx += px; pv.cy += py;
       ctx.save(); ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip();
-      ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath(); grid(ctx, pv, fl.x[0] - OX, fl.x[1] - OX, fl.y[0] - OY, fl.y[1] - OY); ctx.stroke();
-      drawPoints(ctx, pv, function (i) { return i < GROUND ? lvl(0.22 + 0.04 * SH[i]) : 0; }, 0.03, 0, 0, SMALL ? 2 : 1);   // the same rebuilt ground as steps 02 and 04, dimmer up close
+      ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath(); grid(ctx, pv, x0, x1, y0, y1); ctx.stroke();
+      drawPoints(ctx, pv, function (i) { return i < GROUND ? lvl(0.38 + 0.065 * SH[i]) : 0; }, 0.03, 0, 0, SMALL ? 2 : 1);   // the same rebuilt ground as steps 02 and 04
       drawTeam(ctx, pv, Sd, sec, 0.95);
       ctx.restore();
     });
@@ -445,6 +437,27 @@ if (runCv && towIn && BOTS && BOTS.quad && !REDUCED) {
 }
 onScreen(story, function (on) { storyOn = on; });
 drawStory(performance.now());
-(function storyLoop(now) { if (storyOn) drawStory(now); requestAnimationFrame(storyLoop); })(performance.now());
+/* The story plays on its own, like a slow scroll, while it is pinned; scrolling down only speeds it up. Scrolling back up,
+   touching the screen or pressing a key pauses it for a moment. Once the story's end has passed, the stage fades so it never
+   sits over the next section. */
+var stage = story.querySelector('.stage'), AUTO_MS = 30000, autoPause = 0, autoAcc = 0, lastNow = 0;
+function pause(ms) { autoPause = Math.max(autoPause, performance.now() + ms); }
+addEventListener('wheel', function (e) { if (e.deltaY < 0) pause(1500); }, { passive: true });
+addEventListener('touchstart', function () { autoPause = Infinity; }, { passive: true });
+addEventListener('touchend', function () { autoPause = 0; pause(1200); }, { passive: true });
+addEventListener('keydown', function () { pause(1500); });
+(function storyLoop(now) {
+  var dt = Math.min(now - (lastNow || now), 100); lastNow = now;
+  if (storyOn) {
+    var r = story.getBoundingClientRect(), span = story.offsetHeight - innerHeight;
+    if (!REDUCED && r.top <= 0 && r.bottom > innerHeight + 1 && now > autoPause) {
+      autoAcc += span / AUTO_MS * dt; var n = Math.floor(autoAcc);
+      if (n >= 1) { autoAcc -= n; scrollTo({ top: scrollY + n, behavior: 'instant' }); }
+    } else autoAcc = 0;
+    stage.style.opacity = r.bottom < innerHeight ? clamp((r.bottom - 0.6 * innerHeight) / (0.4 * innerHeight), 0, 1).toFixed(3) : '';
+    drawStory(now);
+  }
+  requestAnimationFrame(storyLoop);
+})(performance.now());
 addEventListener('resize', function () { drawHero(performance.now()); drawStory(performance.now()); });
 })();

@@ -150,7 +150,8 @@ section.block { padding-block: clamp(72px, 12vh, 140px) 0; }
 .ba:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
 details.film > summary { list-style: none; cursor: pointer; margin-bottom: 4px; }
 details.film > summary::-webkit-details-marker { display: none; }
-details.film > summary .len { color: var(--dim); font: 500 12px/1 var(--mono); margin-left: 4px; }
+details.film > summary.btn { padding: 16px 26px; font-size: 18px; gap: 12px; }
+details.film > summary .len { color: var(--dim); font: 500 14px/1 var(--mono); margin-left: 4px; }
 details.film[open] > summary { margin-bottom: 16px; }
 .clip video, .clip .empty { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #050606; }
 .clip .empty { display: grid; place-items: center; color: var(--dim); font: 500 12px/1.5 var(--mono); text-align: center; padding: 16px; }
@@ -430,12 +431,21 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <figure class="clip wide" style="margin-top: 24px"><div class="ba"><img src="media/ws30_sim.jpg" loading="lazy" width="1280" height="628" alt="Our Isaac Sim rebuild of the WS30 station, seen from the calibrated camera."><img class="top" src="media/ws30_cam.jpg" loading="lazy" width="1280" height="628" alt="A real CarDA camera frame of the WS30 station."><span class="l">Camera</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the camera frame with the 3D reconstruction"></div></figure>
     <figure class="clip wide" style="margin-top: 24px"><div class="ba"><img src="media/photo_sim.jpg" loading="lazy" width="1200" height="600" alt="The same warehouse view rebuilt in Isaac Sim from that one photo."><img class="top" src="media/photo_src.jpg" loading="lazy" width="1200" height="600" alt="A warehouse photo with a forklift."><span class="l">One photo</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the photo with the 3D reconstruction"></div></figure>
     <script>
+    var baStill = matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelectorAll('.ba').forEach(function (ba) {   // drag anywhere on the image, or use the arrow keys on the hidden range
-      var r = ba.querySelector('input'), drag = false;
+      var r = ba.querySelector('input'), drag = false, touched = false;
       function set(v) { r.value = v; ba.style.setProperty('--p', v + '%'); ba.style.setProperty('--pn', v); }   // --pn fades each corner label as the handle covers it
       function at(e) { var b = ba.getBoundingClientRect(); set(Math.max(0, Math.min(100, (e.clientX - b.left) / b.width * 100)).toFixed(1)); }
-      r.addEventListener('input', function () { set(r.value); });
-      ba.addEventListener('pointerdown', function (e) { drag = true; ba.setPointerCapture(e.pointerId); at(e); });
+      r.addEventListener('input', function () { touched = true; set(r.value); });
+      ba.addEventListener('pointerdown', function (e) { touched = drag = true; ba.setPointerCapture(e.pointerId); at(e); });
+      if (!baStill) {   // the real image shows first; once the frame is fully in view the divider sweeps left to the rebuild, unless someone already grabbed it
+        set(96);
+        new IntersectionObserver(function (es, io) {
+          if (!es[0].isIntersecting) return; io.disconnect();
+          var t0 = performance.now() + 250;
+          (function step(now) { if (touched) return; var u = Math.max(0, Math.min(1, (now - t0) / 1300)); set((96 - 90 * (1 - Math.pow(1 - u, 3))).toFixed(1)); if (u < 1) requestAnimationFrame(step); })(t0);
+        }, { threshold: 0.9 }).observe(ba);
+      }
       ba.addEventListener('pointermove', function (e) { if (drag) at(e); });
       ['pointerup', 'pointercancel'].forEach(function (n) { ba.addEventListener(n, function () { drag = false; }); });
     });
@@ -530,7 +540,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 <script src="options.js?v=7"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=29"></script>
+<script src="engine.js?v=31"></script>
 <script src="dots_data.js?v=4"></script>
 <script src="dots.js?v=3"></script>
 </body>
