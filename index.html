@@ -151,6 +151,7 @@ details.film > summary.btn { padding: 22px 36px; font-size: 22px; gap: 14px; bor
 details.film > summary.btn:hover { background: var(--ink); color: var(--bg); }
 details.film > summary .len { color: var(--dim); font: 500 16px/1 var(--mono); margin-left: 4px; }
 details.film[open] > summary { margin-bottom: 16px; }
+.pairs + details.film { margin-top: 28px; }
 .clip video, .clip .empty { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #050606; }
 .clip .empty { display: grid; place-items: center; color: var(--dim); font: 500 12px/1.5 var(--mono); text-align: center; padding: 16px; }
 .clip figcaption { display: flex; gap: 10px; align-items: baseline; padding: 10px 12px; font-size: 13px; color: var(--dim); }
@@ -460,14 +461,14 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
   <button class="close" type="button" aria-label="Close">&times;</button>
   <section class="block wrap" id="film">
     <h2 class="sec">From a scan to a working robot.</h2>
-    <details class="film">
-      <summary class="btn ghost"><span aria-hidden="true">▶</span>Watch the process<span class="len">29 s</span></summary>
-      <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video></figure>
-    </details>
     <div class="pairs">
     <figure class="clip"><div class="ba"><img src="media/ws30_sim.jpg" loading="lazy" width="1280" height="628" alt="Our Isaac Sim rebuild of the WS30 station, seen from the calibrated camera."><img class="top" src="media/ws30_cam.jpg" loading="lazy" width="1280" height="628" alt="A real CarDA camera frame of the WS30 station."><span class="l">Camera</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the camera frame with the 3D reconstruction"></div></figure>
     <figure class="clip"><div class="ba"><img src="media/photo_sim.jpg" loading="lazy" width="1200" height="600" alt="The same warehouse view rebuilt in Isaac Sim from that one photo."><img class="top" src="media/photo_src.jpg" loading="lazy" width="1200" height="600" alt="A warehouse photo with a forklift."><span class="l">One photo</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the photo with the 3D reconstruction"></div></figure>
     </div>
+    <details class="film">
+      <summary class="btn ghost"><span aria-hidden="true">▶</span>Watch the process<span class="len">29 s</span></summary>
+      <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video></figure>
+    </details>
     <script>
     var baStill = matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelectorAll('.ba').forEach(function (ba) {   // drag anywhere on the image, or use the arrow keys on the hidden range
