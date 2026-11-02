@@ -45,7 +45,7 @@
   const rank = new Array(N); order.forEach((d, i) => rank[d] = i);   // design d survives stage k if rank < STAGES[k]
   const cv = $("abc-dots"), ctx = cv.getContext("2d");
   const alpha = new Float32Array(N).fill(1);
-  let stage = 0, cols = 61, cell = 10, raf = 0;
+  let stage = 0, cols = 61, cell = 10, raf = 0, boxT = 0;   // boxT: 0 to 1 as the A, B, C boxes grow in at the last stage
   const layout = () => {
     const w = cv.clientWidth || cv.parentElement.clientWidth;
     cols = w < 560 ? 35 : 61;
@@ -68,17 +68,19 @@
         ctx.globalAlpha = 1;
       }
     }
-    if (last) {   // name the three survivors
+    if (last && boxT > 0) {   // name the three survivors: each box grows from its square to three cells and fades in
+      const e = 1 - Math.pow(1 - boxT, 3), half = cell * (0.5 + e);
       ctx.font = `500 ${Math.max(11, cell * 1.1)}px ${css.getPropertyValue("--mono")}`;
-      ctx.textBaseline = "middle";
+      ctx.textBaseline = "middle"; ctx.globalAlpha = e;
       for (let d = 0; d < N; d++) if (rank[d] < 3) {
         const cx = (d % cols) * cell, cy = Math.floor(d / cols) * cell;
         ctx.strokeStyle = C_ACC; ctx.lineWidth = 1.5;
-        ctx.strokeRect(cx - cell, cy - cell, cell * 3, cell * 3);
+        ctx.strokeRect(cx + cell / 2 - half, cy + cell / 2 - half, half * 2, half * 2);
         const right = (d % cols) < cols - 4, label = "ABC"[rank[d]];
         ctx.fillStyle = C_ACC; ctx.textAlign = right ? "left" : "right";
         ctx.fillText(label, right ? cx + cell * 2.6 : cx - cell * 1.6, cy + cell / 2);
       }
+      ctx.globalAlpha = 1;
     }
   };
   const tick = () => {
@@ -89,6 +91,8 @@
       alpha[d] = Math.abs(target - a) < 0.01 ? target : a;
       moving ||= alpha[d] !== target;
     }
+    boxT = stage === STAGES.length - 1 ? Math.min(1, boxT + 1 / 30) : 0;
+    moving ||= stage === STAGES.length - 1 && boxT < 1;
     draw();
     raf = moving ? requestAnimationFrame(tick) : 0;
   };
@@ -97,9 +101,21 @@
   $("abc-steps").classList.add("play");
   ask.classList.add("abc-wait");
   const setStage = k => {
+    const next = k === stage + 1 && !reduce, was = steps[stage], wb = was.querySelector("b");
+    const before = next && steps.map(li => li.getBoundingClientRect()), wr = next && wb.getBoundingClientRect(), wc = next && getComputedStyle(wb).color;
     stage = k;
     steps.forEach((li, i) => li.className = i < k ? "past" : i === k ? "now" : "");
-    if (reduce) { for (let d = 0; d < N; d++) alpha[d] = rank[d] < STAGES[k] ? 1 : 0; draw(); }
+    if (next) {   // the step that just finished shrinks into its slot in the trail, and the trail above slides up instead of jumping
+      const ease = "cubic-bezier(0.2, 0.7, 0.2, 1)", nr = wb.getBoundingClientRect();
+      wb.animate([{ transform: `translate(${wr.left - nr.left}px, ${wr.top - nr.top}px) scale(${wr.height / nr.height})`, transformOrigin: "0 0", color: wc },
+                  { transform: "none", transformOrigin: "0 0", color: getComputedStyle(wb).color }], { duration: 500, easing: ease });
+      was.querySelector("span").animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 200, fill: "backwards" });
+      steps.forEach((li, i) => { if (i < k - 1 && before[i].height) {
+        const dy = before[i].top - li.getBoundingClientRect().top;
+        if (dy) li.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 500, easing: ease });
+      } });
+    }
+    if (reduce) { boxT = 1; for (let d = 0; d < N; d++) alpha[d] = rank[d] < STAGES[k] ? 1 : 0; draw(); }
     else if (!raf) raf = requestAnimationFrame(tick);
   };
   let auto = 0, revealed = false;
