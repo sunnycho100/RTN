@@ -138,6 +138,8 @@ section.block { padding-block: clamp(72px, 12vh, 140px) 0; }
 
 .clip { margin: 0; background: var(--panel); border: 1px solid var(--line); }
 /* drag to compare: the camera frame is clipped over the rebuild at --p */
+.pairs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 24px; max-width: 1040px; }
+@media (max-width: 760px) { .pairs { grid-template-columns: 1fr; } }
 .ba { position: relative; --p: 50%; cursor: ew-resize; touch-action: pan-y; user-select: none; }
 .ba img { display: block; width: 100%; height: auto; pointer-events: none; }
 .ba img.top { position: absolute; inset: 0; height: 100%; object-fit: cover; clip-path: inset(0 calc(100% - var(--p)) 0 0); }
@@ -165,6 +167,7 @@ details.film[open] > summary { margin-bottom: 16px; }
 .tiles p { margin: 0; color: var(--dim); font-size: 16px; }
 .clip.wide video { aspect-ratio: 16 / 9; }
 #industry .next { margin-top: 56px; }
+#industry .next .cap-h { margin: 0 0 14px; }
 .close3 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
 @media (max-width: 720px) { .close3 { grid-template-columns: 1fr; } }
 .shots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
@@ -181,6 +184,15 @@ details.film[open] > summary { margin-bottom: 16px; }
 .cta .addr { user-select: all; }
 footer { padding-block: 28px max(28px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 12px 32px; justify-content: space-between; }
 
+
+/* gallery: full screen, scrolls inside */
+dialog.gallery { width: 100%; max-width: 100%; height: 100%; max-height: 100%; margin: 0; padding: 0 0 72px; border: 0; background: var(--bg); color: var(--ink); overflow-y: auto; }
+dialog.gallery::backdrop { background: var(--bg); }
+dialog.gallery[open] { animation: q-fade 240ms ease-out; }
+dialog.gallery .close { position: fixed; z-index: 2; top: max(12px, env(safe-area-inset-top, 0px)); right: max(var(--gutter), env(safe-area-inset-right, 0px)); width: 44px; height: 44px;
+  background: var(--panel); border: 1px solid var(--line); color: var(--ink); font-size: 26px; line-height: 1; cursor: pointer; }
+html:has(dialog[open]) { overflow: hidden; }
+.btn.big { padding: 16px 26px; font-size: 18px; gap: 12px; }
 
 /* request-a-quote modal */
 dialog.quote { width: min(560px, calc(100% - 32px)); max-height: calc(100% - 48px); overflow: auto; padding: 28px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
@@ -335,7 +347,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
   <nav>
     <a href="#options">Example</a>
     <a href="#story">How it works</a>
-    <a href="#industry">Whole floor</a>
+    <a href="#gallery-cta" data-gallery>Simulations</a>
     <a href="#spec">What you get</a>
     <a class="btn" href="#contact" data-quote>Request a quote</a>
   </nav>
@@ -422,14 +434,45 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 
 </section>
 
+  <section class="block wrap" id="gallery-cta">
+    <h2 class="sec">From a scan to a working robot.</h2>
+    <button class="btn ghost big" type="button" data-gallery><span aria-hidden="true">▶</span>See the simulations</button>
+  </section>
+
+  <section class="block wrap" id="spec">
+    <h2 class="sec">What you get.</h2>
+    <div class="spec">
+      <div><b>DELIVERABLES</b><ul><li>Site digital twin<span>Your floor in 3D, built from one walkthrough video</span></li><li>Scenario simulation<span>Each option tested against your cycle-time target</span></li><li>Business case<span>Install cost, payback and a recommended option, with a film</span></li></ul></div>
+      <div><b>ROBOTS WE OPERATE WITH</b><ul class="bots"><li><img src="media/robots/g1.png" alt="" width="256" height="256" loading="lazy">Unitree G1</li><li><img src="media/robots/h1.png" alt="" width="256" height="256" loading="lazy">Unitree H1</li><li><img src="media/robots/go2.png" alt="" width="256" height="256" loading="lazy">Unitree Go2</li><li><img src="media/robots/spot.png" alt="" width="256" height="256" loading="lazy">Boston Dynamics Spot</li><li><img src="media/robots/anymal.png" alt="" width="256" height="256" loading="lazy">ANYbotics ANYmal C</li><li><img src="media/robots/panda.png" alt="" width="256" height="256" loading="lazy">Franka Panda</li><li><img src="media/robots/ur10e.png" alt="" width="256" height="256" loading="lazy">Universal Robots UR10e</li><li><img src="media/robots/m0617.png" alt="" width="256" height="256" loading="lazy">Doosan M0617</li></ul></div>
+    </div>
+  </section>
+
+  <section class="cta wrap" id="contact">
+    <h2>Start with one video.</h2>
+    <div>
+      <button class="btn" type="button" data-quote>Request a quote</button>
+      <p class="mono">We only use your email to reply.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap mono">
+  <span>© 2026 RTOS</span>
+</footer>
+
+
+<dialog class="gallery" id="gallery" aria-label="Simulations">
+  <button class="close" type="button" aria-label="Close">&times;</button>
   <section class="block wrap" id="film">
     <h2 class="sec">From a scan to a working robot.</h2>
     <details class="film">
       <summary class="btn ghost"><span aria-hidden="true">▶</span>Watch the process<span class="len">29 s</span></summary>
       <figure class="clip wide"><video data-src="media/process_film.mp4" poster="media/posters/process_film.jpg" muted loop playsinline preload="none"></video></figure>
     </details>
-    <figure class="clip wide" style="margin-top: 24px"><div class="ba"><img src="media/ws30_sim.jpg" loading="lazy" width="1280" height="628" alt="Our Isaac Sim rebuild of the WS30 station, seen from the calibrated camera."><img class="top" src="media/ws30_cam.jpg" loading="lazy" width="1280" height="628" alt="A real CarDA camera frame of the WS30 station."><span class="l">Camera</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the camera frame with the 3D reconstruction"></div></figure>
-    <figure class="clip wide" style="margin-top: 24px"><div class="ba"><img src="media/photo_sim.jpg" loading="lazy" width="1200" height="600" alt="The same warehouse view rebuilt in Isaac Sim from that one photo."><img class="top" src="media/photo_src.jpg" loading="lazy" width="1200" height="600" alt="A warehouse photo with a forklift."><span class="l">One photo</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the photo with the 3D reconstruction"></div></figure>
+    <div class="pairs">
+    <figure class="clip"><div class="ba"><img src="media/ws30_sim.jpg" loading="lazy" width="1280" height="628" alt="Our Isaac Sim rebuild of the WS30 station, seen from the calibrated camera."><img class="top" src="media/ws30_cam.jpg" loading="lazy" width="1280" height="628" alt="A real CarDA camera frame of the WS30 station."><span class="l">Camera</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the camera frame with the 3D reconstruction"></div></figure>
+    <figure class="clip"><div class="ba"><img src="media/photo_sim.jpg" loading="lazy" width="1200" height="600" alt="The same warehouse view rebuilt in Isaac Sim from that one photo."><img class="top" src="media/photo_src.jpg" loading="lazy" width="1200" height="600" alt="A warehouse photo with a forklift."><span class="l">One photo</span><span class="r">3D reconstruction</span><i></i><input type="range" min="0" max="100" value="50" step="1" aria-label="Compare the photo with the 3D reconstruction"></div></figure>
+    </div>
     <script>
     var baStill = matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelectorAll('.ba').forEach(function (ba) {   // drag anywhere on the image, or use the arrow keys on the hidden range
@@ -459,33 +502,21 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
     <h3 class="cap-h">20 robots in one metal shop</h3><div class="close3"><div><figure class="clip"><video data-src="media/close_3g1_tframe_hq.mp4" poster="media/posters/close_3g1_tframe_hq.jpg" muted loop playsinline preload="none"></video><figcaption>Welded T-frame</figcaption></figure></div><div><figure class="clip"><video data-src="media/close_2g1_sheets_hq.mp4" poster="media/posters/close_2g1_sheets_hq.jpg" muted loop playsinline preload="none"></video><figcaption>Steel sheet bundle</figcaption></figure></div></div>
     <div class="shots"><figure class="clip"><img src="media/shots/panel.jpg" alt="Two UR10e arms carry one panel at a packing bench" width="960" height="480" loading="lazy"><figcaption>Packing</figcaption></figure><figure class="clip"><img src="media/shots/spot.jpg" alt="Spot walks its inspection route down the main aisle" width="960" height="480" loading="lazy"><figcaption>Inspection</figcaption></figure><figure class="clip"><img src="media/shots/qc.jpg" alt="A Franka Panda at the quality-control table" width="960" height="480" loading="lazy"><figcaption>QC</figcaption></figure><figure class="clip"><img src="media/shots/cnc.jpg" alt="A UR5e loads and unloads the CNC machine" width="960" height="480" loading="lazy"><figcaption>CNC</figcaption></figure></div>
     <div class="next">
-      <figure class="clip wide"><video data-src="media/door_team_hq.mp4" poster="media/posters/door_team_hq.jpg" muted loop playsinline preload="none" aria-label="Two rail arms and two humanoid robots fit the glass and drive the screws on a car door at the rebuilt station"></video></figure>
-      <h3 class="cap-h">Car-door station</h3>
+      <h3 class="cap-h">Automating a task done by one person.</h3>
+      <details class="film">
+        <summary class="btn ghost"><span aria-hidden="true">▶</span>Watch a basic simulation<span class="len">53 s</span></summary>
+        <figure class="clip wide"><video data-src="media/door_team_hq.mp4" poster="media/posters/door_team_hq.jpg" muted loop playsinline preload="none" aria-label="Two rail arms and two humanoid robots fit the glass and drive the screws on a car door at the rebuilt station"></video></figure>
+      </details>
     </div>
   </section>
-
-  <section class="block wrap" id="spec">
-    <h2 class="sec">What you get.</h2>
-    <div class="spec">
-      <div><b>DELIVERABLES</b><ul><li>Site digital twin<span>Your floor in 3D, built from one walkthrough video</span></li><li>Scenario simulation<span>Each option tested against your cycle-time target</span></li><li>Business case<span>Install cost, payback and a recommended option, with a film</span></li></ul></div>
-      <div><b>ROBOTS WE OPERATE WITH</b><ul class="bots"><li><img src="media/robots/g1.png" alt="" width="256" height="256" loading="lazy">Unitree G1</li><li><img src="media/robots/h1.png" alt="" width="256" height="256" loading="lazy">Unitree H1</li><li><img src="media/robots/go2.png" alt="" width="256" height="256" loading="lazy">Unitree Go2</li><li><img src="media/robots/spot.png" alt="" width="256" height="256" loading="lazy">Boston Dynamics Spot</li><li><img src="media/robots/anymal.png" alt="" width="256" height="256" loading="lazy">ANYbotics ANYmal C</li><li><img src="media/robots/panda.png" alt="" width="256" height="256" loading="lazy">Franka Panda</li><li><img src="media/robots/ur10e.png" alt="" width="256" height="256" loading="lazy">Universal Robots UR10e</li><li><img src="media/robots/m0617.png" alt="" width="256" height="256" loading="lazy">Doosan M0617</li></ul></div>
-    </div>
-  </section>
-
-  <section class="cta wrap" id="contact">
-    <h2>Start with one video.</h2>
-    <div>
-      <button class="btn" type="button" data-quote>Request a quote</button>
-      <p class="mono">We only use your email to reply.</p>
-    </div>
-  </section>
-</main>
-
-<footer class="wrap mono">
-  <span>© 2026 RTOS</span>
-</footer>
-
-
+</dialog>
+<script>
+(function () {   // the photos, renders and films live in one full-screen gallery so the page itself stays dots and diagrams
+  var g = document.getElementById('gallery');
+  document.querySelectorAll('[data-gallery]').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); g.showModal(); g.scrollTop = 0; }); });
+  g.querySelector('.close').addEventListener('click', function () { g.close(); });
+})();
+</script>
 <dialog class="quote" id="quote" aria-labelledby="quote-title">
   <button class="close" type="button" data-close aria-label="Close">&times;</button>
 
@@ -540,7 +571,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 <script src="options.js?v=7"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=31"></script>
+<script src="engine.js?v=32"></script>
 <script src="dots_data.js?v=4"></script>
 <script src="dots.js?v=3"></script>
 </body>

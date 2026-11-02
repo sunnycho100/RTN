@@ -450,7 +450,7 @@ addEventListener('keydown', function () { pause(1500); });
   var dt = Math.min(now - (lastNow || now), 100); lastNow = now;
   if (storyOn) {
     var r = story.getBoundingClientRect(), span = story.offsetHeight - innerHeight;
-    if (!REDUCED && r.top <= 0 && r.bottom > innerHeight + 1 && now > autoPause) {
+    if (!REDUCED && r.top <= 0 && r.bottom > innerHeight + 1 && now > autoPause && !document.querySelector('dialog[open]')) {
       autoAcc += span / AUTO_MS * dt; var n = Math.floor(autoAcc);
       if (n >= 1) { autoAcc -= n; scrollTo({ top: scrollY + n, behavior: 'instant' }); }
     } else autoAcc = 0;
