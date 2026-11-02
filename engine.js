@@ -308,7 +308,7 @@ function teamBox(T) {   // where the robots work over the whole run: frames the 
 /* The zoom-out: every station gets the scanned room plus the floor the robot team works on (the WS30 team reaches past the
    scanned edge), filled with jittered floor dots. The other 24 stations each run one of five cells, laid out so the same cell
    never touches itself, not even on a diagonal: 0 the real WS30 team, 1 the landing scene, 2 two G1s carrying together,
-   3 an arm bench, 4 a patrol. */
+   3 a packing line, 4 a patrol. */
 var TILE = null;
 function tile() {
   if (TILE || !teamB) return TILE;
@@ -346,8 +346,15 @@ function cell(ctx, v, kind, ox, oy, sec, a) {   // cells 1 to 4, centered on (ox
     drawBot(ctx, v, B.quad, f(B.quad), ox + (u - 0.5) * 3, oy - 1.5, 0, Math.cos(sec / 3) < 0 ? Math.PI : 0, a, true, 1);
   } else if (kind === 2) {   // two G1s carrying one load
     var m = mid(B.coop, 'coop'); drawBot(ctx, v, B.coop, f(B.coop), ox - m[0], oy - m[1], 0, 0, a, true, 1);
-  } else if (kind === 3) {   // an arm bench: three arms down one table, out of step
-    for (var j = -1; j <= 1; j++) drawBot(ctx, v, B.arm, f(B.arm, (j + 1) * 30), ox + j * 1.1, oy, 0, -Math.PI / 2, a, true, 1);
+  } else if (kind === 3) {   // a packing line: three arms on stands reach over a conveyor while boxes run past
+    var line = function (cx, cy, cz, hx, hy, hz) { boxEdges(ctx, v, { cx: cx, cy: cy, cz: cz, hx: hx, hy: hy, hz: hz, c: 1, s: 0 }, ox, oy); };
+    ctx.strokeStyle = rgba(C.ink, 0.5 * a); ctx.beginPath();
+    line(0, 0.25, 0.275, 1.9, 0.2, 0.275);   // the conveyor, 0.55 m tall
+    for (var j = -1; j <= 1; j++) line(j * 1.2, -0.25, 0.3, 0.15, 0.15, 0.3);   // 0.6 m stands
+    ctx.stroke(); ctx.strokeStyle = rgba(C.ink, 0.9 * a); ctx.beginPath();
+    for (j = 0; j < 4; j++) line((sec * 0.3 + j * 0.9) % 3.6 - 1.75, 0.25, 0.69, 0.14, 0.14, 0.14);   // boxes riding the belt
+    ctx.stroke();
+    for (j = -1; j <= 1; j++) drawBot(ctx, v, B.arm, f(B.arm, (j + 1) * 30), ox + j * 1.2, oy - 0.25, 0.6, Math.PI / 2, a, true, 1);
   } else {   // a patrol: two Go2s crossing while an H1 works the middle
     var w = (Math.sin(sec / 2.5) + 1) / 2, back = Math.cos(sec / 2.5) < 0;
     drawBot(ctx, v, B.quad, f(B.quad), ox + (w - 0.5) * 3.5, oy - 0.9, 0, back ? Math.PI : 0, a, true, 1);
