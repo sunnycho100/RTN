@@ -188,7 +188,8 @@ dialog.gallery[open] { animation: q-fade 240ms ease-out; }
 dialog.gallery .close { position: fixed; z-index: 2; top: max(12px, env(safe-area-inset-top, 0px)); right: max(var(--gutter), env(safe-area-inset-right, 0px)); width: 44px; height: 44px;
   background: var(--panel); border: 1px solid var(--line); color: var(--ink); font-size: 26px; line-height: 1; cursor: pointer; }
 html:has(dialog[open]) { overflow: hidden; }
-.btn.big { padding: 16px 26px; font-size: 18px; gap: 12px; }
+.btn.big { padding: 22px 36px; font-size: 22px; gap: 14px; border: 1.5px solid var(--ink); transition: background-color 150ms ease-out, color 150ms ease-out; }
+.btn.ghost.big:hover { background: var(--ink); color: var(--bg); }
 
 /* request-a-quote modal */
 dialog.quote { width: min(560px, calc(100% - 32px)); max-height: calc(100% - 48px); overflow: auto; padding: 28px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
