@@ -70,10 +70,12 @@
 
   // On the live site each step is emailed through FormSubmit; MAIL is FormSubmit's alias for the inbox, so no address sits in the page.
   var MAIL = 'ea48693d03f47fa49242d01578c7fee8';
+  // Not awaited: FormSubmit can take half a minute to answer. A form-encoded body skips the CORS preflight, and keepalive
+  // lets the send finish if the visitor closes the tab.
   function mail(subject, data) {
-    if (!MAIL) return Promise.resolve(false);
-    return fetch('https://formsubmit.co/ajax/' + MAIL, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify(Object.assign({ _subject: subject, _template: 'table' }, data)) }).then(function (r) { return r.ok; }).catch(function () { return false; });
+    if (!MAIL) return;
+    fetch('https://formsubmit.co/ajax/' + MAIL, { method: 'POST', headers: { Accept: 'application/json' }, keepalive: true,
+      body: new URLSearchParams(Object.assign({ _subject: subject, _template: 'table' }, data)) }).catch(function () {});
   }
 
   // Country code: type digits or a country name; the list filters by prefix, and a code not in it is kept as typed.
@@ -119,8 +121,8 @@
     key = email.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 120);
     var btn = f1.querySelector('[type=submit]'); btn.disabled = true; btn.classList.add('sending');
     var lead = { email: email, phone: phone ? d.get('cc') + ' ' + phone : '', company: String(d.get('company') || '').trim() };
-    await Promise.all([save(Object.assign({ details: false, createdAt: new Date().toISOString() }, lead)),
-      mail('RTOS quote request from ' + email, Object.assign({ _replyto: email }, lead))]);
+    mail('RTOS quote request from ' + email, Object.assign({ _replyto: email }, lead));
+    await save(Object.assign({ details: false, createdAt: new Date().toISOString() }, lead));
     btn.disabled = false; btn.classList.remove('sending');
     go('received');
   });
@@ -155,9 +157,10 @@
       try { details.videoAsset = (await s.assets.upload(file)).id; }
       catch (err) { note.textContent = "The video didn't upload. Please share a Google Drive link instead."; btn.disabled = false; btn.classList.remove('sending'); return; }
     }
-    await Promise.all([save(details, true), mail('RTOS quote details from ' + f1.email.value.trim(), { _replyto: f1.email.value.trim(), email: f1.email.value.trim(),
+    mail('RTOS quote details from ' + f1.email.value.trim(), { _replyto: f1.email.value.trim(), email: f1.email.value.trim(),
       location: details.location, task: details.task, goal: details.goal, machines: machines.map(function (m) { return [m.type, m.model].filter(Boolean).join(', '); }).join('; '),
-      videoLink: details.videoLink, videoFile: file ? file.name + ' (' + (file.size / 1048576).toFixed(1) + ' MB, chosen on the site, not uploaded)' : '', notes: details.notes })]);
+      videoLink: details.videoLink, videoFile: file ? file.name + ' (' + (file.size / 1048576).toFixed(1) + ' MB, chosen on the site, not uploaded)' : '', notes: details.notes });
+    await save(details, true);
     btn.disabled = false; btn.classList.remove('sending');
     go('done');
   });
