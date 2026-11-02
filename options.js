@@ -16,6 +16,7 @@
     ["npv", "5-year return", v => "$" + Math.round(v / 1000) + "k", false],
     ["overrun", "Cycles over target", v => Math.round(v) + "%", true],
     ["strain", "Awkward posture", v => Math.round(v) + " s per door", true],
+    ["payback", "Payback", v => v + " yr", true],
   ];
   // share of the 20,000 weightings where each option holds the best practical design, split by top-weighted criterion
   // (priority_shares.py). X = the two-robot setup, which is not one of the three options.
@@ -155,12 +156,11 @@
         <div class="abc-kpi"><dt>${label}</dt><dd>${f(o[k])}${best[k] === id ? "<em>BEST</em>" : ""}</dd>
           <div class="abc-bar"><i class="${best[k] === id ? "best" : ""}" data-w="${(o[k] / max[k] * 100).toFixed(1)}"></i></div></div>`).join("")}
       </dl>
-      <div class="mono abc-foot">Payback ${o.payback} yr · ${o.doors} doors per hour<br>Top pick for ${o.share}% of priorities</div>
     </button>`).join("");
   const cards = [...document.querySelectorAll(".abc-card")];
   function fillBars() {   // called by reveal()
     document.querySelectorAll(".abc-bar i").forEach((b, i) => {
-      b.style.transitionDelay = reduce ? "0s" : (i % 4) * 0.08 + Math.floor(i / 4) * 0.12 + "s";
+      b.style.transitionDelay = reduce ? "0s" : (i % KPI.length) * 0.08 + Math.floor(i / KPI.length) * 0.12 + "s";
       b.style.width = b.dataset.w + "%";
     });
   }

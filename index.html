@@ -95,21 +95,16 @@ a { color: inherit; }
 .rail button.done::after { background: var(--accent); }
 .rail button:focus-visible { outline: 1px solid var(--accent); }
 @media (max-width: 720px) { .rail { display: none; } .cap { max-width: calc(100vw - 2 * var(--gutter)); } .cap p { font-size: 15px; } }
-.team-panel { position: absolute; top: 88px; bottom: calc(clamp(32px, 8vh, 80px) + 190px); left: max(var(--gutter), env(safe-area-inset-left, 0px)); right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); display: grid; place-items: center; opacity: 0; visibility: hidden; }
+.team-panel { position: absolute; top: 88px; bottom: auto; left: max(var(--gutter), env(safe-area-inset-left, 0px)); right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 120px); display: grid; place-items: center; opacity: 0; visibility: hidden; }
 .team-panel .clip { width: 100%; height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
 .team-panel .clip.dots { height: auto; display: block; background: none; border: 0; }   /* engine.js draws the two views straight into the story canvas */
-.dots-panes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 12px 0; }
-.dots-panes > div { position: relative; aspect-ratio: 16 / 9; }
-.dots-panes span { position: absolute; left: 10px; top: 8px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
-.dots-panes .team span { color: var(--accent); }
 .dots-events { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 10px 12px 0; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
 .dots-events span { color: var(--line); transition: color 0.4s; }
 .dots-events span.on { color: var(--accent); }
 .dots-bar { position: relative; height: 1px; margin: 8px 12px 0; background: var(--line); }
 .dots-bar i { position: absolute; left: 0; top: 0; height: 1px; width: 0; background: var(--accent); }
-@media (max-width: 720px) { .dots-panes { grid-template-columns: 1fr; gap: 8px; } }
 @media (max-width: 720px) {
-  .team-panel { left: 16px; right: 16px; top: 70px; bottom: 210px; }
+  .team-panel { left: 16px; right: 16px; top: 70px; bottom: auto; }
 }
 .verdict { position: absolute; right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: clamp(32px, 8vh, 80px); width: min(320px, 100% - 32px);
   padding: 18px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); opacity: 0; transition: opacity 0.4s; }
@@ -326,7 +321,6 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 .abc-bar { grid-column: 1 / -1; height: 6px; background: var(--line); }
 .abc-bar i { display: block; height: 100%; width: 0; background: color-mix(in srgb, var(--ink) 38%, transparent); transition: width 0.9s cubic-bezier(.2,.7,.2,1); }
 .abc-bar i.best { background: var(--accent); }
-.abc-foot { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
 
 @media (max-width: 860px) {
   .abc-funnel { grid-template-columns: 1fr; gap: 20px; }
@@ -380,7 +374,6 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
       </div>
       <div class="team-panel" id="team-panel">
         <figure class="clip dots">
-          <div class="dots-panes"><div><span class="mono">Today</span></div><div class="team"><span class="mono">With a robot team</span></div></div>
           <div class="dots-events mono" id="dots-events"></div><div class="dots-bar"><i id="dots-bar"></i></div>
           <figcaption><span class="tag ours">Ours</span><span class="tag">Real time</span></figcaption>
         </figure>
@@ -568,10 +561,10 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
   </div>
 </dialog>
 <script src="quote.js?v=6"></script>
-<script src="options.js?v=7"></script>
+<script src="options.js?v=8"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=32"></script>
+<script src="engine.js?v=33"></script>
 <script src="dots_data.js?v=4"></script>
 <script src="dots.js?v=3"></script>
 </body>

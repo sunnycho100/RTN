@@ -90,11 +90,11 @@ function proj(v, x, y, z) {
   P[0] = v.cx + v.f * (dx * v.rx + dy * v.ry) / zc; P[1] = v.cy - v.f * (dx * v.ux + dy * v.uy + dz * v.uz) / zc; P[2] = zc; return true;
 }
 function seg(ctx, v, a, b) { if (!proj(v, a[0], a[1], a[2])) return; var x = P[0], y = P[1]; if (!proj(v, b[0], b[1], b[2])) return; ctx.moveTo(x, y); ctx.lineTo(P[0], P[1]); }
-function grid(ctx, v, x0, x1, y0, y1) {   // 0.5 m floor grid in 0.5 m pieces: a line passing behind a close camera loses only its near piece
-  x0 = Math.floor(x0 * 2) / 2; y0 = Math.floor(y0 * 2) / 2;
+function grid(ctx, v, x0, x1, y0, y1, ox, oy) {   // 0.5 m floor grid in 0.5 m pieces (shifted by ox, oy): a line passing behind a close camera loses only its near piece
+  x0 = Math.floor(x0 * 2) / 2; y0 = Math.floor(y0 * 2) / 2; ox = ox || 0; oy = oy || 0;
   for (var gx = x0; gx <= x1 + 1e-6; gx += 0.5) for (var gy = y0; gy <= y1 + 1e-6; gy += 0.5) {
-    if (gy + 0.5 <= y1 + 1e-6) seg(ctx, v, [gx, gy, 0], [gx, gy + 0.5, 0]);
-    if (gx + 0.5 <= x1 + 1e-6) seg(ctx, v, [gx, gy, 0], [gx + 0.5, gy, 0]);
+    if (gy + 0.5 <= y1 + 1e-6) seg(ctx, v, [gx + ox, gy + oy, 0], [gx + ox, gy + 0.5 + oy, 0]);
+    if (gx + 0.5 <= x1 + 1e-6) seg(ctx, v, [gx + ox, gy + oy, 0], [gx + 0.5 + ox, gy + oy, 0]);
   }
 }
 var EDGES = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
@@ -234,7 +234,7 @@ var KEYS = [  // camera at the start of each stage (input, capture, rebuild, tea
   { yaw: -0.9, pitch: 0.85, dist: 8.2 }, { yaw: -0.3, pitch: 0.38, dist: 6.5 }, { yaw: 0.25, pitch: 0.9, dist: 9.5 }, { yaw: 0.55, pitch: 1.02, dist: 30 }];
 KEYS.forEach(function (k, j) { if (j !== 4) k.dist *= Math.max(RW, RD) / 4.83; });   // tuned for a 4.83 m room; stage 04 frames the robots, not the room
 var teamPanel = document.getElementById('team-panel');
-var panes = Array.prototype.slice.call(document.querySelectorAll('#team-panel .dots-panes > div')), scanT0 = 0;
+var scanT0 = 0, ZR = new Float32Array(Z);   // ZR: the scan with everything above the floor scaled down while step 02 raises it
 function show(el, o) { if (el) { el.style.opacity = o.toFixed(3); el.style.visibility = o > 0.01 ? 'visible' : 'hidden'; } }
 function storyT() { var span = story.offsetHeight - innerHeight; return clamp(-story.getBoundingClientRect().top / span * 1.1, 0, 1) * 6; }   // the last tenth of the scroll holds the final screen
 railBtns.forEach(function (b) { b.addEventListener('click', function () {
@@ -284,14 +284,15 @@ function teamPose(T, pi, k, k2, u) {
   return [1 - 2 * (qy * qy + qz * qz), 2 * (qx * qy - qz * qw), 2 * (qx * qz + qy * qw), 2 * (qx * qy + qz * qw), 1 - 2 * (qx * qx + qz * qz),
     2 * (qy * qz - qx * qw), 2 * (qx * qz - qy * qw), 2 * (qy * qz + qx * qw), 1 - 2 * (qx * qx + qy * qy), m(4) / 1000 - OX, m(5) / 1000 - OY, m(6) / 1000];
 }
-function drawTeam(ctx, v, T, sec, a) {
+function drawTeam(ctx, v, T, sec, a, ox, oy) {
+  ox = ox || 0; oy = oy || 0;
   var fi = clamp(sec * 15, 0, T.F - 1), k = Math.floor(fi), k2 = Math.min(k + 1, T.F - 1), u = fi - k, Q = T.pts, cols = [rgba(C.ink, 0.85 * a), rgba(C.acc, a)];
   T.parts.forEach(function (p, pi) {
     var r = teamPose(T, pi, k, k2, u);
     ctx.fillStyle = cols[p.c === 'a' ? 1 : 0];
     for (var j = p.o * 3; j < (p.o + p.n) * 3; j += 6) {
       var x = Q[j], y = Q[j + 1], z = Q[j + 2];
-      if (!proj(v, r[9] + r[0] * x + r[1] * y + r[2] * z, r[10] + r[3] * x + r[4] * y + r[5] * z, r[11] + r[6] * x + r[7] * y + r[8] * z)) continue;
+      if (!proj(v, ox + r[9] + r[0] * x + r[1] * y + r[2] * z, oy + r[10] + r[3] * x + r[4] * y + r[5] * z, r[11] + r[6] * x + r[7] * y + r[8] * z)) continue;
       var s = clamp(0.02 * v.f / P[2], 1, 3); ctx.fillRect(P[0] - s / 2, P[1] - s / 2, s, s);
     }
   });
@@ -309,24 +310,27 @@ function drawStory(now) {
   tShown += (storyT() - tShown) * (REDUCED ? 1 : 0.14); var t = tShown;
   var a = Math.min(5, Math.floor(t)), u = smooth(0, 1, t - a), K0 = KEYS[a], K1 = KEYS[a + 1];
   var T = wsTeam(); if (T && !teamB) { teamB = teamBox(T); teamC = [(teamB[0] + teamB[1]) / 2, (teamB[2] + teamB[3]) / 2]; }
-  var fc = teamC || [spawn[0] - 0.7, spawn[1] - 0.5], focus = T || BOTS ? smooth(4, 4.35, t) * (1 - smooth(5, 5.35, t)) : 0;   // stage 04 looks at the robots
-  var v = view(W, H, { tx: focus * fc[0], ty: focus * fc[1], tz: a === 5 ? 0.4 : 0.7, yaw: K0.yaw + (K1.yaw - K0.yaw) * u + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03),
-    pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch, dist: K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
-  ctx.clearRect(0, 0, W, H);
-
   var robots = smooth(4, 4.25, t), fac = smooth(5.15, 5.7, t);
   var team = smooth(3, 3.2, t) * (1 - smooth(3.8, 4, t)), dots = smooth(0.85, 1.05, t);
+  var split = REDUCED ? (t >= 3 && t < 4 ? 1 : 0) : smooth(3, 3.35, t) * (1 - smooth(3.65, 4, t));   // step 03: the floor becomes two, the person's and the robot team's
+  var rise = REDUCED ? 1 : smooth(2, 2.6, t);   // step 02: the rebuilt room rises out of the floor
+  var fc = teamC || [spawn[0] - 0.7, spawn[1] - 0.5], focus = T || BOTS ? smooth(4, 4.35, t) * (1 - smooth(5, 5.35, t)) : 0;   // stage 04 looks at the robots
+  var v = view(W, H, { tx: focus * fc[0], ty: focus * fc[1], tz: a === 5 ? 0.4 : 0.7, yaw: K0.yaw + (K1.yaw - K0.yaw) * u + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03),
+    pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch, dist: (K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u)) * (1 + 0.55 * split), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
+  ctx.clearRect(0, 0, W, H);
+
   // step 01: one quick pass of the phone along the room, started when the step shows and replayed after scrolling back above it
   if (t < 0.85) scanT0 = 0; else if (!scanT0) scanT0 = now;
   var sw = REDUCED || t >= 2 ? 1 : scanT0 ? smooth(0, 1, (now - scanT0) / 1800) : 0, sx = -RW / 2 - 0.3 + sw * (RW + 0.6);
-  ctx.globalAlpha = 1 - team;   // step 03 hands the canvas to the side-by-side views below
-  show(teamPanel, team);
+  show(teamPanel, team);   // the event strip and progress bar for step 03
+  var half = (Math.max(RW, RD) + 1.2) * split / 2, ox = v.rx * half, oy = v.ry * half;   // the two floors sit side by side across the screen
+  var copies = split > 0.01 ? [-1, 1] : [0];
 
   ctx.lineWidth = dpr; ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath();     // floor grid
   // the grid covers the scan and, when the robot team works past the scanned edge, the simulated floor under it too
   var x0 = -RW / 2 - 0.6, x1 = RW / 2 + 0.6, y0 = -RD / 2 - 0.6, y1 = RD / 2 + 0.6;
   if (teamB) { x0 = Math.min(x0, teamB[0] - 1); x1 = Math.max(x1, teamB[1] + 1); y0 = Math.min(y0, teamB[2] - 1); y1 = Math.max(y1, teamB[3] + 1); }
-  grid(ctx, v, x0, x1, y0, y1); ctx.stroke();
+  copies.forEach(function (c) { grid(ctx, v, x0, x1, y0, y1, c * ox, c * oy); }); ctx.stroke();
 
   if (fac > 0) {   // facility: copies of the room around it (the zoom-out)
     var sx = RW + 1.6, sy = RD + 1.6;
@@ -338,11 +342,15 @@ function drawStory(now) {
       drawPoints(ctx, v, function () { return lvl(0.32 * on); }, 0.03, gxi * sx, gyi * sy, ring === 1 ? 4 : 9);
     }
   }
-  drawPoints(ctx, v, function (i) {   // the scan: revealed behind the sweep, then the rebuilt room
-    if (X[i] > sx) return 0;
-    if (sw < 1 && X[i] > sx - 0.14) return 16 + lvl(0.95 * dots);   // the strip being read, in accent
-    return lvl(dots * (i < GROUND ? 1 : 1 - robots * (1 - fac)) * (0.38 + 0.065 * SH[i]));   // the rebuilt ground stays from step 02 on; step 04 hides the rest of the static scan until the zoom-out
-  }, 0.03, 0, 0, SMALL ? 2 : 1);
+  if (rise < 1) for (i = GROUND; i < N; i++) ZR[i] = Z[i] * rise;
+  var env = Math.sqrt(rise) * (1 - Math.max(split, robots * (1 - fac)));   // the room above the floor: rises in step 02, steps aside for 03 and 04, back for the zoom-out
+  copies.forEach(function (c) {
+    drawPoints(ctx, v, function (i) {   // the scan: the floor revealed behind the sweep, then the rebuilt room
+      if (X[i] > sx) return 0;
+      if (sw < 1 && X[i] > sx - 0.14) return i < GROUND ? 16 + lvl(0.95 * dots) : 0;   // the strip being read, in accent
+      return lvl(dots * (i < GROUND ? 1 : env) * (0.38 + 0.065 * SH[i]));
+    }, 0.03, c * ox, c * oy, SMALL ? 2 : 1, X, Y, rise < 1 ? ZR : Z);
+  });
 
   var path = smooth(0.9, 1.05, t) * (1 - smooth(1.7, 2.3, t)) * (1 - smooth(0.85, 1, sw));   // the phone and the strip it reads, gone once the pass ends
   if (path > 0) {
@@ -368,21 +376,15 @@ function drawStory(now) {
   } else teamT0 = 0;
   ctx.globalAlpha = 1;
 
-  var Td = T && window.DOTS.sides.today, K4 = KEYS[4];
-  if (team > 0 && Td) {   // step 03: today and with a robot team side by side, both inside the rebuilt field (same floor, grid and camera as step 04), on the dots.js clock
-    var cr = simCv.getBoundingClientRect(), sec = window.DOTS.clock || 0;
-    ctx.globalAlpha = team; ctx.lineWidth = dpr;
-    panes.forEach(function (el, j) {
-      var r = el.getBoundingClientRect(), px = (r.left - cr.left) * dpr, py = (r.top - cr.top) * dpr, pw = r.width * dpr, ph = r.height * dpr;
-      var Sd = j ? T : Td, pv = view(pw, ph, { tx: fc[0], ty: fc[1], tz: 0.6, yaw: K4.yaw + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03), pitch: K4.pitch + 0.12,
-        dist: K4.dist * 0.95, fov: CFG.story.fov, ox: 0.5, oy: 0.55 }); pv.cx += px; pv.cy += py;
-      ctx.save(); ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip();
-      ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath(); grid(ctx, pv, x0, x1, y0, y1); ctx.stroke();
-      drawPoints(ctx, pv, function (i) { return i < GROUND ? lvl(0.38 + 0.065 * SH[i]) : 0; }, 0.03, 0, 0, SMALL ? 2 : 1);   // the same rebuilt ground as steps 02 and 04
-      drawTeam(ctx, pv, Sd, sec, 0.95);
-      ctx.restore();
+  var Td = T && window.DOTS.sides.today;
+  if (split > 0.01 && Td) {   // step 03: the person's floor on the left, the robot team's on the right, on the dots.js clock
+    var sec = window.DOTS.clock || 0;
+    drawTeam(ctx, v, Td, sec, 0.95 * split, -ox, -oy); drawTeam(ctx, v, T, sec, 0.95 * split, ox, oy);
+    ctx.font = '500 ' + Math.round(11 * dpr) + 'px ' + css('--mono'); ctx.textAlign = 'center';
+    [[-1, 'TODAY', C.ink], [1, 'WITH A ROBOT TEAM', C.acc]].forEach(function (l) {
+      if (!proj(v, l[0] * ox + fc[0], l[0] * oy + fc[1], 2.6)) return;
+      ctx.fillStyle = rgba(l[2], 0.8 * split); ctx.fillText(l[1], P[0], P[1]);
     });
-    ctx.globalAlpha = 1;
   }
 
   var cur = Math.min(5, Math.floor(clamp(t, 0, 5.999)));
