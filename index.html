@@ -197,7 +197,8 @@ dialog.gallery::backdrop { background: var(--bg); }
 dialog.gallery[open] { animation: q-fade 240ms ease-out; }
 dialog.gallery .close { position: fixed; z-index: 2; top: max(12px, env(safe-area-inset-top, 0px)); right: max(var(--gutter), env(safe-area-inset-right, 0px)); width: 44px; height: 44px;
   background: var(--panel); border: 1px solid var(--line); color: var(--ink); font-size: 26px; line-height: 1; cursor: pointer; }
-html:has(dialog[open]) { overflow: hidden; }
+@media (hover: hover) { html:has(dialog[open]) { overflow: hidden; } }   /* not on touch screens: iOS Safari puts taps inside the dialog in the wrong place while the page under it is locked */
+dialog { overscroll-behavior: contain; }
 .btn.big { padding: 22px 36px; font-size: 22px; gap: 14px; border: 1.5px solid var(--ink); transition: background-color 150ms ease-out, color 150ms ease-out; }
 @media (hover: hover) { .btn.ghost.big:hover { background: var(--ink); color: var(--bg); } }
 
