@@ -373,14 +373,15 @@ function drawStory(now) {
   var rise = REDUCED ? 1 : smooth(2, 2.6, t);   // step 02: the rebuilt room rises out of the floor
   var fc = teamC || [spawn[0] - 0.7, spawn[1] - 0.5], focus = T || BOTS ? smooth(4, 4.35, t) * (1 - smooth(5, 5.35, t)) : 0;   // stage 04 looks at the robots
   var v = view(W, H, { tx: focus * fc[0], ty: focus * fc[1], tz: a === 5 ? 0.4 : 0.7, yaw: K0.yaw + (K1.yaw - K0.yaw) * u + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03),
-    pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch, dist: (K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u)) * (1 + 0.55 * split), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
+    pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch + (H > W ? 0.35 * split : 0), dist: (K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u)) * (1 + (H > W ? 1.1 : 0.55) * split), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
   ctx.clearRect(0, 0, W, H);
 
   // step 01: one quick pass of the phone along the room, started when the step shows and replayed after scrolling back above it
   if (t < 0.85) scanT0 = 0; else if (!scanT0) scanT0 = now;
   var sw = REDUCED || t >= 2 ? 1 : scanT0 ? smooth(0, 1, (now - scanT0) / 1800) : 0, sx = -RW / 2 - 0.3 + sw * (RW + 0.6);
   show(teamPanel, team);   // the event strip and progress bar for step 03
-  var half = (Math.max(RW, RD) + 1.2) * split / 2, ox = v.rx * half, oy = v.ry * half;   // the two floors sit side by side across the screen
+  // the two floors sit side by side across the screen; on a portrait screen they stack, today's floor behind, the robot team's in front
+  var half = (Math.max(RW, RD) + 1.2) * split / 2, ox = (H > W ? v.ry : v.rx) * half, oy = (H > W ? -v.rx : v.ry) * half;
   var copies = split > 0.01 ? [-1, 1] : [0];
 
   ctx.lineWidth = dpr; ctx.strokeStyle = rgba(C.line, 0.9); ctx.beginPath();     // floor grid
