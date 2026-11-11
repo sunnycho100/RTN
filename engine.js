@@ -373,7 +373,7 @@ function drawStory(now) {
   var rise = REDUCED ? 1 : smooth(2, 2.6, t);   // step 02: the rebuilt room rises out of the floor
   var fc = teamC || [spawn[0] - 0.7, spawn[1] - 0.5], focus = T || BOTS ? smooth(4, 4.35, t) * (1 - smooth(5, 5.35, t)) : 0;   // stage 04 looks at the robots
   var v = view(W, H, { tx: focus * fc[0], ty: focus * fc[1], tz: a === 5 ? 0.4 : 0.7, yaw: K0.yaw + (K1.yaw - K0.yaw) * u + (REDUCED ? 0 : Math.sin(now / 9000) * 0.03),
-    pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch + (H > W ? 0.35 * split : 0), dist: (K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u)) * (1 + (H > W ? 1.1 : 0.55) * split), fov: CFG.story.fov, ox: so.ox, oy: so.oy });
+    pitch: K0.pitch + (K1.pitch - K0.pitch) * u + CFG.story.pitch + (H > W ? 0.35 * split : 0), dist: (K0.dist + (K1.dist - K0.dist) * (a === 5 ? smooth(0.15, 1, t - 5) : u)) * (1 + (H > W ? 1.1 : 0.55) * split) * (SMALL ? 1 + 0.2 * fac : 1), fov: CFG.story.fov, ox: so.ox, oy: so.oy + (SMALL ? 0.2 * fac : 0) });   // phones: the zoom-out sits below the verdict card
   ctx.clearRect(0, 0, W, H);
 
   // step 01: one quick pass of the phone along the room, started when the step shows and replayed after scrolling back above it

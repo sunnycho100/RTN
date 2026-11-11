@@ -53,7 +53,7 @@ a { color: inherit; }
 .nav nav { display: flex; align-items: center; gap: 22px; }
 .nav nav a { text-decoration: none; color: var(--dim); font-size: 14px; }
 .nav nav a:hover { color: var(--ink); }
-.nav nav a.btn { color: var(--bg); }
+.nav nav a.btn { color: var(--bg); white-space: nowrap; }
 .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg);
   font: 600 14px/1 var(--body); text-decoration: none; cursor: pointer; }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
@@ -112,7 +112,8 @@ a { color: inherit; }
 .verdict dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 12px 0 0; font-variant-numeric: tabular-nums; }
 .verdict dt { color: var(--dim); font-size: 14px; }
 .verdict dd { margin: 0; text-align: right; font: 500 14px/1.4 var(--mono); }
-@media (max-width: 720px) { .verdict { bottom: auto; top: 84px; } }
+@media (max-width: 720px) { .verdict { bottom: auto; top: 84px; width: calc(100% - 2 * var(--gutter)); } }   /* full width on phones, so each value stays on one line */
+@media (max-width: 380px) { .verdict { padding: 14px 16px; } .verdict dt, .verdict dd { font-size: 12px; } .verdict dl { gap: 4px 12px; } }
 
 /* sections */
 section.block { padding-block: clamp(72px, 12vh, 140px) 0; }
@@ -599,7 +600,7 @@ dialog.quote .btn.sending .lbl .b { opacity: 1; }
 <script src="options.js?v=8"></script>
 <script src="scan.js?v=4"></script>
 <script src="robots.js?v=2"></script>
-<script src="engine.js?v=37"></script>
+<script src="engine.js?v=38"></script>
 <script src="dots_data.js?v=4"></script>
 <script src="dots.js?v=3"></script>
 </body>
