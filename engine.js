@@ -519,7 +519,8 @@ addEventListener('click', function () { pause(1500); });   // a nav link or rail
     var r = story.getBoundingClientRect(), span = story.offsetHeight - innerHeight;
     if (!REDUCED && r.top <= 0 && r.bottom > innerHeight + 1 && now > autoPause && !document.querySelector('dialog[open]')) {
       autoAcc += span / AUTO_MS * dt; var n = Math.floor(autoAcc);
-      if (n >= 1) { autoAcc -= n; scrollTo({ top: scrollY + n, behavior: 'instant' }); }
+      if (n >= 1) {   // 'auto' for this one jump: older iOS Safari rejects behavior 'instant', and html is smooth-scrolled
+        autoAcc -= n; var rs = document.documentElement.style; rs.scrollBehavior = 'auto'; scrollTo(0, scrollY + n); rs.scrollBehavior = ''; }
     } else autoAcc = 0;
     autoY = scrollY;
     stage.style.opacity = r.bottom < innerHeight ? clamp((r.bottom - 0.6 * innerHeight) / (0.4 * innerHeight), 0, 1).toFixed(3) : '';
